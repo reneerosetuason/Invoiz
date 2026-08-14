@@ -1,0 +1,346 @@
+import 'package:flutter/material.dart';
+import '../models/chat.dart';
+import '../services/api_service.dart';
+import '../theme.dart';
+import '../widgets/auth_service_provider.dart';
+import '../widgets/main_layout.dart';
+
+class ChatScreen extends StatefulWidget {
+  const ChatScreen({super.key});
+
+  @override
+  State<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  final _api = ApiService();
+  List<Conversation> _conversations = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() => _loading = true);
+    try {
+      final data = await _api.get('conversations');
+      setState(() {
+        _conversations = (data['conversations'] as List)
+            .whereType<Map<String, dynamic>>()
+            .map(Conversation.fromJson)
+            .toList();
+        _loading = false;
+      });
+    } catch (e) {
+      setState(() => _loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  Future<void> _newConversation() async {
+    final subjectCtrl = TextEditingController();
+    final bodyCtrl = TextEditingController();
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('New Message'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: subjectCtrl,
+              decoration: const InputDecoration(labelText: 'Subject'),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: bodyCtrl,
+              maxLines: 3,
+              decoration: const InputDecoration(labelText: 'Message'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Send')),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    try {
+      await _api.post('conversations', {
+        'subject': subjectCtrl.text.trim().isEmpty ? 'Inquiry' : subjectCtrl.text.trim(),
+        'body': bodyCtrl.text.trim(),
+      });
+      _load();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MainLayout(
+      title: 'Messages',
+      child: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _conversations.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.chat_bubble_outline, size: 60, color: AppColors.textSecondary),
+                      const SizedBox(height: 12),
+                      const Text('No conversations yet.'),
+                      const SizedBox(height: 16),
+                      ElevatedButton(onPressed: _newConversation, child: const Text('Start a Conversation')),
+                    ],
+                  ),
+                )
+              : Column(
+                  children: [
+                    Expanded(
+                      child: ListView.separated(
+                        padding: const EdgeInsets.all(12),
+                        itemCount: _conversations.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                        itemBuilder: (context, i) => _conversationTile(_conversations[i]),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: ElevatedButton.icon(
+                        onPressed: _newConversation,
+                        icon: const Icon(Icons.add),
+                        label: const Text('New Message'),
+                        style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(44)),
+                      ),
+                    ),
+                  ],
+                ),
+    );
+  }
+
+  Widget _conversationTile(Conversation c) {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => _ChatThreadScreen(conversationId: c.id, subject: c.subject)),
+      ).then((_) => _load()),
+      child: Container(
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
+              child: const Icon(Icons.support_agent, color: Colors.white, size: 24),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(c.subject, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis),
+                      ),
+                      if (c.unreadCount > 0)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(10)),
+                          child: Text('${c.unreadCount}', style: const TextStyle(fontSize: 10, color: Colors.white)),
+                        ),
+                    ],
+                  ),
+                  if (c.lastBody != null)
+                    Text(
+                      c.lastBody!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ChatThreadScreen extends StatefulWidget {
+  final int conversationId;
+  final String subject;
+  const _ChatThreadScreen({required this.conversationId, required this.subject});
+
+  @override
+  State<_ChatThreadScreen> createState() => _ChatThreadScreenState();
+}
+
+class _ChatThreadScreenState extends State<_ChatThreadScreen> {
+  final _api = ApiService();
+  final _inputCtrl = TextEditingController();
+  List<ChatMessage> _messages = [];
+  bool _loading = true;
+  final _scroll = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final data = await _api.get('conversations/${widget.conversationId}/messages');
+      setState(() {
+        _messages = (data['messages'] as List)
+            .whereType<Map<String, dynamic>>()
+            .map(ChatMessage.fromJson)
+            .toList();
+        _loading = false;
+      });
+      _scrollToBottom();
+    } catch (e) {
+      setState(() => _loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scroll.hasClients) _scroll.jumpTo(_scroll.position.maxScrollExtent);
+    });
+  }
+
+  Future<void> _send() async {
+    final text = _inputCtrl.text.trim();
+    if (text.isEmpty) return;
+    _inputCtrl.clear();
+    try {
+      final r = await _api.post('conversations/${widget.conversationId}/reply', {'body': text});
+      setState(() {
+        _messages.add(ChatMessage.fromJson(r['message'] as Map<String, dynamic>));
+      });
+      _scrollToBottom();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  @override
+  void dispose() {
+    _inputCtrl.dispose();
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MainLayout(
+      title: widget.subject,
+      child: Column(
+        children: [
+          Expanded(
+            child: _loading
+                ? const Center(child: CircularProgressIndicator())
+                : _messages.isEmpty
+                    ? const Center(child: Text('No messages yet. Say hello!'))
+                    : ListView.builder(
+                        controller: _scroll,
+                        padding: const EdgeInsets.all(12),
+                        itemCount: _messages.length,
+                        itemBuilder: (context, i) => _bubble(_messages[i]),
+                      ),
+          ),
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.all(8),
+            child: SafeArea(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _inputCtrl,
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: (_) => _send(),
+                      decoration: const InputDecoration(
+                        hintText: 'Type a message...',
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: _send,
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(46, 46),
+                      padding: EdgeInsets.zero,
+                      shape: const CircleBorder(),
+                    ),
+                    child: const Icon(Icons.send),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _bubble(ChatMessage m) {
+    final myId = AuthServiceProvider.of(context).user?.id;
+    final mine = m.senderId == myId;
+    return Align(
+      alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        constraints: const BoxConstraints(maxWidth: 280),
+        decoration: BoxDecoration(
+          color: mine ? AppColors.primary : Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(12),
+            topRight: const Radius.circular(12),
+            bottomLeft: Radius.circular(mine ? 12 : 2),
+            bottomRight: Radius.circular(mine ? 2 : 12),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (!mine)
+              Text(m.senderName ?? '', style: TextStyle(fontSize: 10, color: mine ? Colors.white70 : AppColors.primary)),
+            const SizedBox(height: 2),
+            Text(
+              m.body,
+              style: TextStyle(fontSize: 14, color: mine ? Colors.white : AppColors.textPrimary),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              _time(m.createdAt),
+              style: TextStyle(fontSize: 9, color: mine ? Colors.white60 : AppColors.textSecondary),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _time(String iso) {
+    try {
+      final d = DateTime.parse(iso).toLocal();
+      return '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
+    } catch (_) {
+      return '';
+    }
+  }
+}

@@ -78,4 +78,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Product::class, 'seller_id');
     }
+
+    public function seller()
+    {
+        return $this->hasOne(Seller::class, 'user_id');
+    }
+
+    public function canSell(): bool
+    {
+        return $this->seller?->isApproved() ?? false;
+    }
 }

@@ -1,3 +1,5 @@
+import 'seller.dart';
+
 class User {
   final int id;
   final String lastName;
@@ -15,6 +17,7 @@ class User {
   final String? barangay;
   final String? addressLine;
   final String? idImage;
+  final Seller? seller;
 
   User({
     required this.id,
@@ -33,6 +36,7 @@ class User {
     this.barangay,
     this.addressLine,
     this.idImage,
+    this.seller,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
@@ -52,6 +56,9 @@ class User {
         barangay: json['barangay'] as String?,
         addressLine: json['address_line'] as String?,
         idImage: json['id_image'] as String?,
+        seller: json['seller'] != null
+            ? Seller.fromJson(json['seller'] as Map<String, dynamic>)
+            : null,
       );
 
   String get fullName =>

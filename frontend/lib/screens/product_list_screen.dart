@@ -67,39 +67,51 @@ class _ProductListScreenState extends State<ProductListScreen> {
       child: Column(
         children: [
           Container(
-            color: AppColors.primary,
-            padding: const EdgeInsets.fromLTRB(12, 6, 12, 10),
+            color: AppColors.card,
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
             child: Row(
               children: [
                 Expanded(
                   child: Container(
-                    height: 38,
+                    height: 44,
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(4),
+                      color: AppColors.surfaceSoft,
+                      borderRadius: BorderRadius.circular(14),
                     ),
-                    child: TextField(
-                      controller: _searchCtrl,
-                      onSubmitted: (_) => _load(),
-                      textInputAction: TextInputAction.search,
-                      style: const TextStyle(fontSize: 14),
-                      decoration: const InputDecoration(
-                        hintText: 'Search...',
-                        border: InputBorder.none,
-                        isDense: true,
-                        contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-                      ),
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 12),
+                        const Icon(Icons.search, color: AppColors.textSecondary, size: 20),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: TextField(
+                            controller: _searchCtrl,
+                            onSubmitted: (_) => _load(),
+                            textInputAction: TextInputAction.search,
+                            style: const TextStyle(fontSize: 14),
+                            decoration: const InputDecoration(
+                              hintText: 'Search products...',
+                              border: InputBorder.none,
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(vertical: 10),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
                 const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: _load,
-                  child: Container(
-                    width: 44,
-                    height: 38,
-                    color: Colors.amber.shade600,
-                    child: const Icon(Icons.search, color: Colors.white, size: 20),
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: AppColors.secondary,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.search, color: Colors.white, size: 22),
+                    onPressed: _load,
                   ),
                 ),
               ],
@@ -139,8 +151,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
                         padding: const EdgeInsets.all(12),
                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          mainAxisSpacing: 10,
-                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 14,
+                          crossAxisSpacing: 14,
                           childAspectRatio: 0.68,
                         ),
                         itemCount: _products.length,
@@ -192,32 +204,44 @@ class _ProductListScreenState extends State<ProductListScreen> {
         MaterialPageRoute(builder: (_) => ProductDetailScreen(productId: p['id'] as int)),
       ),
       child: Container(
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               height: 140,
               width: double.infinity,
-              color: const Color(0xFFF3F3F3),
+              color: AppColors.surfaceSoft,
               child: _image(p['image'] as String?),
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(p['name'] as String, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13)),
-                    const SizedBox(height: 4),
-                    Text(_fmt(price), style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 15)),
+                    Text(p['name'] as String, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 6),
+                    Text(_fmt(price), style: const TextStyle(color: AppColors.warning, fontWeight: FontWeight.w800, fontSize: 15)),
                     const Spacer(),
                     Row(
                       children: [
                         if (rating != null) ...[
                           const Icon(Icons.star, color: AppColors.gold, size: 14),
                           const SizedBox(width: 2),
-                          Text(rating.toStringAsFixed(1), style: const TextStyle(fontSize: 11)),
+                          Text(rating.toStringAsFixed(1), style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
                           const SizedBox(width: 6),
                         ],
                         Text('${p['stock']} left', style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),

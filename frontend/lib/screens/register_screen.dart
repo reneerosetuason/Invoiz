@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
 import '../config.dart';
 import '../services/api_service.dart';
 import '../theme.dart';
+import '../widgets/invoiz_logo.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -40,7 +40,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? _barangayName;
   bool _loadingAddress = false;
 
-  XFile? _idImage;
   bool _busy = false;
 
   @override
@@ -90,13 +89,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } catch (_) {}
   }
 
-  Future<void> _pickImage() async {
-    final picked = await ImagePicker().pickImage(source: ImageSource.gallery, maxWidth: 1200);
-    if (picked != null) {
-      setState(() => _idImage = picked);
-    }
-  }
-
   Future<void> _pickBirthday() async {
     final picked = await showDatePicker(
       context: context,
@@ -133,11 +125,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _busy = true);
     try {
       final api = ApiService();
-      final files = <http.MultipartFile>[];
-      if (_idImage != null) {
-        final bytes = await _idImage!.readAsBytes();
-        files.add(http.MultipartFile.fromBytes('id_image', bytes, filename: _idImage!.name));
-      }
 
       await api.postForm('register', {
         'last_name': _lastName.text.trim(),
@@ -153,7 +140,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'municipality': _municipalityName ?? '',
         'barangay': _barangayName ?? '',
         'address_line': _street.text.trim(),
-      }, files: files);
+      });
 
       if (!mounted) return;
       showDialog(
@@ -213,128 +200,141 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Buyer Registration'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.zero,
           children: [
-            _sectionTitle('Personal Information'),
-            _field('Last name*', _lastName, icon: Icons.person, required: true),
-            _field('First name*', _firstName, icon: Icons.person_outline, required: true),
-            _field('Middle initial', _middleInitial, icon: Icons.person_pin),
-            const SizedBox(height: 12),
-            Text('Sex*', style: _labelStyle()),
-            const SizedBox(height: 6),
-            DropdownButtonFormField<String>(
-              value: _sex,
-              decoration: const InputDecoration(prefixIcon: Icon(Icons.wc)),
-              items: ['male', 'female', 'other']
-                  .map((s) => DropdownMenuItem(value: s, child: Text(s.toUpperCase())))
-                  .toList(),
-              onChanged: (v) => setState(() => _sex = v),
-              validator: (v) => v == null ? 'Select sex' : null,
-            ),
-            const SizedBox(height: 12),
-            _field('E-mail*', _email, icon: Icons.email_outlined, required: true, keyboard: TextInputType.emailAddress),
-            _field('Contact No.*', _phone, icon: Icons.phone_outlined, required: true, keyboard: TextInputType.phone),
-            const SizedBox(height: 12),
-            InkWell(
-              onTap: _pickBirthday,
-              child: InputDecorator(
-                decoration: const InputDecoration(
-                  labelText: 'Birthday*',
-                  prefixIcon: Icon(Icons.cake_outlined),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(20, 40, 20, 28),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [AppColors.primary, AppColors.primaryDark],
                 ),
-                child: Text(_birthday.text.isEmpty ? 'YYYY-MM-DD' : _birthday.text),
+                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
               ),
-            ),
-            if (_birthDate != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(
-                  'Age (auto): ${_calcAge(_birthDate!)}',
-                  style: const TextStyle(color: AppColors.success, fontSize: 13, fontWeight: FontWeight.w600),
-                ),
-              ),
-            _field('Password*', _password, icon: Icons.lock_outline, obscure: true, required: true),
-            _field('Confirm Password*', _passwordConfirm, icon: Icons.lock, obscure: true, required: true,
-                confirmWith: _password),
-
-            const SizedBox(height: 18),
-            _sectionTitle('Address (Philippine Standard Geographic Code)'),
-            _addressDropdown('Province', _provinceName, _provinces, (v) {
-              setState(() {
-                _provinceCode = v;
-                _provinceName = _provinces.firstWhere((p) => p['code'] == v)['name'] as String;
-                _loadMunicipalities();
-              });
-            }),
-            _addressDropdown('Municipality', _municipalityName, _municipalities, (v) {
-              setState(() {
-                _municipalityCode = v;
-                _municipalityName = _municipalities.firstWhere((m) => m['code'] == v)['name'] as String;
-                _loadBarangays();
-              });
-            }),
-            _addressDropdown('Barangay', _barangayName, _barangays, (v) {
-              setState(() {
-                _barangayName = _barangays.firstWhere((b) => b['code'] == v)['name'] as String;
-              });
-            }),
-            _field('Street / House no. / etc.', _street, icon: Icons.home_outlined),
-            if (_loadingAddress) const LinearProgressIndicator(),
-
-            const SizedBox(height: 18),
-            _sectionTitle('Identification'),
-            InkWell(
-              onTap: _pickImage,
-              child: Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: const Color(0xFFE0E0E0)),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      _idImage == null ? Icons.upload_file : Icons.check_circle,
-                      color: _idImage == null ? AppColors.textSecondary : AppColors.success,
+              child: Column(
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () => Navigator.pop(context),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
+                  ),
+                  Hero(
+                    tag: 'invoiz_logo',
+                    child: InvoizLogo.logoWidget(size: 88, radius: 24),
+                  ),
+                  const SizedBox(height: 14),
+                  const Text(
+                    'Create your account',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Register as a buyer to start shopping',
+                    style: TextStyle(color: Colors.white70, fontSize: 13),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _sectionTitle('Personal Information'),
+                  _field('Last name*', _lastName, icon: Icons.person, required: true),
+                  _field('First name*', _firstName, icon: Icons.person_outline, required: true),
+                  _field('Middle initial', _middleInitial, icon: Icons.person_pin),
+                  const SizedBox(height: 12),
+                  Text('Sex*', style: _labelStyle()),
+                  const SizedBox(height: 6),
+                  DropdownButtonFormField<String>(
+                    value: _sex,
+                    decoration: const InputDecoration(prefixIcon: Icon(Icons.wc)),
+                    items: ['male', 'female', 'other']
+                        .map((s) => DropdownMenuItem(value: s, child: Text(s.toUpperCase())))
+                        .toList(),
+                    onChanged: (v) => setState(() => _sex = v),
+                    validator: (v) => v == null ? 'Select sex' : null,
+                  ),
+                  const SizedBox(height: 12),
+                  _field('E-mail*', _email, icon: Icons.email_outlined, required: true, keyboard: TextInputType.emailAddress),
+                  _field('Contact No.*', _phone, icon: Icons.phone_outlined, required: true, keyboard: TextInputType.phone),
+                  const SizedBox(height: 12),
+                  InkWell(
+                    onTap: _pickBirthday,
+                    child: InputDecorator(
+                      decoration: const InputDecoration(
+                        labelText: 'Birthday*',
+                        prefixIcon: Icon(Icons.cake_outlined),
+                      ),
+                      child: Text(_birthday.text.isEmpty ? 'YYYY-MM-DD' : _birthday.text),
+                    ),
+                  ),
+                  if (_birthDate != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
                       child: Text(
-                        _idImage == null ? 'Upload ID (valid government ID)' : _idImage!.name,
-                        style: const TextStyle(fontSize: 14),
+                        'Age (auto): ${_calcAge(_birthDate!)}',
+                        style: const TextStyle(color: AppColors.success, fontSize: 13, fontWeight: FontWeight.w600),
                       ),
                     ),
-                  ],
-                ),
+                  _field('Password*', _password, icon: Icons.lock_outline, obscure: true, required: true),
+                  _field('Confirm Password*', _passwordConfirm, icon: Icons.lock, obscure: true, required: true,
+                      confirmWith: _password),
+
+                  const SizedBox(height: 18),
+                  _sectionTitle('Address (Philippine Standard Geographic Code)'),
+                  _addressDropdown('Province', _provinceName, _provinces, (v) {
+                    setState(() {
+                      _provinceCode = v;
+                      _provinceName = _provinces.firstWhere((p) => p['code'] == v)['name'] as String;
+                      _loadMunicipalities();
+                    });
+                  }),
+                  _addressDropdown('Municipality', _municipalityName, _municipalities, (v) {
+                    setState(() {
+                      _municipalityCode = v;
+                      _municipalityName = _municipalities.firstWhere((m) => m['code'] == v)['name'] as String;
+                      _loadBarangays();
+                    });
+                  }),
+                  _addressDropdown('Barangay', _barangayName, _barangays, (v) {
+                    setState(() {
+                      _barangayName = _barangays.firstWhere((b) => b['code'] == v)['name'] as String;
+                    });
+                  }),
+                  _field('Street / House no. / etc.', _street, icon: Icons.home_outlined),
+                  if (_loadingAddress) const LinearProgressIndicator(),
+
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: _busy ? null : _submit,
+                    style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(46)),
+                    child: _busy
+                        ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                        : const Text('Submit Registration', style: TextStyle(fontSize: 15)),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'After submitting your registration, please wait for the administrator\'s approval, which will be sent to your email.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                  ),
+                  const SizedBox(height: 20),
+                ],
               ),
             ),
-
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _busy ? null : _submit,
-              style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(46)),
-              child: _busy
-                  ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                  : const Text('Submit Registration', style: TextStyle(fontSize: 15)),
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'After submitting your registration, please wait for the administrator\'s approval, which will be sent to your email.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
-            ),
-            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -343,10 +343,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Widget _sectionTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Text(
-        title,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.primary),
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Container(
+            width: 4,
+            height: 18,
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(999),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: -0.2),
+          ),
+        ],
       ),
     );
   }

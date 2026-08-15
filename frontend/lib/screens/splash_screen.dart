@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
-import '../widgets/auth_service_provider.dart';
+import '../widgets/invoiz_logo.dart';
 import 'home_screen.dart';
-import 'login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -19,48 +18,69 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _go() async {
-    await Future.delayed(const Duration(milliseconds: 1200));
+    await Future.delayed(const Duration(milliseconds: 1300));
     if (!mounted) return;
-    final auth = AuthServiceProvider.of(context);
+    // App always opens as a guest. Login / Register are available
+    // from the sidebar menu and the home screen.
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => auth.isLoggedIn ? const HomeScreen() : const LoginScreen()),
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primary,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 110,
-              height: 110,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(28),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [AppColors.primary, AppColors.primaryDark],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              const Spacer(flex: 2),
+              Hero(
+                tag: 'invoiz_logo',
+                child: InvoizLogo.logoWidget(size: 120, radius: 32),
               ),
-              child: const Icon(Icons.storefront, color: AppColors.primary, size: 72),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Invoiz',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 40,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.2,
+              const SizedBox(height: 28),
+              const Text(
+                'Invoiz',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 44,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.5,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Shop anything, delivered fast',
-              style: TextStyle(color: Colors.white70, fontSize: 15),
-            ),
-          ],
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: const Text(
+                  'Shop anything, delivered fast',
+                  style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+                ),
+              ),
+              const Spacer(flex: 3),
+              SizedBox(
+                width: 28,
+                height: 28,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  color: Colors.white.withValues(alpha: 0.9),
+                ),
+              ),
+              const SizedBox(height: 40),
+            ],
+          ),
         ),
       ),
     );

@@ -11,8 +11,13 @@ import '../screens/favorites_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/orders_screen.dart';
+import '../screens/register_screen.dart';
+import '../screens/seller_apply_screen.dart';
+import '../screens/seller_home_screen.dart';
+import '../services/auth_service.dart';
 import '../theme.dart';
 import 'auth_service_provider.dart';
+import 'invoiz_logo.dart';
 
 class MainLayout extends StatelessWidget {
   final Widget child;
@@ -32,13 +37,36 @@ class MainLayout extends StatelessWidget {
       backgroundColor: AppColors.background,
       appBar: showAppBar
           ? AppBar(
+              titleSpacing: 4,
               title: Row(
                 children: [
-                  const Text('Invoiz', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: AppColors.accent,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        InvoizLogo.logoWidget(size: 26, radius: 7),
+                        const SizedBox(width: 6),
+                        const Text(
+                          'Invoiz',
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   if (title.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(left: 12),
-                      child: Text(title, style: const TextStyle(fontSize: 16)),
+                      child: Text(title, style: const TextStyle(fontSize: 15)),
                     ),
                 ],
               ),
@@ -84,50 +112,101 @@ class Sidebar extends StatelessWidget {
     }
 
     return Drawer(
-      width: 280,
+      width: 290,
+      shape: const RoundedRectangleBorder(),
       child: Column(
         children: [
           Container(
             width: double.infinity,
-            color: AppColors.primary,
-            padding: const EdgeInsets.fromLTRB(20, 32, 20, 20),
+            padding: const EdgeInsets.fromLTRB(20, 32, 20, 18),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.primary, AppColors.primaryDark],
+              ),
+              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.storefront, color: Colors.white, size: 28),
-                    SizedBox(width: 8),
-                    Text(
+                    InvoizLogo.logoWidget(size: 30, radius: 8, background: Colors.white),
+                    const SizedBox(width: 10),
+                    const Text(
                       'Invoiz',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 21,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 if (isLoggedIn) ...[
-                  Text(
-                    'Hi, ${auth.user?.firstName ?? ''}!',
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                  const Text(
+                    'Hello there!',
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${auth.user?.firstName ?? ''} ${auth.user?.lastName ?? ''}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
                   Text(
                     auth.user?.email ?? '',
-                    style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 12),
+                    style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 12),
                   ),
                 ] else ...[
                   const Text(
-                    'Browse as Guest',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    'Welcome to Invoiz',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 3),
                   const Text(
-                    'Log in to shop & order',
+                    'Browse freely, or sign in to order.',
                     style: TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _GuestAction(
+                          icon: Icons.login,
+                          label: 'Login',
+                          color: Colors.white,
+                          background: Colors.white.withValues(alpha: 0.18),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const LoginScreen()),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _GuestAction(
+                          icon: Icons.person_add_alt_1,
+                          label: 'Register',
+                          color: AppColors.primaryDark,
+                          background: Colors.white,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ],
@@ -135,13 +214,20 @@ class Sidebar extends StatelessWidget {
           ),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
               children: [
                 _NavItem(icon: Icons.home_outlined, label: 'Home', onTap: () => goTo(const HomeScreen())),
                 _NavItem(
                   icon: Icons.favorite_outline,
                   label: 'Favorites',
                   onTap: () => goTo(const FavoritesScreen()),
+                ),
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(16, 10, 16, 6),
+                  child: Text(
+                    'MY ACCOUNT',
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.2, color: AppColors.textSecondary),
+                  ),
                 ),
                 if (isLoggedIn) ...[
                   _NavItem(
@@ -164,39 +250,125 @@ class Sidebar extends StatelessWidget {
                     label: 'Account',
                     onTap: () => goTo(const AccountScreen()),
                   ),
-                ],
-                const Divider(height: 1),
-                if (isLoggedIn)
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(16, 10, 16, 6),
+                    child: Text(
+                      'SELL',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.2, color: AppColors.textSecondary),
+                    ),
+                  ),
+                  if (auth.canActAsSeller)
+                    _NavItem(
+                      icon: Icons.storefront,
+                      label: 'Seller Center',
+                      onTap: () => goTo(const SellerHomeScreen()),
+                    )
+                  else
+                    _NavItem(
+                      icon: Icons.storefront_outlined,
+                      label: auth.user?.seller != null
+                          ? (auth.user!.seller!.isPending
+                              ? 'Seller Application: Pending'
+                              : 'Seller Application: ${auth.user!.seller!.approvalStatus}')
+                          : 'Apply as Seller',
+                      onTap: () => goTo(const SellerApplyScreen()),
+                    ),
+                  if (auth.canActAsSeller)
+                    _NavItem(
+                      icon: auth.isSellerMode ? Icons.shopping_bag_outlined : Icons.storefront_outlined,
+                      label: auth.isSellerMode ? 'Switch to Buyer' : 'Switch to Seller',
+                      onTap: () async {
+                        Navigator.pop(context);
+                        await auth.setMode(
+                          auth.isSellerMode ? AuthService.modeBuyer : AuthService.modeSeller,
+                        );
+                        if (!context.mounted) return;
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => auth.isSellerMode
+                                ? const SellerHomeScreen()
+                                : const HomeScreen(),
+                          ),
+                          (route) => false,
+                        );
+                      },
+                    ),
+                  const Divider(),
                   _NavItem(
                     icon: Icons.logout,
                     label: 'Logout',
+                    destructive: true,
                     onTap: () {
                       Navigator.pop(context);
                       auth.logout();
                       Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        MaterialPageRoute(builder: (_) => const HomeScreen()),
                         (route) => false,
                       );
                     },
-                  )
-                else
+                  ),
+                ] else ...[
                   _NavItem(
-                    icon: Icons.login,
-                    label: 'Login',
+                    icon: Icons.lock_outline,
+                    label: 'Sign in to order',
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const LoginScreen()),
                     ),
                   ),
+                ],
               ],
             ),
           ),
           const Padding(
-            padding: EdgeInsets.all(12),
-            child: Text('Invoiz v1.0', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+            padding: EdgeInsets.all(14),
+            child: Text('Invoiz · v1.0', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _GuestAction extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final Color background;
+  final VoidCallback onTap;
+
+  const _GuestAction({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.background,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: background,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: color, size: 18),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(color: color, fontSize: 14, fontWeight: FontWeight.w700),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -206,14 +378,22 @@ class _NavItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
+  final bool destructive;
 
-  const _NavItem({required this.icon, required this.label, required this.onTap});
+  const _NavItem({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.destructive = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final color = destructive ? AppColors.warning : AppColors.textPrimary;
     return ListTile(
-      leading: Icon(icon, color: AppColors.textPrimary),
-      title: Text(label, style: const TextStyle(fontSize: 14)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      leading: Icon(icon, color: color, size: 22),
+      title: Text(label, style: TextStyle(fontSize: 14, color: color, fontWeight: FontWeight.w500)),
       onTap: onTap,
     );
   }

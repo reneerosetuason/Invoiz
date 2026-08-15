@@ -7,19 +7,30 @@ import 'api_service.dart';
 class AuthService extends ChangeNotifier {
   static const _tokenKey = 'auth_token';
   static const _userKey = 'auth_user';
+  static const _modeKey = 'auth_mode';
+
+  static const String modeBuyer = 'buyer';
+  static const String modeSeller = 'seller';
 
   String? _token;
   User? _user;
   bool _loading = true;
+  String _mode = modeBuyer;
 
   String? get token => _token;
   User? get user => _user;
   bool get isLoading => _loading;
   bool get isLoggedIn => _token != null;
+  String get mode => _mode;
+  bool get isSellerMode => _mode == modeSeller;
+
+  /// Whether this account has an approved seller side.
+  bool get canActAsSeller => _user?.seller?.isApproved ?? false;
 
   Future<void> loadFromStorage() async {
     final prefs = await SharedPreferences.getInstance();
     _token = prefs.getString(_tokenKey);
+    _mode = prefs.getString(_modeKey) ?? modeBuyer;
     final userJson = prefs.getString(_userKey);
     if (userJson != null) {
       _user = User.fromJson(jsonDecode(userJson) as Map<String, dynamic>);
@@ -48,6 +59,16 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Switch between acting as a buyer and acting as a seller.
+  /// Only available when the account has an approved seller side.
+  Future<void> setMode(String mode) async {
+    if (mode == _mode) return;
+    _mode = mode;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_modeKey, mode);
+    notifyListeners();
+  }
+
   Future<void> refreshUser() async {
     try {
       final data = await ApiService().get('me');
@@ -64,10 +85,12 @@ class AuthService extends ChangeNotifier {
     } catch (_) {}
     _token = null;
     _user = null;
+    _mode = modeBuyer;
     ApiService.setToken(null);
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
     await prefs.remove(_userKey);
+    await prefs.remove(_modeKey);
     notifyListeners();
   }
 }

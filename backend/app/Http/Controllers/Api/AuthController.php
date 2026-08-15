@@ -89,11 +89,14 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Login successful.',
             'token'   => $token,
-            'user'    => $user->only([
-                'id', 'first_name', 'last_name', 'middle_initial', 'email',
-                'sex', 'phone', 'birthday', 'age', 'role', 'approval_status',
-                'province', 'municipality', 'barangay', 'address_line', 'id_image',
-            ]),
+            'user'    => array_merge(
+                $user->only([
+                    'id', 'first_name', 'last_name', 'middle_initial', 'email',
+                    'sex', 'phone', 'birthday', 'age', 'role', 'approval_status',
+                    'province', 'municipality', 'barangay', 'address_line', 'id_image',
+                ]),
+                ['seller' => $user->seller],
+            ),
         ]);
     }
 
@@ -109,11 +112,14 @@ class AuthController extends Controller
         $user = $request->user();
 
         return response()->json([
-            'user' => $user->only([
-                'id', 'last_name', 'first_name', 'middle_initial', 'sex',
-                'email', 'phone', 'birthday', 'age', 'role', 'approval_status',
-                'province', 'municipality', 'barangay', 'address_line', 'id_image',
-            ]),
+            'user' => array_merge(
+                $user->only([
+                    'id', 'last_name', 'first_name', 'middle_initial', 'sex',
+                    'email', 'phone', 'birthday', 'age', 'role', 'approval_status',
+                    'province', 'municipality', 'barangay', 'address_line', 'id_image',
+                ]),
+                ['seller' => $user->seller],
+            ),
         ]);
     }
 

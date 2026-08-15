@@ -6,12 +6,15 @@ A Shopee-style e-commerce application built with:
 - **Backend:** Laravel 13 / PHP (`backend/`)
 - **Database:** MySQL / MariaDB (`invoizdb`)
 
-**Roles implemented:** Guest (browse only) and Buyer (shop, cart, order, chat).
+**Roles implemented:** Guest (browse only), Buyer (shop, cart, order, chat), and
+**Buyer + Seller** (one account, two sides — switch between them anytime).
 
 > Guests can freely browse products and categories. To add to cart, place
 > orders, chat, or manage an account, a user must **log in first** as an
 > **approved buyer**. New buyer registrations are **pending** until an
-> administrator approves them.
+> administrator approves them. A buyer can also **apply to become a seller**
+> from the sidebar; once approved, the same login can act as a buyer or a
+> seller and switch between the two from the sidebar menu.
 
 ---
 
@@ -110,6 +113,23 @@ The API runs at `http://127.0.0.1:8000/api`.
 (`/api/orders/checkout`), chat (`/api/conversations`), favorites
 (`/api/favorites`).
 
+**Seller endpoints (bearer token):** `POST /api/seller/apply`,
+`GET /api/seller/status`, `GET /api/seller/me`. The seller application adds a
+`sellers` row to the **same** `users` identity — personal info already lives on
+the buyer account; the application only collects the business details
+(business name, line of business, valid ID, business permit). It is **pending**
+until an administrator approves it.
+
+**Seller flow:**
+1. Log in as an approved buyer → sidebar → **Apply as Seller**.
+2. Fill in business name, line of business (from categories), upload a valid ID
+   and a business permit, submit (status becomes `pending`).
+3. Admin approves (`UPDATE sellers SET approval_status='approved' WHERE user_id=...;`).
+4. Next login shows the **Continue as Buyer / Continue as Seller** picker.
+   The sidebar also gets **Switch to Seller / Switch to Buyer**.
+5. The seller center is currently a placeholder (full store management is
+   built separately).
+
 ---
 
 ## 5. Frontend (Flutter)
@@ -167,6 +187,8 @@ flutter build web --release
      order detail with timeline, cancel, and **Rate & Feedback**
    - **Messages** — start conversations with Invoiz support
    - **Account** — profile, edit profile, addresses, logout
+   - **Sell** — Apply as Seller (business info + ID + business permit), Seller
+     Center (placeholder), and **Switch to Seller / Switch to Buyer**
 
 ---
 
@@ -175,12 +197,20 @@ flutter build web --release
 | Role  | E-mail               | Password    | Status |
 |-------|----------------------|-------------|--------|
 | Seller (demo) | `seller@invoiz.test` | `password` | approved |
+| Buyer (demo)  | `juan@test.com`      | `password123` | approved |
 
 For a **buyer**, register a new account in the app. By default it will be
 `pending`. To approve it quickly for testing:
 
 ```bash
 mysql -u root -padmin invoizdb -e "UPDATE users SET approval_status='approved' WHERE email='your@email.com';"
+```
+
+To test the **buyer + seller** flow with the same account, apply as a seller in
+the app (sidebar → Apply as Seller), then approve the seller side:
+
+```bash
+mysql -u root -padmin invoizdb -e "UPDATE sellers SET approval_status='approved' WHERE user_id=<the user id>;"
 ```
 
 > In a full system, an admin panel would approve accounts and e-mail the user.

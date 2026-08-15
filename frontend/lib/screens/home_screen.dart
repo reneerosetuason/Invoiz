@@ -3,7 +3,6 @@ import '../services/api_service.dart';
 import '../theme.dart';
 import '../widgets/auth_service_provider.dart';
 import '../widgets/main_layout.dart';
-import 'login_screen.dart';
 import 'product_detail_screen.dart';
 import 'product_list_screen.dart';
 
@@ -48,9 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red.shade700),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _searchProducts() {
@@ -105,29 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           _searchBar(context),
           if (_selectedCategory != null)
-            Container(
-              width: double.infinity,
-              color: AppColors.accent,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              child: Row(
-                children: [
-                  const Text('Category: ', style: TextStyle(fontSize: 13)),
-                  Expanded(
-                    child: Text(
-                      _categories
-                          .firstWhere((c) => c['id'] == _selectedCategory,
-                              orElse: () => {'name': ''})['name']
-                          as String,
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () => _selectCategory(null),
-                    child: const Icon(Icons.close, size: 18),
-                  ),
-                ],
-              ),
-            ),
+            _selectedCategoryBar(),
           Expanded(
             child: _loading
                 ? const Center(child: CircularProgressIndicator())
@@ -140,24 +115,50 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _searchBar(BuildContext context) {
-    final auth = AuthServiceProvider.of(context);
+  Widget _selectedCategoryBar() {
+    final name = _categories
+            .firstWhere((c) => c['id'] == _selectedCategory, orElse: () => {'name': ''})['name']
+        as String;
     return Container(
-      color: AppColors.primary,
-      padding: const EdgeInsets.fromLTRB(12, 6, 12, 10),
+      width: double.infinity,
+      color: AppColors.accent,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          const Icon(Icons.filter_alt_outlined, size: 16, color: AppColors.primary),
+          const SizedBox(width: 6),
+          Text(
+            name,
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primary),
+          ),
+          const Spacer(),
+          GestureDetector(
+            onTap: () => _selectCategory(null),
+            child: const Icon(Icons.close, size: 18, color: AppColors.primary),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _searchBar(BuildContext context) {
+    return Container(
+      color: AppColors.card,
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
       child: Row(
         children: [
           Expanded(
             child: Container(
-              height: 38,
+              height: 44,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(4),
+                color: AppColors.surfaceSoft,
+                borderRadius: BorderRadius.circular(14),
               ),
               child: Row(
                 children: [
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 12),
                   const Icon(Icons.search, color: AppColors.textSecondary, size: 20),
+                  const SizedBox(width: 6),
                   Expanded(
                     child: TextField(
                       controller: _searchCtrl,
@@ -165,36 +166,29 @@ class _HomeScreenState extends State<HomeScreen> {
                       onSubmitted: (_) => _searchProducts(),
                       style: const TextStyle(fontSize: 14),
                       decoration: const InputDecoration(
-                        hintText: 'Search products...',
+                        hintText: 'What are you looking for?',
                         border: InputBorder.none,
                         isDense: true,
                         contentPadding: EdgeInsets.symmetric(vertical: 10),
                       ),
                     ),
                   ),
-                  GestureDetector(
-                    onTap: _searchProducts,
-                    child: Container(
-                      width: 48,
-                      height: 38,
-                      color: Colors.amber.shade600,
-                      child: const Icon(Icons.search, color: Colors.white, size: 20),
-                    ),
-                  ),
                 ],
               ),
             ),
           ),
-          const SizedBox(width: 10),
-          GestureDetector(
-            onTap: () {
-              if (!auth.isLoggedIn) {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
-                return;
-              }
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const ProductListScreen()));
-            },
-            child: const Icon(Icons.shopping_bag_outlined, color: Colors.white, size: 26),
+          const SizedBox(width: 8),
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: AppColors.secondary,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.search, color: Colors.white, size: 22),
+              onPressed: _searchProducts,
+            ),
           ),
         ],
       ),
@@ -202,100 +196,206 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildBody(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 8),
-        Padding(
-          padding: const EdgeInsets.only(left: 16, top: 4),
-          child: Row(
-            children: [
-              const Text(
-                'Categories',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(width: 8),
-              const Expanded(child: SizedBox()),
-              TextButton(
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ProductListScreen()),
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(child: _heroBanner(context)),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 22, 16, 12),
+            child: Row(
+              children: [
+                const Text(
+                  'Categories',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: -0.2),
                 ),
-                child: const Text('View all'),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 108,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: _categories.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
-            itemBuilder: (context, i) {
-              final cat = _categories[i];
-              final selected = cat['id'] == _selectedCategory;
-              return GestureDetector(
-                onTap: () => _selectCategory(cat['id'] as int),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 68,
-                      height: 68,
-                      decoration: BoxDecoration(
-                        color: selected ? AppColors.accent : Colors.white,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: selected ? AppColors.primary : const Color(0xFFE0E0E0),
-                        ),
-                      ),
-                      child: Icon(
-                        _categoryIcon(cat['name'] as String),
-                        color: AppColors.primary,
-                        size: 30,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    SizedBox(
-                      width: 80,
-                      child: Text(
-                        cat['name'] as String,
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 11),
-                      ),
-                    ),
-                  ],
+                const Spacer(),
+                TextButton(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ProductListScreen()),
+                  ),
+                  child: const Text('View all'),
                 ),
-              );
-            },
+              ],
+            ),
           ),
         ),
-        const Padding(
-          padding: EdgeInsets.fromLTRB(16, 14, 16, 6),
-          child: Text(
-            'For You',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: 100,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: _categories.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              itemBuilder: (context, i) => _categoryChip(_categories[i]),
+            ),
           ),
         ),
-        Expanded(child: _productGrid()),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 10),
+            child: Row(
+              children: [
+                const Text(
+                  'For You',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: -0.2),
+                ),
+                const Spacer(),
+                Text(
+                  '${_products.length} items',
+                  style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                ),
+              ],
+            ),
+          ),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+          sliver: SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 14,
+              crossAxisSpacing: 14,
+              childAspectRatio: 0.64,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (context, i) => _productCard(_products[i]),
+              childCount: _products.length,
+            ),
+          ),
+        ),
       ],
     );
   }
 
-  Widget _productGrid() {
-    return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-        childAspectRatio: 0.68,
+  Widget _heroBanner(BuildContext context) {
+    final auth = AuthServiceProvider.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+      child: Container(
+        height: 164,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [AppColors.primary, Color(0xFF2E8B8F)],
+          ),
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.25),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+              right: -24,
+              bottom: -28,
+              child: Icon(
+                Icons.shopping_bag,
+                size: 150,
+                color: Colors.white.withValues(alpha: 0.10),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    auth.isLoggedIn ? 'Hi, ${auth.user?.firstName ?? 'there'}!' : 'Welcome to Invoiz',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  const Text(
+                    'Everyday essentials at your fingertips.\nCash on delivery, nationwide.',
+                    maxLines: 2,
+                    style: TextStyle(color: Colors.white70, fontSize: 12.5, height: 1.35),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: const Text(
+                      'Start shopping',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
-      itemCount: _products.length,
-      itemBuilder: (context, i) => _productCard(_products[i]),
+    );
+  }
+
+  Widget _categoryChip(Map<String, dynamic> cat) {
+    final selected = cat['id'] == _selectedCategory;
+    return GestureDetector(
+      onTap: () => _selectCategory(cat['id'] as int),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        width: 84,
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.primary : AppColors.card,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: selected ? AppColors.primary : AppColors.border),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.25),
+                    blurRadius: 12,
+                    offset: const Offset(0, 5),
+                  ),
+                ]
+              : null,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              _categoryIcon(cat['name'] as String),
+              color: selected ? Colors.white : AppColors.primary,
+              size: 26,
+            ),
+            const SizedBox(height: 6),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Text(
+                cat['name'] as String,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w600,
+                  color: selected ? Colors.white : AppColors.textPrimary,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -311,21 +411,71 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(6),
+          color: AppColors.card,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
+        clipBehavior: Clip.antiAlias,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              height: 140,
+              height: 138,
               width: double.infinity,
-              color: const Color(0xFFF3F3F3),
-              child: _productImage(p['image'] as String?),
+              color: AppColors.surfaceSoft,
+              child: Stack(
+                children: [
+                  Positioned.fill(child: _productImage(p['image'] as String?)),
+                  if (p['stock'] is int && (p['stock'] as int) == 0)
+                    Positioned.fill(
+                      child: Container(
+                        color: Colors.black.withValues(alpha: 0.35),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'SOLD OUT',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                  if (rating != null)
+                    Positioned(
+                      top: 8,
+                      left: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppColors.card,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.star, color: AppColors.gold, size: 13),
+                            const SizedBox(width: 3),
+                            Text(
+                              rating.toStringAsFixed(1),
+                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -333,39 +483,40 @@ class _HomeScreenState extends State<HomeScreen> {
                       p['name'] as String,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 13, height: 1.2),
+                      style: const TextStyle(fontSize: 13, height: 1.25, fontWeight: FontWeight.w500),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     Text(
                       _formatPrice(price),
                       style: const TextStyle(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
+                        color: AppColors.warning,
+                        fontWeight: FontWeight.w800,
                         fontSize: 15,
                       ),
                     ),
                     const Spacer(),
-                    if (rating != null)
-                      Row(
-                        children: [
-                          const Icon(Icons.star, color: AppColors.gold, size: 14),
-                          const SizedBox(width: 2),
-                          Text(
-                            rating.toStringAsFixed(1),
-                            style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                    Row(
+                      children: [
+                        const Icon(Icons.local_shipping_outlined, size: 12, color: AppColors.textSecondary),
+                        const SizedBox(width: 3),
+                        Text(
+                          'COD',
+                          style: TextStyle(fontSize: 10.5, color: AppColors.textSecondary.withValues(alpha: 0.9)),
+                        ),
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: AppColors.accent,
+                            borderRadius: BorderRadius.circular(999),
                           ),
-                          const SizedBox(width: 6),
-                          Text(
+                          child: Text(
                             '${p['stock']} left',
-                            style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                            style: const TextStyle(fontSize: 10, color: AppColors.primary, fontWeight: FontWeight.w600),
                           ),
-                        ],
-                      )
-                    else
-                      Text(
-                        '${p['stock']} left',
-                        style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
-                      ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),

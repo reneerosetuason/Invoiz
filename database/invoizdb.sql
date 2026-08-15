@@ -67,6 +67,35 @@ CREATE TABLE users (
 );
 
 
+-- CHANGE: NEW table for the seller application.
+-- One identity (users) can act as BOTH buyer and seller: the buyer's
+-- personal info lives in `users`, and this row adds the seller side of
+-- that same account (business info + seller approval).
+CREATE TABLE sellers (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+
+    user_id BIGINT UNSIGNED NOT NULL UNIQUE,
+    business_name VARCHAR(150) NOT NULL,
+    line_of_business VARCHAR(100) NOT NULL,
+
+    id_image VARCHAR(255) NULL,
+    business_permit VARCHAR(255) NULL,
+
+    approval_status ENUM('pending', 'approved', 'rejected')
+        NOT NULL DEFAULT 'pending',
+    status ENUM('active', 'inactive')
+        NOT NULL DEFAULT 'active',
+
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT sellers_user_id_foreign
+        FOREIGN KEY (user_id) REFERENCES users (id)
+        ON DELETE CASCADE
+);
+
+
 -- =========================================================
 -- 2. CATEGORIES
 -- =========================================================

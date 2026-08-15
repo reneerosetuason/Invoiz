@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\SellerController;
 use App\Http\Controllers\Api\VoucherController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -69,6 +70,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // Favorites
     Route::get('/favorites', [FavoriteController::class, 'index']);
     Route::post('/favorites/toggle', [FavoriteController::class, 'toggle']);
+
+    // Seller application (buyer + seller live under one identity)
+    Route::post('/seller/apply', [SellerController::class, 'apply']);
+    Route::get('/seller/status', [SellerController::class, 'status']);
+    Route::get('/seller/me', [SellerController::class, 'me']);
 });
 
 Route::get('/user', function (Request $request) {

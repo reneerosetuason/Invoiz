@@ -144,7 +144,9 @@ flutter run -d chrome
 
 > If the API base URL differs, edit `frontend/lib/config.dart`
 > (`AppConfig.apiBaseUrl`). For a physical phone use your LAN IP, e.g.
-> `http://192.168.x.x:8000/api`.
+> `http://192.168.x.x:8000/api`. Product images resolve against the same
+> host automatically (via `AppConfig.storageUrl`), so they work on devices
+> too — no separate image URL to change.
 
 ### 5b. Run on Android
 
@@ -161,6 +163,55 @@ cd frontend
 flutter build web --release
 # serve build/web with any static server
 ```
+
+---
+
+## 5d. Buyer experience extras
+
+- **Order progress bar** — order detail shows a visual
+  Placed → Confirmed → On the way → Delivered stepper (cancelled orders show a
+  red notice instead).
+- **"X sold" badges** — product cards and detail pages show how many units were
+  actually sold (computed from non-cancelled order items).
+- **Recently Viewed** — a horizontal row on Home with the last products you
+  opened (stored locally; a history icon clears it).
+- **Best-for-you voucher** — in Checkout a highlighted suggestion computes which
+  voucher saves the most for your cart and applies it in one tap.
+- **Notifications inbox** — the bell in the navbar (badge shows unread count)
+  opens a list of order status updates and review acknowledgements
+  (`GET /api/notifications`).
+- **Dark mode** — sidebar toggle at the bottom switches the whole app to a dark
+  palette; your choice is remembered between sessions.
+
+### 5e. Seller store page (buyer view)
+
+Every product card shows a **Sold by <Store>** link, and the product page has a
+**Visit Store** button — both open the seller's storefront:
+
+- **Header** — store banner with logo/name, verified badge, and line of business.
+- **Stats row** — Rating, Followers, Products, and total units Sold.
+- **Follow / Following** — tap to follow (or unfollow) the store; follower counts
+  update live (`GET /api/stores/{seller}/follow`).
+- **Products tab** — in-store **search bar + sort** (Newest / Price / Rating).
+- **Reviews tab** — overall store rating with a **5→1 star breakdown bar** and
+  the list of buyer reviews across all of the store's products
+  (`GET /api/stores/{seller}/reviews`).
+- **Chat** — one tap opens a conversation with the seller.
+
+Public store endpoint: `GET /api/stores/{seller}` returns the store profile
+(stats, `is_following` when a buyer is logged in, rating breakdown) plus a
+paginated product list.
+
+### 5f. Product gallery & specifications
+
+- **Image gallery** — the product page shows a **swipeable photo gallery**
+  (up to 3 photos, `product_images` table) with a `1/3` counter, tappable
+  thumbnails, and a **full-screen zoomable viewer** (tap the photo to open).
+  The backend attaches a `gallery` array to `GET /api/products/{id}`.
+- **Specifications** — products now carry rich details rendered in a spec
+  table on the product page: **Brand, Model, SKU, Material, Dimensions,
+  Weight, Warranty, Origin** plus the category. Stored as columns on
+  `products`; seeded for all 8 demo products.
 
 ---
 

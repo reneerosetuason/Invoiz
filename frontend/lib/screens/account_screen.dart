@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../theme.dart';
 import '../widgets/auth_service_provider.dart';
@@ -43,7 +43,7 @@ class _AccountScreenState extends State<AccountScreen> {
         padding: const EdgeInsets.all(12),
         children: [
           Container(
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
+            decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(6)),
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
@@ -61,11 +61,11 @@ class _AccountScreenState extends State<AccountScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(user?.fullName ?? 'User', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                      Text(user?.email ?? '', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                      Text(user?.email ?? '', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                       const SizedBox(height: 4),
                       Text(
                         'Member since ${_shortDate(user?.birthday)}',
-                        style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                        style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
                       ),
                     ],
                   ),
@@ -86,7 +86,7 @@ class _AccountScreenState extends State<AccountScreen> {
           }),
           const SizedBox(height: 8),
           Container(
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
+            decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(6)),
             child: ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),
               title: const Text('Logout', style: TextStyle(color: Colors.red)),
@@ -108,11 +108,11 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget _menuTile(IconData icon, String title, VoidCallback onTap) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
+      decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(6)),
       child: ListTile(
         leading: Icon(icon, color: AppColors.primary),
         title: Text(title, style: const TextStyle(fontSize: 14)),
-        trailing: const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+        trailing: Icon(Icons.chevron_right, color: AppColors.textSecondary),
         onTap: onTap,
       ),
     );

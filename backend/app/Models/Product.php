@@ -11,6 +11,14 @@ class Product extends Model
         'category_id',
         'name',
         'description',
+        'brand',
+        'model',
+        'sku',
+        'material',
+        'dimensions',
+        'weight',
+        'warranty',
+        'origin',
         'price',
         'stock',
         'image',
@@ -40,6 +48,13 @@ class Product extends Model
     public function variants()
     {
         return $this->hasMany(ProductVariant::class, 'product_id')->where('status', 'active');
+    }
+
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class, 'product_id')
+            ->orderBy('sort_order')
+            ->orderBy('id');
     }
 
     public function reviews()

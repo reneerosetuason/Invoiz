@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import '../services/api_service.dart';
@@ -29,21 +29,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? _sex;
   XFile? _idImage;
   bool _busy = false;
+  bool _loaded = false;
 
   @override
   void initState() {
     super.initState();
-    final user = AuthServiceProvider.of(context).user;
-    if (user != null) {
-      _lastName.text = user.lastName;
-      _firstName.text = user.firstName;
-      _middleInitial.text = user.middleInitial ?? '';
-      _phone.text = user.phone ?? '';
-      _street.text = user.addressLine ?? '';
-      _province.text = user.province ?? '';
-      _municipality.text = user.municipality ?? '';
-      _barangay.text = user.barangay ?? '';
-      _sex = user.sex;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_loaded) {
+      _loaded = true;
+      final user = AuthServiceProvider.of(context).user;
+      if (user != null) {
+        _lastName.text = user.lastName;
+        _firstName.text = user.firstName;
+        _middleInitial.text = user.middleInitial ?? '';
+        _phone.text = user.phone ?? '';
+        _street.text = user.addressLine ?? '';
+        _province.text = user.province ?? '';
+        _municipality.text = user.municipality ?? '';
+        _barangay.text = user.barangay ?? '';
+        _sex = user.sex;
+      }
     }
   }
 
@@ -100,7 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await AuthServiceProvider.of(context).refreshUser();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile updated.'), backgroundColor: AppColors.success),
+        SnackBar(content: Text('Profile updated.'), backgroundColor: AppColors.success),
       );
       Navigator.pop(context);
     } catch (e) {
@@ -121,7 +130,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            const Text('Personal Information', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary)),
+            Text('Personal Information', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary)),
             const SizedBox(height: 12),
             TextFormField(
               controller: _lastName,
@@ -151,7 +160,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               decoration: const InputDecoration(labelText: 'Contact No.'),
             ),
             const Divider(height: 30),
-            const Text('Address', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary)),
+            Text('Address', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary)),
             const SizedBox(height: 12),
             TextFormField(controller: _province, decoration: const InputDecoration(labelText: 'Province')),
             const SizedBox(height: 12),
@@ -161,7 +170,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 12),
             TextFormField(controller: _street, decoration: const InputDecoration(labelText: 'Street / House no.')),
             const Divider(height: 30),
-            const Text('Change Password', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary)),
+            Text('Change Password', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary)),
             const SizedBox(height: 12),
             TextFormField(
               controller: _password,
@@ -175,15 +184,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
               decoration: const InputDecoration(labelText: 'Confirm new password'),
             ),
             const Divider(height: 30),
-            const Text('Identification', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary)),
+            Text('Identification', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary)),
             const SizedBox(height: 12),
             InkWell(
               onTap: _pickImage,
               child: Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: const Color(0xFFE0E0E0)),
+                  color: AppColors.card,
+                  border: Border.all(color: AppColors.border),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Row(

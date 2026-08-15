@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import '../config.dart';
 import '../services/api_service.dart';
 import '../theme.dart';
 import '../widgets/main_layout.dart';
 import 'product_detail_screen.dart';
+import 'seller_store_screen.dart';
 
 class ProductListScreen extends StatefulWidget {
   final int? categoryId;
@@ -81,7 +83,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     child: Row(
                       children: [
                         const SizedBox(width: 12),
-                        const Icon(Icons.search, color: AppColors.textSecondary, size: 20),
+                        Icon(Icons.search, color: AppColors.textSecondary, size: 20),
                         const SizedBox(width: 6),
                         Expanded(
                           child: TextField(
@@ -198,6 +200,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Widget _card(Map<String, dynamic> p) {
     final price = double.tryParse('${p['price']}') ?? 0;
     final rating = p['rating'] != null ? double.tryParse('${p['rating']}') : null;
+    final sold = p['sold'] is int ? (p['sold'] as int) : 0;
+    final shop = p['shop'];
+    final shopName = shop is Map<String, dynamic>
+        ? (shop['business_name'] as String? ?? 'Invoiz Store')
+        : null;
+    final shopSellerId = shop is Map<String, dynamic> ? (shop['seller_id'] as int?) : null;
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
@@ -205,7 +213,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.card,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: AppColors.border),
           boxShadow: [
@@ -234,17 +242,51 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   children: [
                     Text(p['name'] as String, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
                     const SizedBox(height: 6),
-                    Text(_fmt(price), style: const TextStyle(color: AppColors.warning, fontWeight: FontWeight.w800, fontSize: 15)),
+                    Text(_fmt(price), style: TextStyle(color: AppColors.warning, fontWeight: FontWeight.w800, fontSize: 15)),
                     const Spacer(),
+                    if (shopName != null && shopSellerId != null)
+                      GestureDetector(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => SellerStoreScreen(sellerId: shopSellerId),
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            children: [
+                              Icon(Icons.storefront, size: 12, color: AppColors.primary),
+                              const SizedBox(width: 3),
+                              Expanded(
+                                child: Text(
+                                  shopName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     Row(
                       children: [
                         if (rating != null) ...[
-                          const Icon(Icons.star, color: AppColors.gold, size: 14),
+                          Icon(Icons.star, color: AppColors.gold, size: 14),
                           const SizedBox(width: 2),
-                          Text(rating.toStringAsFixed(1), style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                          Text(rating.toStringAsFixed(1), style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
                           const SizedBox(width: 6),
                         ],
-                        Text('${p['stock']} left', style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                        Text('${p['stock']} left', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                        if (sold > 0) ...[
+                          const SizedBox(width: 6),
+                          Text('$sold sold', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                        ],
                       ],
                     ),
                   ],
@@ -259,13 +301,13 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
   Widget _image(String? url) {
     if (url == null || url.isEmpty) return const Icon(Icons.image_not_supported_outlined, color: Colors.grey, size: 40);
-    final src = url.startsWith('http') ? url : 'http://127.0.0.1:8000/storage/$url';
+    final src = AppConfig.storageUrl(url);
     return Image.network(src, fit: BoxFit.cover,
         errorBuilder: (_, __, ___) => const Icon(Icons.image_not_supported_outlined, color: Colors.grey, size: 40));
   }
 
   String _fmt(double v) {
     final n = v.toStringAsFixed(2);
-    return '₱${n.split('.')[0]}.${n.split('.')[1]}';
+    return 'â‚±${n.split('.')[0]}.${n.split('.')[1]}';
   }
 }

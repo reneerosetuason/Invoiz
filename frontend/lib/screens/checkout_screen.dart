@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../models/address.dart';
 import '../models/cart.dart';
 import '../models/voucher.dart';
@@ -94,7 +94,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       });
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Order placed successfully! (Cash on Delivery)'), backgroundColor: AppColors.success),
+        SnackBar(content: Text('Order placed successfully! (Cash on Delivery)'), backgroundColor: AppColors.success),
       );
       Navigator.pushAndRemoveUntil(
         context,
@@ -144,7 +144,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   Widget _section(String title, Widget child) {
     return Container(
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
+      decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(6)),
       padding: const EdgeInsets.all(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,7 +161,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     if (_addresses.isEmpty) {
       return Column(
         children: [
-          const Text('No saved addresses yet.', style: TextStyle(color: AppColors.textSecondary)),
+          Text('No saved addresses yet.', style: TextStyle(color: AppColors.textSecondary)),
           const SizedBox(height: 8),
           ElevatedButton(
             onPressed: () async {
@@ -184,7 +184,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             title: Text(a.recipientName, style: const TextStyle(fontSize: 14)),
             subtitle: Text(
               '${a.phone}\n${a.fullAddress}',
-              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
           );
         }),
@@ -234,14 +234,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.confirmation_number, color: AppColors.primary),
+                Icon(Icons.confirmation_number, color: AppColors.primary),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Voucher: $_selectedVoucher', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                      Text('Discount: -${_fmt(_validatedDiscount ?? 0)}', style: const TextStyle(fontSize: 12, color: AppColors.primary)),
+                      Text('Discount: -${_fmt(_validatedDiscount ?? 0)}', style: TextStyle(fontSize: 12, color: AppColors.primary)),
                     ],
                   ),
                 ),
@@ -255,21 +255,78 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ],
             ),
           ),
+        if (_selectedVoucher == null) _bestVoucherHint(),
         if (_vouchers.isNotEmpty)
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: _vouchers.map((v) {
               return ActionChip(
-                avatar: const Icon(Icons.local_offer, size: 16, color: AppColors.primary),
+                avatar: Icon(Icons.local_offer, size: 16, color: AppColors.primary),
                 label: Text(v.code),
                 onPressed: () => _applyVoucher(v.code),
               );
             }).toList(),
           )
         else
-          const Text('No active vouchers.', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+          Text('No active vouchers.', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
       ],
+    );
+  }
+
+  /// Finds the voucher that saves the most for the current cart subtotal
+  /// and surfaces it as a one-tap "best for you" suggestion.
+  Widget _bestVoucherHint() {
+    final subtotal = _cart?.subtotal ?? 0;
+    Voucher? best;
+    double bestSave = 0;
+
+    for (final v in _vouchers) {
+      if (subtotal < v.minSpend) continue;
+      double save;
+      if (v.discountType == 'fixed') {
+        save = v.discountValue;
+      } else {
+        save = subtotal * v.discountValue / 100;
+        if (v.maxDiscount != null && save > v.maxDiscount!) save = v.maxDiscount!;
+      }
+      if (save > subtotal) save = subtotal;
+      if (save > bestSave) {
+        bestSave = save;
+        best = v;
+      }
+    }
+
+    if (best == null || bestSave <= 0) return const SizedBox.shrink();
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.secondary.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: AppColors.secondary),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.auto_awesome, color: AppColors.secondary, size: 18),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Best for you: ${best!.code}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                Text('Saves ${_fmt(bestSave)} on this order', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: () => _applyVoucher(best!.code),
+            child: const Text('Apply'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -291,7 +348,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text('Voucher Discount', style: TextStyle(fontSize: 13)),
-            Text('-${_fmt(discount)}', style: const TextStyle(fontSize: 13, color: AppColors.primary)),
+            Text('-${_fmt(discount)}', style: TextStyle(fontSize: 13, color: AppColors.primary)),
           ],
         ),
         const SizedBox(height: 6),
@@ -309,7 +366,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             const Text('Total', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
             Text(
               _fmt(total),
-              style: const TextStyle(color: AppColors.primary, fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(color: AppColors.primary, fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -319,6 +376,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   String _fmt(double v) {
     final n = v.toStringAsFixed(2);
-    return '₱${n.split('.')[0]}.${n.split('.')[1]}';
+    return 'â‚±${n.split('.')[0]}.${n.split('.')[1]}';
   }
 }

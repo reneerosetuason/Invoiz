@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use App\Models\User;
 use App\Models\Voucher;
@@ -58,6 +59,9 @@ class DatabaseSeeder extends Seeder
                 'category' => 'Fashion',
                 'description' => 'Premium cotton casual tee. Available in multiple colors and sizes.',
                 'price' => 199.00, 'stock' => 100,
+                'brand' => 'BasicWear', 'model' => 'BW-T100', 'sku' => 'TSH-WHT-199',
+                'material' => '100% Cotton', 'dimensions' => 'M 50x70 cm',
+                'weight' => '180 g', 'warranty' => 'No Warranty', 'origin' => 'Philippines',
                 'variants' => [
                     ['Color', 'White'], ['Color', 'Black'], ['Color', 'Navy'],
                     ['Size', 'S'], ['Size', 'M'], ['Size', 'L'], ['Size', 'XL'],
@@ -68,6 +72,9 @@ class DatabaseSeeder extends Seeder
                 'category' => 'Electronics',
                 'description' => 'True wireless earbuds with charging case and 24hr battery.',
                 'price' => 899.00, 'stock' => 50,
+                'brand' => 'SoundPeak', 'model' => 'SP-EB24', 'sku' => 'EAR-BT-899',
+                'material' => 'ABS + Silicone', 'dimensions' => 'Case 6 x 4.5 x 2.5 cm',
+                'weight' => '48 g', 'warranty' => '6 months', 'origin' => 'China',
                 'variants' => [['Color', 'Black'], ['Color', 'White']],
             ],
             [
@@ -75,6 +82,9 @@ class DatabaseSeeder extends Seeder
                 'category' => 'Home & Living',
                 'description' => 'Insulated steel bottle keeps drinks cold/hot for hours.',
                 'price' => 349.00, 'stock' => 80,
+                'brand' => 'Hydra', 'model' => 'HY-750', 'sku' => 'BTL-STL-349',
+                'material' => 'Stainless Steel', 'dimensions' => '26 x 7 cm',
+                'weight' => '340 g', 'warranty' => 'No Warranty', 'origin' => 'China',
                 'variants' => [['Color', 'Silver'], ['Color', 'Matte Black'], ['Color', 'Rose Gold']],
             ],
             [
@@ -82,6 +92,9 @@ class DatabaseSeeder extends Seeder
                 'category' => 'Beauty & Health',
                 'description' => 'Vitamin C serum for glowing, hydrated skin.',
                 'price' => 450.00, 'stock' => 60,
+                'brand' => 'GlowLab', 'model' => 'GL-C30', 'sku' => 'SRM-C30-450',
+                'material' => 'Vitamin C + Hyaluronic Acid', 'dimensions' => 'Bottle 11 x 3.5 cm',
+                'weight' => '70 g', 'warranty' => 'No Warranty', 'origin' => 'Korea',
                 'variants' => [['Size', '30ml'], ['Size', '50ml']],
             ],
             [
@@ -89,6 +102,9 @@ class DatabaseSeeder extends Seeder
                 'category' => 'Sports & Outdoors',
                 'description' => 'Eco-friendly TPE yoga mat with carry strap.',
                 'price' => 599.00, 'stock' => 40,
+                'brand' => 'FlexFit', 'model' => 'FF-TPE', 'sku' => 'YGA-TPE-599',
+                'material' => 'TPE Foam', 'dimensions' => '183 x 61 x 0.6 cm',
+                'weight' => '900 g', 'warranty' => 'No Warranty', 'origin' => 'China',
                 'variants' => [['Color', 'Purple'], ['Color', 'Green'], ['Color', 'Blue']],
             ],
             [
@@ -96,6 +112,9 @@ class DatabaseSeeder extends Seeder
                 'category' => 'Toys & Hobbies',
                 'description' => 'Colorful building bricks for endless creative play.',
                 'price' => 750.00, 'stock' => 30,
+                'brand' => 'BuildPlay', 'model' => 'BP-500', 'sku' => 'BLK-500-750',
+                'material' => 'ABS Plastic', 'dimensions' => 'Box 30 x 22 x 12 cm',
+                'weight' => '1.2 kg', 'warranty' => 'No Warranty', 'origin' => 'China',
                 'variants' => [],
             ],
             [
@@ -103,6 +122,9 @@ class DatabaseSeeder extends Seeder
                 'category' => 'Groceries',
                 'description' => 'Rich and aromatic 3-in-1 instant coffee.',
                 'price' => 120.00, 'stock' => 200,
+                'brand' => 'BrewNest', 'model' => 'BN-100', 'sku' => 'COF-100-120',
+                'material' => 'Roasted coffee, creamer, sugar', 'dimensions' => 'Pouch 16 x 10 cm',
+                'weight' => '100 g', 'warranty' => 'No Warranty', 'origin' => 'Philippines',
                 'variants' => [['Size', '100g'], ['Size', '250g']],
             ],
             [
@@ -110,6 +132,9 @@ class DatabaseSeeder extends Seeder
                 'category' => 'Books',
                 'description' => 'A gripping hardbound fiction novel.',
                 'price' => 499.00, 'stock' => 25,
+                'brand' => 'PaperTrail Books', 'model' => 'PT-2301', 'sku' => 'BOK-HB-499',
+                'material' => 'Paper, Hardcover', 'dimensions' => '23 x 15 x 3 cm',
+                'weight' => '450 g', 'warranty' => 'No Warranty', 'origin' => 'Philippines',
                 'variants' => [],
             ],
         ];
@@ -121,11 +146,31 @@ class DatabaseSeeder extends Seeder
                     'seller_id'   => $seller->id,
                     'category_id' => $catId($p['category']),
                     'description' => $p['description'],
+                    'brand'       => $p['brand'],
+                    'model'       => $p['model'],
+                    'sku'         => $p['sku'],
+                    'material'    => $p['material'],
+                    'dimensions'  => $p['dimensions'],
+                    'weight'      => $p['weight'],
+                    'warranty'    => $p['warranty'],
+                    'origin'      => $p['origin'],
                     'price'       => $p['price'],
                     'stock'       => $p['stock'],
                     'status'      => 'active',
                 ]
             );
+
+            // Cover image + gallery (3 photos per product).
+            $firstId = $product->id;
+            $product->update(['image' => "products/p{$firstId}_1.png"]);
+            ProductImage::where('product_id', $product->id)->delete();
+            for ($i = 1; $i <= 3; $i++) {
+                ProductImage::create([
+                    'product_id'  => $product->id,
+                    'image_path'  => "products/p{$firstId}_$i.png",
+                    'sort_order'  => $i,
+                ]);
+            }
 
             foreach ($p['variants'] as [$type, $value]) {
                 ProductVariant::updateOrCreate(

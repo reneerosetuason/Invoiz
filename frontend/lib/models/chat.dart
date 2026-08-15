@@ -5,6 +5,9 @@ class Conversation {
   final String? lastBody;
   final String? lastSender;
   final String? lastTime;
+  final int? sellerId;
+  final String? sellerName;
+  final String? sellerBusinessName;
 
   Conversation({
     required this.id,
@@ -13,6 +16,9 @@ class Conversation {
     this.lastBody,
     this.lastSender,
     this.lastTime,
+    this.sellerId,
+    this.sellerName,
+    this.sellerBusinessName,
   });
 
   factory Conversation.fromJson(Map<String, dynamic> json) {
@@ -22,6 +28,16 @@ class Conversation {
       lastMsg = last;
     }
     final sender = lastMsg?['sender'];
+    final seller = json['seller'];
+    String? sellerBusinessName;
+    String? sellerName;
+    if (seller is Map<String, dynamic>) {
+      final sellerRow = seller['seller'];
+      if (sellerRow is Map<String, dynamic> && sellerRow['business_name'] != null) {
+        sellerBusinessName = sellerRow['business_name'] as String;
+      }
+      sellerName = seller['first_name'] as String?;
+    }
     return Conversation(
       id: json['id'] as int,
       subject: json['subject'] as String? ?? 'Chat',
@@ -29,7 +45,19 @@ class Conversation {
       lastBody: lastMsg?['body'] as String?,
       lastSender: sender is Map<String, dynamic> ? sender['first_name'] as String? : null,
       lastTime: lastMsg?['created_at'] as String?,
+      sellerId: json['seller_id'] as int?,
+      sellerName: sellerName,
+      sellerBusinessName: sellerBusinessName,
     );
+  }
+
+  /// Display name for the thread: the seller's shop name when this is a
+  /// seller chat, otherwise the subject.
+  String get displayName => sellerBusinessName ?? subject;
+
+  String get initial {
+    final name = sellerBusinessName ?? subject;
+    return name.trim().isEmpty ? 'I' : name.trim().substring(0, 1).toUpperCase();
   }
 }
 

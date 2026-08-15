@@ -127,6 +127,16 @@ CREATE TABLE products (
     name VARCHAR(150) NOT NULL,
     description TEXT NULL,
 
+    -- CHANGE: extra product details (Shopee-style specs)
+    brand VARCHAR(100) NULL,
+    model VARCHAR(100) NULL,
+    sku VARCHAR(100) NULL,
+    material VARCHAR(100) NULL,
+    dimensions VARCHAR(100) NULL,
+    weight VARCHAR(50) NULL,
+    warranty VARCHAR(100) NULL,
+    origin VARCHAR(100) NULL,
+
     price DECIMAL(10,2) NOT NULL,
     stock INT UNSIGNED NOT NULL DEFAULT 0,
 
@@ -180,6 +190,27 @@ CREATE TABLE product_variants (
         ON UPDATE CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_product_variants_product
+        FOREIGN KEY (product_id)
+        REFERENCES products(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+
+-- =========================================================
+-- 3c. PRODUCT IMAGES  -- CHANGE: NEW TABLE
+--     Multiple gallery photos per product (Shopee-style).
+-- =========================================================
+CREATE TABLE product_images (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+
+    product_id BIGINT UNSIGNED NOT NULL,
+    image_path VARCHAR(255) NOT NULL,
+    sort_order INT UNSIGNED NOT NULL DEFAULT 0,
+
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_product_images_product
         FOREIGN KEY (product_id)
         REFERENCES products(id)
         ON DELETE CASCADE
@@ -661,6 +692,35 @@ CREATE TABLE favorites (
 
     CONSTRAINT uq_favorite_buyer_product
         UNIQUE (buyer_id, product_id)
+);
+
+
+-- =========================================================
+-- 16b. STORE FOLLOWS  -- CHANGE: NEW TABLE
+--      Buyers can follow a seller's store (Shopee-style).
+-- =========================================================
+CREATE TABLE store_follows (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+
+    buyer_id BIGINT UNSIGNED NOT NULL,
+    seller_id BIGINT UNSIGNED NOT NULL,
+
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_store_follows_buyer
+        FOREIGN KEY (buyer_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT fk_store_follows_seller
+        FOREIGN KEY (seller_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    CONSTRAINT uq_store_follow_buyer_seller
+        UNIQUE (buyer_id, seller_id)
 );
 
 

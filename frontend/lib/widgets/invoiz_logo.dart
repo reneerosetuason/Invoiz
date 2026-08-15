@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../theme.dart';
 
 /// Shared Invoiz logo image. Use [logoWidget] for a rounded-tile version
@@ -22,7 +22,7 @@ class InvoizLogo {
       child: Image.asset(
         assetPath,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => const Icon(
+        errorBuilder: (_, __, ___) => Icon(
           Icons.storefront,
           color: AppColors.primary,
           size: 28,

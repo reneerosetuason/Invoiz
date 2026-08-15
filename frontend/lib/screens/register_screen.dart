@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../config.dart';
@@ -286,7 +286,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       padding: const EdgeInsets.only(top: 4),
                       child: Text(
                         'Age (auto): ${_calcAge(_birthDate!)}',
-                        style: const TextStyle(color: AppColors.success, fontSize: 13, fontWeight: FontWeight.w600),
+                        style: TextStyle(color: AppColors.success, fontSize: 13, fontWeight: FontWeight.w600),
                       ),
                     ),
                   _field('Password*', _password, icon: Icons.lock_outline, obscure: true, required: true),
@@ -326,7 +326,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         : const Text('Submit Registration', style: TextStyle(fontSize: 15)),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
+                  Text(
                     'After submitting your registration, please wait for the administrator\'s approval, which will be sent to your email.',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
@@ -365,7 +365,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   TextStyle _labelStyle() =>
-      const TextStyle(fontSize: 14, color: AppColors.textPrimary, fontWeight: FontWeight.w500);
+      TextStyle(fontSize: 14, color: AppColors.textPrimary, fontWeight: FontWeight.w500);
 
   Widget _field(
     String label,

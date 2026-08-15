@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../theme.dart';
 import '../widgets/auth_service_provider.dart';
@@ -71,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -107,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(22),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.card,
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
@@ -158,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text(
+                            Text(
                               "Don't have an account? ",
                               style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
                             ),
@@ -167,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 context,
                                 MaterialPageRoute(builder: (_) => const RegisterScreen()),
                               ),
-                              child: const Text(
+                              child: Text(
                                 'Register',
                                 style: TextStyle(
                                   color: AppColors.primary,
@@ -178,7 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ],
                         ),
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.symmetric(vertical: 16),
                           child: Row(
                             children: [

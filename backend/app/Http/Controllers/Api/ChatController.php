@@ -11,7 +11,7 @@ class ChatController extends Controller
 {
     public function index(Request $request)
     {
-        $conversations = Conversation::with(['lastMessage.sender'])
+        $conversations = Conversation::with(['lastMessage.sender', 'seller.seller'])
             ->where('buyer_id', $request->user()->id)
             ->withCount(['messages as unread_count' => function ($q) use ($request) {
                 $q->where('is_read', false)->where('sender_id', '!=', $request->user()->id);
@@ -25,24 +25,38 @@ class ChatController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'subject' => ['required', 'string', 'max:150'],
-            'body'    => ['required', 'string', 'max:2000'],
+            'subject'   => ['required', 'string', 'max:150'],
+            'body'      => ['required', 'string', 'max:2000'],
+            'seller_id' => ['nullable', 'integer'],
         ]);
 
-        $conversation = Conversation::create([
-            'buyer_id' => $request->user()->id,
-            'subject'  => $validated['subject'],
-        ]);
+        $buyerId = $request->user()->id;
+
+        // Chats initiated from a product/store link to that seller. Reuse an
+        // existing thread between this buyer and the seller when possible.
+        $conversation = Conversation::where('buyer_id', $buyerId)
+            ->where('seller_id', $validated['seller_id'] ?? null)
+            ->first();
+
+        if (! $conversation) {
+            $conversation = Conversation::create([
+                'buyer_id'  => $buyerId,
+                'seller_id' => $validated['seller_id'] ?? null,
+                'subject'   => $validated['subject'],
+            ]);
+        }
 
         Message::create([
             'conversation_id' => $conversation->id,
-            'sender_id'       => $request->user()->id,
+            'sender_id'       => $buyerId,
             'body'            => $validated['body'],
         ]);
 
+        $conversation->touch();
+
         return response()->json([
-            'message'        => 'Message sent.',
-            'conversation'   => $conversation,
+            'message'      => 'Message sent.',
+            'conversation' => $conversation->load('seller.seller'),
         ], 201);
     }
 

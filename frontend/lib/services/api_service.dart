@@ -56,6 +56,29 @@ class ApiService {
     return _decode(res);
   }
 
+  Future<dynamic> request(String path, {required String method, Map<String, dynamic>? body}) async {
+    final uri = _uri(path);
+    final headers = _headers();
+    http.Response res;
+    switch (method.toUpperCase()) {
+      case 'GET':
+        res = await http.get(uri, headers: headers);
+        break;
+      case 'POST':
+        res = await http.post(uri, headers: headers, body: jsonEncode(body ?? {}));
+        break;
+      case 'PUT':
+        res = await http.put(uri, headers: headers, body: jsonEncode(body ?? {}));
+        break;
+      case 'DELETE':
+        res = await http.delete(uri, headers: headers);
+        break;
+      default:
+        throw ArgumentError('Unsupported method: $method');
+    }
+    return _decode(res);
+  }
+
   dynamic _decode(http.Response res) {
     final body = res.body.isEmpty ? null : jsonDecode(res.body);
     if (res.statusCode >= 200 && res.statusCode < 300) {

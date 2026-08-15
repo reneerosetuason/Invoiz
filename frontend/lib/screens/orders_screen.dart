@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../models/order.dart';
 import '../services/api_service.dart';
 import '../theme.dart';
@@ -134,7 +134,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
         MaterialPageRoute(builder: (_) => OrderDetailScreen(orderId: order.id)),
       ),
       child: Container(
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
+        decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(6)),
         padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,21 +169,21 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   if (otherCount > 0)
-                    Text(' +$otherCount more', style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                    Text(' +$otherCount more', style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
                 ],
               ),
             const SizedBox(height: 8),
             Row(
               children: [
-                Text('Total: ', style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                Text('Total: ', style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
                 Text(
                   _fmt(order.totalAmount),
-                  style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 14),
+                  style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 14),
                 ),
                 const Spacer(),
                 Text(
                   _date(order.createdAt),
-                  style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                  style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
                 ),
               ],
             ),
@@ -195,7 +195,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   String _fmt(double v) {
     final n = v.toStringAsFixed(2);
-    return '₱${n.split('.')[0]}.${n.split('.')[1]}';
+    return 'â‚±${n.split('.')[0]}.${n.split('.')[1]}';
   }
 
   String _date(String iso) {

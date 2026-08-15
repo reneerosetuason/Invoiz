@@ -1,10 +1,13 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import '../config.dart';
 import '../services/api_service.dart';
+import '../services/recently_viewed_service.dart';
 import '../theme.dart';
 import '../widgets/auth_service_provider.dart';
 import '../widgets/main_layout.dart';
 import 'product_detail_screen.dart';
 import 'product_list_screen.dart';
+import 'seller_store_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List _categories = [];
   List _products = [];
+  List _recent = [];
   bool _loading = true;
   int? _selectedCategory;
   String _search = '';
@@ -34,10 +38,12 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final cats = await _api.get('categories');
       final prods = await _api.get('products', query: {'per_page': '20'});
+      final recent = await RecentlyViewedService.load();
       setState(() {
         _categories = (cats['categories'] as List).cast<Map<String, dynamic>>();
         final data = prods['data'] as List;
         _products = data.cast<Map<String, dynamic>>();
+        _recent = recent;
         _loading = false;
       });
     } catch (e) {
@@ -125,16 +131,16 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          const Icon(Icons.filter_alt_outlined, size: 16, color: AppColors.primary),
+          Icon(Icons.filter_alt_outlined, size: 16, color: AppColors.primary),
           const SizedBox(width: 6),
           Text(
             name,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primary),
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primary),
           ),
           const Spacer(),
           GestureDetector(
             onTap: () => _selectCategory(null),
-            child: const Icon(Icons.close, size: 18, color: AppColors.primary),
+            child: Icon(Icons.close, size: 18, color: AppColors.primary),
           ),
         ],
       ),
@@ -157,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 children: [
                   const SizedBox(width: 12),
-                  const Icon(Icons.search, color: AppColors.textSecondary, size: 20),
+                  Icon(Icons.search, color: AppColors.textSecondary, size: 20),
                   const SizedBox(width: 6),
                   Expanded(
                     child: TextField(
@@ -232,6 +238,42 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
+        if (_recent.isNotEmpty) ...[
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 10),
+              child: Row(
+                children: [
+                  const Text(
+                    'Recently Viewed',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: -0.2),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: Icon(Icons.history, size: 20, color: AppColors.textSecondary),
+                    tooltip: 'Clear history',
+                    onPressed: () async {
+                      await RecentlyViewedService.clear();
+                      if (mounted) setState(() => _recent = []);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 190,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: _recent.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                itemBuilder: (context, i) => _recentCard(_recent[i]),
+              ),
+            ),
+          ),
+        ],
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 10),
@@ -244,7 +286,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Spacer(),
                 Text(
                   '${_products.length} items',
-                  style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                  style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
                 ),
               ],
             ),
@@ -269,6 +311,72 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _recentCard(Map<String, dynamic> p) {
+    final price = double.tryParse('${p['price']}') ?? 0;
+    final sold = p['sold'] is int ? (p['sold'] as int) : 0;
+    return GestureDetector(
+      onTap: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ProductDetailScreen(productId: p['id'] as int),
+          ),
+        );
+        if (mounted) {
+          final recent = await RecentlyViewedService.load();
+          setState(() => _recent = recent);
+        }
+      },
+      child: Container(
+        width: 130,
+        decoration: BoxDecoration(
+          color: AppColors.card,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 100,
+              width: double.infinity,
+              color: AppColors.surfaceSoft,
+              child: _productImage(p['image'] as String?),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      p['name'] as String,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 11.5, height: 1.2, fontWeight: FontWeight.w500),
+                    ),
+                    const Spacer(),
+                    Text(
+                      _formatPrice(price),
+                      style: TextStyle(
+                        color: AppColors.warning,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13,
+                      ),
+                    ),
+                    if (sold > 0)
+                      Text('$sold sold', style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _heroBanner(BuildContext context) {
     final auth = AuthServiceProvider.of(context);
     return Padding(
@@ -276,7 +384,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Container(
         height: 164,
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [AppColors.primary, Color(0xFF2E8B8F)],
@@ -330,7 +438,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(999),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Start shopping',
                       style: TextStyle(
                         color: AppColors.primary,
@@ -402,13 +510,25 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _productCard(Map<String, dynamic> p) {
     final price = double.tryParse('${p['price']}') ?? 0;
     final rating = p['rating'] != null ? double.tryParse('${p['rating']}') : null;
+    final sold = p['sold'] is int ? (p['sold'] as int) : 0;
+    final shop = p['shop'];
+    final shopName = shop is Map<String, dynamic>
+        ? (shop['business_name'] as String? ?? 'Invoiz Store')
+        : null;
+    final shopSellerId = shop is Map<String, dynamic> ? (shop['seller_id'] as int?) : null;
     return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ProductDetailScreen(productId: p['id'] as int),
-        ),
-      ),
+      onTap: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ProductDetailScreen(productId: p['id'] as int),
+          ),
+        );
+        if (mounted) {
+          final recent = await RecentlyViewedService.load();
+          setState(() => _recent = recent);
+        }
+      },
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.card,
@@ -460,13 +580,29 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.star, color: AppColors.gold, size: 13),
+                            Icon(Icons.star, color: AppColors.gold, size: 13),
                             const SizedBox(width: 3),
                             Text(
                               rating.toStringAsFixed(1),
                               style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
                             ),
                           ],
+                        ),
+                      ),
+                    ),
+                  if (sold > 0)
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppColors.card,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          '$sold sold',
+                          style: TextStyle(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
@@ -488,16 +624,46 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 6),
                     Text(
                       _formatPrice(price),
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.warning,
                         fontWeight: FontWeight.w800,
                         fontSize: 15,
                       ),
                     ),
                     const Spacer(),
+                    if (shopName != null && shopSellerId != null)
+                      GestureDetector(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => SellerStoreScreen(sellerId: shopSellerId),
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            children: [
+                              Icon(Icons.storefront, size: 12, color: AppColors.primary),
+                              const SizedBox(width: 3),
+                              Expanded(
+                                child: Text(
+                                  shopName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     Row(
                       children: [
-                        const Icon(Icons.local_shipping_outlined, size: 12, color: AppColors.textSecondary),
+                        Icon(Icons.local_shipping_outlined, size: 12, color: AppColors.textSecondary),
                         const SizedBox(width: 3),
                         Text(
                           'COD',
@@ -512,7 +678,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           child: Text(
                             '${p['stock']} left',
-                            style: const TextStyle(fontSize: 10, color: AppColors.primary, fontWeight: FontWeight.w600),
+                            style: TextStyle(fontSize: 10, color: AppColors.primary, fontWeight: FontWeight.w600),
                           ),
                         ),
                       ],
@@ -540,14 +706,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   String _imageUrl(String path) {
-    if (path.startsWith('http')) return path;
-    return 'http://127.0.0.1:8000/storage/$path';
+    return AppConfig.storageUrl(path);
   }
 
   String _formatPrice(double value) {
     final n = value.toStringAsFixed(2);
     final parts = n.split('.');
-    return '₱${parts[0]}.${parts[1]}';
+    return 'â‚±${parts[0]}.${parts[1]}';
   }
 
   IconData _categoryIcon(String name) {

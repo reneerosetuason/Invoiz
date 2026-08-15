@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../theme.dart';
 import '../widgets/auth_service_provider.dart';
 import '../widgets/main_layout.dart';
@@ -82,9 +82,9 @@ class _SellerHomeScreenState extends State<SellerHomeScreen> {
             const SizedBox(height: 6),
             Text(
               'This is your seller dashboard, ${user?.firstName ?? ''}. The full seller '
-              'experience — adding products, managing orders, and store analytics — '
+              'experience â€” adding products, managing orders, and store analytics â€” '
               'is coming soon.',
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 14, height: 1.5),
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 14, height: 1.5),
             ),
             const SizedBox(height: 24),
             _comingSoonTile(Icons.inventory_2_outlined, 'Manage Products'),
@@ -119,7 +119,7 @@ class _SellerHomeScreenState extends State<SellerHomeScreen> {
               color: AppColors.accent,
               borderRadius: BorderRadius.circular(999),
             ),
-            child: const Text(
+            child: Text(
               'Coming soon',
               style: TextStyle(fontSize: 11, color: AppColors.primary, fontWeight: FontWeight.w700),
             ),

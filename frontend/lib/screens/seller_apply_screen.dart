@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import '../services/api_service.dart';
@@ -148,7 +148,7 @@ class _SellerApplyScreenState extends State<SellerApplyScreen> {
                 color: AppColors.accent,
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: const Row(
+              child: Row(
                 children: [
                   Icon(Icons.storefront, color: AppColors.primary, size: 30),
                   SizedBox(width: 12),
@@ -167,8 +167,8 @@ class _SellerApplyScreenState extends State<SellerApplyScreen> {
             if (user != null) ...[
               _infoRow(Icons.person_outline, 'Name', '${user.firstName} ${user.lastName}'),
               _infoRow(Icons.mail_outline, 'E-mail', user.email),
-              _infoRow(Icons.phone_outlined, 'Contact No.', user.phone ?? '—'),
-              _infoRow(Icons.cake_outlined, 'Birthday / Age', '${user.birthday ?? '—'} (${user.age ?? '—'} y/o)'),
+              _infoRow(Icons.phone_outlined, 'Contact No.', user.phone ?? 'â€”'),
+              _infoRow(Icons.cake_outlined, 'Birthday / Age', '${user.birthday ?? 'â€”'} (${user.age ?? 'â€”'} y/o)'),
               _infoRow(Icons.location_on_outlined, 'Address',
                   [user.barangay, user.municipality, user.province, user.addressLine]
                       .where((s) => s != null && s.isNotEmpty)
@@ -224,7 +224,7 @@ class _SellerApplyScreenState extends State<SellerApplyScreen> {
                   : const Text('Submit Application'),
             ),
             const SizedBox(height: 12),
-            const Text(
+            Text(
               'After submitting your application, please wait for the administrator\'s approval, '
               'which will be sent to your email.',
               textAlign: TextAlign.center,
@@ -270,7 +270,7 @@ class _SellerApplyScreenState extends State<SellerApplyScreen> {
           const SizedBox(width: 10),
           SizedBox(
             width: 110,
-            child: Text(label, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+            child: Text(label, style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
           ),
           Expanded(
             child: Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),

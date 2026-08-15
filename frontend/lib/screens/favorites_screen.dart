@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import '../config.dart';
 import '../models/product.dart';
 import '../services/api_service.dart';
 import '../theme.dart';
@@ -61,7 +62,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.favorite_border, size: 60, color: AppColors.textSecondary),
+              Icon(Icons.favorite_border, size: 60, color: AppColors.textSecondary),
               const SizedBox(height: 12),
               const Text('Please log in to view your favorites.'),
               const SizedBox(height: 16),
@@ -101,7 +102,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         MaterialPageRoute(builder: (_) => ProductDetailScreen(productId: p.id)),
       ),
       child: Container(
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
+        decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(6)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -110,11 +111,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 Container(
                   height: 140,
                   width: double.infinity,
-                  color: const Color(0xFFF3F3F3),
+                  color: AppColors.surfaceSoft,
                   child: p.image == null
                       ? const Icon(Icons.image_not_supported_outlined, color: Colors.grey, size: 40)
                       : Image.network(
-                          p.image!.startsWith('http') ? p.image! : 'http://127.0.0.1:8000/storage/${p.image}',
+                          AppConfig.storageUrl(p.image),
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => const Icon(Icons.image_not_supported_outlined, color: Colors.grey, size: 40),
                         ),
@@ -141,7 +142,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   children: [
                     Text(p.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13)),
                     const SizedBox(height: 4),
-                    Text(p.formattedPrice, style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 15)),
+                    Text(p.formattedPrice, style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 15)),
                   ],
                 ),
               ),

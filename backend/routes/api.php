@@ -6,9 +6,11 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\SellerController;
+use App\Http\Controllers\Api\StoreController;
 use App\Http\Controllers\Api\VoucherController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +27,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
+Route::get('/stores/{seller}', [StoreController::class, 'show']);
+Route::get('/stores/{seller}/reviews', [StoreController::class, 'reviews']);
 
 // ---- Auth ----
 Route::post('/register', [AuthController::class, 'register']);
@@ -70,6 +74,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // Favorites
     Route::get('/favorites', [FavoriteController::class, 'index']);
     Route::post('/favorites/toggle', [FavoriteController::class, 'toggle']);
+
+    // Follow / unfollow a store
+    Route::post('/stores/{seller}/follow', [StoreController::class, 'follow']);
+    Route::delete('/stores/{seller}/follow', [StoreController::class, 'follow']);
+
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index']);
 
     // Seller application (buyer + seller live under one identity)
     Route::post('/seller/apply', [SellerController::class, 'apply']);

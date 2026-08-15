@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../theme.dart';
 import '../widgets/auth_service_provider.dart';
@@ -31,7 +31,7 @@ class RolePickerScreen extends StatelessWidget {
     final user = auth.user;
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -48,10 +48,10 @@ class RolePickerScreen extends StatelessWidget {
                     width: 86,
                     height: 86,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.card,
                       borderRadius: BorderRadius.circular(24),
                     ),
-                    child: const Icon(Icons.storefront, color: AppColors.primary, size: 52),
+                    child: Icon(Icons.storefront, color: AppColors.primary, size: 52),
                   ),
                   const SizedBox(height: 20),
                   const Text(
@@ -101,7 +101,7 @@ class RolePickerScreen extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return Material(
-      color: Colors.white,
+      color: AppColors.card,
       borderRadius: BorderRadius.circular(20),
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
@@ -137,7 +137,7 @@ class RolePickerScreen extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
@@ -146,12 +146,12 @@ class RolePickerScreen extends StatelessWidget {
                     const SizedBox(height: 3),
                     Text(
                       subtitle,
-                      style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                      style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
                     ),
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+              Icon(Icons.chevron_right, color: AppColors.textSecondary),
             ],
           ),
         ),

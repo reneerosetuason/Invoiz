@@ -1,9 +1,51 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../models/chat.dart';
 import '../services/api_service.dart';
 import '../theme.dart';
 import '../widgets/auth_service_provider.dart';
 import '../widgets/main_layout.dart';
+import 'login_screen.dart';
+
+/// Starts (or reuses) a conversation with a seller and opens the thread.
+/// Used from the product page and the seller store page ("Chat with Seller").
+Future<void> openSellerChat(
+  BuildContext context, {
+  required int sellerId,
+  required String subject,
+  required String initialBody,
+}) async {
+  final auth = AuthServiceProvider.of(context);
+  if (!auth.isLoggedIn) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please log in to chat with the seller.')),
+    );
+    Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+    return;
+  }
+
+  final api = ApiService();
+  try {
+    final r = await api.post('conversations', {
+      'seller_id': sellerId,
+      'subject': subject,
+      'body': initialBody,
+    });
+    final conv = r['conversation'] as Map<String, dynamic>;
+    if (!context.mounted) return;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ChatThreadScreen(
+          conversationId: conv['id'] as int,
+          subject: subject,
+        ),
+      ),
+    );
+  } catch (e) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+  }
+}
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -91,7 +133,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.chat_bubble_outline, size: 60, color: AppColors.textSecondary),
+                      Icon(Icons.chat_bubble_outline, size: 60, color: AppColors.textSecondary),
                       const SizedBox(height: 12),
                       const Text('No conversations yet.'),
                       const SizedBox(height: 16),
@@ -127,18 +169,27 @@ class _ChatScreenState extends State<ChatScreen> {
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => _ChatThreadScreen(conversationId: c.id, subject: c.subject)),
+        MaterialPageRoute(builder: (_) => ChatThreadScreen(conversationId: c.id, subject: c.displayName)),
       ).then((_) => _load()),
       child: Container(
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
+        decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(6)),
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
             Container(
               width: 44,
               height: 44,
-              decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
-              child: const Icon(Icons.support_agent, color: Colors.white, size: 24),
+              decoration: BoxDecoration(
+                color: c.sellerId != null ? AppColors.primaryDark : AppColors.primary,
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: c.sellerId != null
+                  ? Text(
+                      c.initial,
+                      style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700),
+                    )
+                  : const Icon(Icons.support_agent, color: Colors.white, size: 24),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -148,7 +199,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: Text(c.subject, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis),
+                        child: Text(c.displayName, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis),
                       ),
                       if (c.unreadCount > 0)
                         Container(
@@ -163,7 +214,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       c.lastBody!,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                      style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
                     ),
                 ],
               ),
@@ -175,16 +226,16 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 }
 
-class _ChatThreadScreen extends StatefulWidget {
+class ChatThreadScreen extends StatefulWidget {
   final int conversationId;
   final String subject;
-  const _ChatThreadScreen({required this.conversationId, required this.subject});
+  const ChatThreadScreen({super.key, required this.conversationId, required this.subject});
 
   @override
-  State<_ChatThreadScreen> createState() => _ChatThreadScreenState();
+  State<ChatThreadScreen> createState() => _ChatThreadScreenState();
 }
 
-class _ChatThreadScreenState extends State<_ChatThreadScreen> {
+class _ChatThreadScreenState extends State<ChatThreadScreen> {
   final _api = ApiService();
   final _inputCtrl = TextEditingController();
   List<ChatMessage> _messages = [];
@@ -261,7 +312,7 @@ class _ChatThreadScreenState extends State<_ChatThreadScreen> {
                       ),
           ),
           Container(
-            color: Colors.white,
+            color: AppColors.card,
             padding: const EdgeInsets.all(8),
             child: SafeArea(
               child: Row(

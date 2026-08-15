@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 // NOTE: This file is the single, shared shell for ALL pages.
 // It provides the top navbar + left sidebar (like Shopee) so that
@@ -10,10 +10,12 @@ import '../screens/chat_screen.dart';
 import '../screens/favorites_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/login_screen.dart';
+import '../screens/notifications_screen.dart';
 import '../screens/orders_screen.dart';
 import '../screens/register_screen.dart';
 import '../screens/seller_apply_screen.dart';
 import '../screens/seller_home_screen.dart';
+import '../services/api_service.dart';
 import '../services/auth_service.dart';
 import '../theme.dart';
 import 'auth_service_provider.dart';
@@ -51,7 +53,7 @@ class MainLayout extends StatelessWidget {
                       children: [
                         InvoizLogo.logoWidget(size: 26, radius: 7),
                         const SizedBox(width: 6),
-                        const Text(
+                        Text(
                           'Invoiz',
                           style: TextStyle(
                             color: AppColors.primary,
@@ -88,6 +90,7 @@ class MainLayout extends StatelessWidget {
                     },
                   ),
                 ),
+                const _NotificationBell(),
                 const SizedBox(width: 4),
               ],
             )
@@ -222,7 +225,7 @@ class Sidebar extends StatelessWidget {
                   label: 'Favorites',
                   onTap: () => goTo(const FavoritesScreen()),
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.fromLTRB(16, 10, 16, 6),
                   child: Text(
                     'MY ACCOUNT',
@@ -241,6 +244,11 @@ class Sidebar extends StatelessWidget {
                     onTap: () => goTo(const OrdersScreen()),
                   ),
                   _NavItem(
+                    icon: Icons.notifications_outlined,
+                    label: 'Notifications',
+                    onTap: () => goTo(const NotificationsScreen()),
+                  ),
+                  _NavItem(
                     icon: Icons.chat_outlined,
                     label: 'Messages',
                     onTap: () => goTo(const ChatScreen()),
@@ -250,7 +258,7 @@ class Sidebar extends StatelessWidget {
                     label: 'Account',
                     onTap: () => goTo(const AccountScreen()),
                   ),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.fromLTRB(16, 10, 16, 6),
                     child: Text(
                       'SELL',
@@ -319,12 +327,14 @@ class Sidebar extends StatelessWidget {
                     ),
                   ),
                 ],
+                const Divider(),
+                const _DarkModeToggle(),
               ],
             ),
           ),
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(14),
-            child: Text('Invoiz · v1.0', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+            child: Text('Invoiz Â· v1.0', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
           ),
         ],
       ),
@@ -370,6 +380,92 @@ class _GuestAction extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _DarkModeToggle extends StatelessWidget {
+  const _DarkModeToggle();
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<bool>(
+      valueListenable: ThemeController.isDark,
+      builder: (context, isDark, _) {
+        return SwitchListTile(
+          secondary: Icon(isDark ? Icons.dark_mode : Icons.light_mode, size: 22),
+          title: Text(isDark ? 'Dark mode' : 'Light mode', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+          value: isDark,
+          onChanged: (v) => ThemeController.setDark(v),
+        );
+      },
+    );
+  }
+}
+
+class _NotificationBell extends StatefulWidget {
+  const _NotificationBell();
+
+  @override
+  State<_NotificationBell> createState() => _NotificationBellState();
+}
+
+class _NotificationBellState extends State<_NotificationBell> {
+  final _api = ApiService();
+  int _unread = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final data = await _api.get('notifications');
+      if (!mounted) return;
+      final items = (data['notifications'] as List).cast<Map<String, dynamic>>();
+      setState(() => _unread = items.where((n) => n['read'] == false).length);
+    } catch (_) {
+      // silent: guest or offline
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = AuthServiceProvider.of(context);
+    if (!auth.isLoggedIn) return const SizedBox.shrink();
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.notifications_outlined),
+          onPressed: () async {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+            );
+            _load();
+          },
+        ),
+        if (_unread > 0)
+          Positioned(
+            right: 4,
+            top: 6,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+              decoration: BoxDecoration(
+                color: AppColors.warning,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: Colors.white, width: 1.5),
+              ),
+              child: Text(
+                '$_unread',
+                style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

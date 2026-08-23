@@ -232,7 +232,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
               height: 140,
               width: double.infinity,
               color: AppColors.surfaceSoft,
-              child: _image(p['image'] as String?),
+              child: _image(_cover(p)),
             ),
             Expanded(
               child: Padding(
@@ -297,6 +297,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
         ),
       ),
     );
+  }
+
+  String? _cover(Map<String, dynamic> p) {
+    final g = p['gallery'];
+    if (g is List && g.isNotEmpty) return g.first as String;
+    return p['image'] as String?;
   }
 
   Widget _image(String? url) {

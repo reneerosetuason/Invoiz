@@ -13,7 +13,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $query = Product::query()
-            ->with(['category', 'variants'])
+            ->with(['category', 'variants', 'images'])
             ->where('status', 'active');
 
         if ($request->has('category_id')) {
@@ -53,6 +53,7 @@ class ProductController extends Controller
         });
 
         $this->attachShop($products->getCollection());
+        $this->attachGallery($products->getCollection());
 
         return response()->json($products);
     }
@@ -140,7 +141,9 @@ class ProductController extends Controller
                 'rating'         => round((float) ($ratings[$product->seller_id] ?? 0), 1),
                 'product_count'  => (int) ($counts[$product->seller_id] ?? 0),
                 'followers'      => (int) ($followers[$product->seller_id] ?? 0),
-                'logo'           => null,
+                'logo'           => $store->logo,
+                'primary_color'  => $store->primary_color ?? '#16697A',
+                'accent_color'   => $store->accent_color ?? '#F0A202',
             ];
         }
     }

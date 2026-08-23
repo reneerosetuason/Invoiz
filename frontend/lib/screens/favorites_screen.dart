@@ -7,6 +7,7 @@ import '../widgets/auth_service_provider.dart';
 import '../widgets/main_layout.dart';
 import 'login_screen.dart';
 import 'product_detail_screen.dart';
+import 'seller_store_screen.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -143,6 +144,32 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     Text(p.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13)),
                     const SizedBox(height: 4),
                     Text(p.formattedPrice, style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 15)),
+                    const SizedBox(height: 4),
+                    if (p.shop != null)
+                      GestureDetector(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => SellerStoreScreen(sellerId: p.shop!.sellerId)),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.storefront, size: 12, color: AppColors.primary),
+                            const SizedBox(width: 3),
+                            Expanded(
+                              child: Text(
+                                p.shop!.businessName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
               ),

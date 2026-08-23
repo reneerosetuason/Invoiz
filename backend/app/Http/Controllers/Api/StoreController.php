@@ -204,7 +204,9 @@ class StoreController extends Controller
                 '1' => (int) ($reviewAgg->r1 ?? 0),
             ] : [],
             'member_since'     => $seller->created_at?->toDateString(),
-            'logo'             => null,
+            'logo'             => $seller->logo,
+            'primary_color'    => $seller->primary_color ?? '#16697A',
+            'accent_color'     => $seller->accent_color ?? '#F0A202',
         ];
     }
 }

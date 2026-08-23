@@ -342,7 +342,7 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 100,
               width: double.infinity,
               color: AppColors.surfaceSoft,
-              child: _productImage(p['image'] as String?),
+              child: _productImage(_cover(p)),
             ),
             Expanded(
               child: Padding(
@@ -552,7 +552,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: AppColors.surfaceSoft,
               child: Stack(
                 children: [
-                  Positioned.fill(child: _productImage(p['image'] as String?)),
+                  Positioned.fill(child: _productImage(_cover(p))),
                   if (p['stock'] is int && (p['stock'] as int) == 0)
                     Positioned.fill(
                       child: Container(
@@ -691,6 +691,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  String? _cover(Map<String, dynamic> p) {
+    final g = p['gallery'];
+    if (g is List && g.isNotEmpty) return g.first as String;
+    return p['image'] as String?;
   }
 
   Widget _productImage(String? url) {

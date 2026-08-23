@@ -328,7 +328,6 @@ class Sidebar extends StatelessWidget {
                   ),
                 ],
                 const Divider(),
-                const _DarkModeToggle(),
               ],
             ),
           ),
@@ -380,25 +379,6 @@ class _GuestAction extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _DarkModeToggle extends StatelessWidget {
-  const _DarkModeToggle();
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: ThemeController.isDark,
-      builder: (context, isDark, _) {
-        return SwitchListTile(
-          secondary: Icon(isDark ? Icons.dark_mode : Icons.light_mode, size: 22),
-          title: Text(isDark ? 'Dark mode' : 'Light mode', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-          value: isDark,
-          onChanged: (v) => ThemeController.setDark(v),
-        );
-      },
     );
   }
 }

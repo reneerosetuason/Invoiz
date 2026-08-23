@@ -14,6 +14,9 @@ class Seller extends Model
         'business_permit',
         'approval_status',
         'status',
+        'primary_color',
+        'accent_color',
+        'logo',
     ];
 
     protected $casts = [

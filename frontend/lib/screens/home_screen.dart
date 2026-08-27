@@ -299,7 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisCount: 2,
               mainAxisSpacing: 14,
               crossAxisSpacing: 14,
-              childAspectRatio: 0.64,
+              childAspectRatio: 0.74,
             ),
             delegate: SliverChildBuilderDelegate(
               (context, i) => _productCard(_products[i]),
@@ -630,7 +630,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontSize: 15,
                       ),
                     ),
-                    const Spacer(),
+                    const SizedBox(height: 10),
                     if (shopName != null && shopSellerId != null)
                       GestureDetector(
                         onTap: () => Navigator.push(
@@ -718,7 +718,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _formatPrice(double value) {
     final n = value.toStringAsFixed(2);
     final parts = n.split('.');
-    return 'â‚±${parts[0]}.${parts[1]}';
+    return '₱${parts[0]}.${parts[1]}';
   }
 
   IconData _categoryIcon(String name) {

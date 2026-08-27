@@ -195,7 +195,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   String _fmt(double v) {
     final n = v.toStringAsFixed(2);
-    return 'â‚±${n.split('.')[0]}.${n.split('.')[1]}';
+    return '₱${n.split('.')[0]}.${n.split('.')[1]}';
   }
 
   String _date(String iso) {

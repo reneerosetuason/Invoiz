@@ -315,7 +315,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         child: Text(item.productName, style: const TextStyle(fontSize: 13)),
                       ),
                       Text(
-                        '${item.quantity} Ã— ${_fmt(item.price)}',
+                        '${item.quantity} × ${_fmt(item.price)}',
                         style: const TextStyle(fontSize: 13),
                       ),
                     ],
@@ -442,7 +442,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   String _fmt(double v) {
     final n = v.toStringAsFixed(2);
-    return 'â‚±${n.split('.')[0]}.${n.split('.')[1]}';
+    return '₱${n.split('.')[0]}.${n.split('.')[1]}';
   }
 
   String _date(String iso) {

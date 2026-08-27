@@ -13,6 +13,6 @@ class AppConfig {
     if (path == null || path.isEmpty) return '';
     if (path.startsWith('http://') || path.startsWith('https://')) return path;
     final base = apiBaseUrl.replaceFirst(RegExp(r'/api/?$'), '');
-    return '$base/storage/$path';
+    return '$base/img/$path';
   }
 }

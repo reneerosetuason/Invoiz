@@ -247,6 +247,6 @@ class _CartScreenState extends State<CartScreen> {
 
   String _fmt(double v) {
     final n = v.toStringAsFixed(2);
-    return 'â‚±${n.split('.')[0]}.${n.split('.')[1]}';
+    return '₱${n.split('.')[0]}.${n.split('.')[1]}';
   }
 }

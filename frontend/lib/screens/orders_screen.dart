@@ -85,6 +85,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   @override
   Widget build(BuildContext context) {
     return MainLayout(
+      currentIndex: 3,
       title: 'My Orders',
       child: Column(
         children: [

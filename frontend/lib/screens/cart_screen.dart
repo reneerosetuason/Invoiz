@@ -76,6 +76,7 @@ class _CartScreenState extends State<CartScreen> {
     final auth = AuthServiceProvider.of(context);
     if (!auth.isLoggedIn) {
       return MainLayout(
+        currentIndex: 2,
         title: 'My Cart',
         child: Center(
           child: Column(
@@ -96,6 +97,7 @@ class _CartScreenState extends State<CartScreen> {
     }
 
     return MainLayout(
+      currentIndex: 2,
       title: 'My Cart',
       child: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -160,8 +162,8 @@ class _CartScreenState extends State<CartScreen> {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    Text(_fmt(item.unitPrice), style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
-                    const Spacer(),
+                    Flexible(child: Text(_fmt(item.unitPrice), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold))),
+                    const SizedBox(width: 8),
                     _qtyCtrl(item),
                   ],
                 ),
@@ -216,21 +218,22 @@ class _CartScreenState extends State<CartScreen> {
       child: SafeArea(
         child: Row(
           children: [
-            Text('Total: ', style: const TextStyle(fontSize: 14)),
-            Text(
-              _fmt(_selectedSubtotal),
-              style: TextStyle(color: AppColors.primary, fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const Spacer(),
-            ElevatedButton(
-              onPressed: _selected.isEmpty
-                  ? null
-                  : () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const CheckoutScreen()),
-                      ),
-              style: ElevatedButton.styleFrom(minimumSize: const Size(140, 44)),
-              child: const Text('Checkout'),
+            Flexible(child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('Total: ', style: TextStyle(fontSize: 14)),
+                Flexible(child: Text(_fmt(_selectedSubtotal), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: AppColors.primary, fontSize: 16, fontWeight: FontWeight.bold))),
+              ],
+            )),
+            const SizedBox(width: 8),
+            Flexible(
+              child: ElevatedButton(
+                onPressed: _selected.isEmpty
+                    ? null
+                    : () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CheckoutScreen())),
+                style: ElevatedButton.styleFrom(minimumSize: const Size(110, 44), padding: const EdgeInsets.symmetric(horizontal: 12)),
+                child: const Text('Checkout', maxLines: 1, overflow: TextOverflow.ellipsis),
+              ),
             ),
           ],
         ),

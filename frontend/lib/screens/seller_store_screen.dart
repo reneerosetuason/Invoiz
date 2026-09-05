@@ -124,6 +124,7 @@ class _SellerStoreScreenState extends State<SellerStoreScreen>
   @override
   Widget build(BuildContext context) {
     return MainLayout(
+      showBottomNav: false,
       title: _store?['business_name'] as String? ?? 'Store',
       child: _loading
           ? const Center(child: CircularProgressIndicator())

@@ -1,11 +1,14 @@
 ﻿import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import '../services/auth_service.dart';
 import '../theme.dart';
 import '../widgets/auth_service_provider.dart';
 import '../widgets/main_layout.dart';
 import 'add_address_screen.dart';
 import 'orders_screen.dart';
 import 'profile_screen.dart';
+import 'seller_apply_screen.dart';
+import 'seller_home_screen.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -38,6 +41,7 @@ class _AccountScreenState extends State<AccountScreen> {
     final user = auth.user;
 
     return MainLayout(
+      currentIndex: 4,
       title: 'Account',
       child: ListView(
         padding: const EdgeInsets.all(12),
@@ -84,6 +88,20 @@ class _AccountScreenState extends State<AccountScreen> {
           _menuTile(Icons.person_outline, 'Edit Profile', () {
             Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen()));
           }),
+          if (auth.canActAsSeller)
+            _menuTile(Icons.storefront, 'Seller Center', () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const SellerHomeScreen()));
+            })
+          else if (auth.isLoggedIn)
+            _menuTile(
+              Icons.storefront_outlined,
+              auth.user?.seller != null
+                  ? (auth.user!.seller!.isPending
+                      ? 'Seller Application: Pending'
+                      : 'Seller: ${auth.user!.seller!.approvalStatus}')
+                  : 'Apply as Seller',
+              () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SellerApplyScreen())),
+            ),
           const SizedBox(height: 8),
           Container(
             decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(6)),

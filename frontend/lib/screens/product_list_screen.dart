@@ -65,6 +65,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
   @override
   Widget build(BuildContext context) {
     return MainLayout(
+      currentIndex: 1,
       title: 'Products',
       child: Column(
         children: [
@@ -136,10 +137,19 @@ class _ProductListScreenState extends State<ProductListScreen> {
               children: [
                 const Text('Sort:', style: TextStyle(fontSize: 13)),
                 const SizedBox(width: 8),
-                _sortChip('newest', 'Newest'),
-                _sortChip('price_asc', 'Price: Low-High'),
-                _sortChip('price_desc', 'Price: High-Low'),
-                _sortChip('rating', 'Rating'),
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _sortChip('newest', 'Newest'),
+                        _sortChip('price_asc', 'Price: Low-High'),
+                        _sortChip('price_desc', 'Price: High-Low'),
+                        _sortChip('rating', 'Rating'),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -155,7 +165,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                           crossAxisCount: 2,
                           mainAxisSpacing: 14,
                           crossAxisSpacing: 14,
-                          childAspectRatio: 0.68,
+                          childAspectRatio: 0.64,
                         ),
                         itemCount: _products.length,
                         itemBuilder: (context, i) => _card(_products[i]),
@@ -236,14 +246,14 @@ class _ProductListScreenState extends State<ProductListScreen> {
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(p['name'] as String, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                    Text(p['name'] as String, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12.5, height: 1.2, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 4),
+                    Text(_fmt(price), style: TextStyle(color: AppColors.warning, fontWeight: FontWeight.w800, fontSize: 14)),
                     const SizedBox(height: 6),
-                    Text(_fmt(price), style: TextStyle(color: AppColors.warning, fontWeight: FontWeight.w800, fontSize: 15)),
-                    const Spacer(),
                     if (shopName != null && shopSellerId != null)
                       GestureDetector(
                         onTap: () => Navigator.push(
@@ -282,10 +292,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
                           Text(rating.toStringAsFixed(1), style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
                           const SizedBox(width: 6),
                         ],
-                        Text('${p['stock']} left', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                        Flexible(child: Text('${p['stock']} left', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: AppColors.textSecondary))),
                         if (sold > 0) ...[
                           const SizedBox(width: 6),
-                          Text('$sold sold', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                          Flexible(child: Text('$sold sold', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: AppColors.textSecondary))),
                         ],
                       ],
                     ),

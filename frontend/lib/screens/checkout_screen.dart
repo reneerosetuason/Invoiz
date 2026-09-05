@@ -144,16 +144,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   Widget _section(String title, Widget child) {
     return Container(
-      decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(6)),
+      decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(6), border: Border.all(color: AppColors.border)),
       padding: const EdgeInsets.all(14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 12),
-          child,
-        ],
-      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF212121))), const SizedBox(height: 12), child]),
     );
   }
 

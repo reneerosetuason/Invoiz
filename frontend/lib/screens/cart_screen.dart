@@ -5,8 +5,11 @@ import '../services/api_service.dart';
 import '../theme.dart';
 import '../widgets/auth_service_provider.dart';
 import '../widgets/main_layout.dart';
+import 'chat_screen.dart';
 import 'checkout_screen.dart';
+import 'home_screen.dart';
 import 'login_screen.dart';
+import 'notifications_screen.dart';
 import 'product_detail_screen.dart';
 
 class CartScreen extends StatefulWidget {
@@ -77,45 +80,105 @@ class _CartScreenState extends State<CartScreen> {
     if (!auth.isLoggedIn) {
       return MainLayout(
         currentIndex: 2,
-        title: 'My Cart',
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.lock_outline, size: 60, color: AppColors.textSecondary),
-              const SizedBox(height: 12),
-              const Text('Please log in to view your cart.'),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen())),
-                child: const Text('Login'),
+        showAppBar: false,
+        child: Column(
+          children: [
+            _cartHeader(context, isLoggedIn: false),
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.lock_outline, size: 60, color: AppColors.textSecondary),
+                    const SizedBox(height: 12),
+                    const Text('Please log in to view your cart.', style: TextStyle(color: Color(0xFF212121))),
+                    const SizedBox(height: 16),
+                    ElevatedButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen())), child: const Text('Login')),
+                  ],
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       );
     }
 
     return MainLayout(
       currentIndex: 2,
-      title: 'My Cart',
-      child: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : _cart == null || _cart!.items.isEmpty
-              ? const Center(child: Text('Your cart is empty.'))
-              : Column(
-                  children: [
-                    Expanded(
-                      child: ListView.separated(
+      showAppBar: false,
+      child: Column(
+        children: [
+          _cartHeader(context, isLoggedIn: true),
+          Expanded(
+            child: _loading
+                ? const Center(child: CircularProgressIndicator())
+                : _cart == null || _cart!.items.isEmpty
+                    ? const Center(child: Text('Your cart is empty.', style: TextStyle(color: Color(0xFF212121))))
+                    : ListView.separated(
                         padding: const EdgeInsets.all(12),
                         itemCount: _cart!.items.length,
                         separatorBuilder: (_, __) => const SizedBox(height: 8),
                         itemBuilder: (context, i) => _cartItemTile(_cart!.items[i]),
                       ),
-                    ),
-                    _checkoutBar(context),
-                  ],
-                ),
+          ),
+          if (!_loading && _cart != null && _cart!.items.isNotEmpty) _checkoutBar(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _cartHeader(BuildContext context, {required bool isLoggedIn}) {
+    return Container(
+      decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [AppColors.primary, const Color(0xFF1B8A8A)])),
+      padding: EdgeInsets.fromLTRB(8, MediaQuery.of(context).padding.top + 6, 8, 10),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 22),
+            onPressed: () {
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              } else {
+                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const HomeScreen()), (route) => false);
+              }
+            },
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+          ),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Container(
+              height: 36,
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+              child: Row(
+                children: [
+                  const SizedBox(width: 10),
+                  Icon(Icons.search, color: AppColors.textSecondary, size: 18),
+                  const SizedBox(width: 6),
+                  const Expanded(child: Text('Search products...', style: TextStyle(color: Color(0xFF9E9E9E), fontSize: 13))),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined, color: Colors.white, size: 22),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen())),
+          ),
+          IconButton(
+            icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 22),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            onPressed: () {
+              final auth = AuthServiceProvider.of(context);
+              if (!auth.isLoggedIn) { Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen())); return; }
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatScreen()));
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -156,17 +219,10 @@ class _CartScreenState extends State<CartScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.product.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13)),
-                if (item.variantLabel.isNotEmpty)
-                  Text(item.variantLabel, style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                Text(item.product.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF212121))),
+                if (item.variantLabel.isNotEmpty) Text(item.variantLabel, style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
                 const SizedBox(height: 6),
-                Row(
-                  children: [
-                    Flexible(child: Text(_fmt(item.unitPrice), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold))),
-                    const SizedBox(width: 8),
-                    _qtyCtrl(item),
-                  ],
-                ),
+                Row(children: [Flexible(child: Text(_fmt(item.unitPrice), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold))), const SizedBox(width: 8), _qtyCtrl(item)]),
               ],
             ),
           ),
@@ -188,11 +244,11 @@ class _CartScreenState extends State<CartScreen> {
           ),
         ),
         Container(
-          width: 34,
+          width: 36,
           height: 28,
           alignment: Alignment.center,
-          decoration: BoxDecoration(border: Border.all(color: AppColors.border)),
-          child: Text('${item.quantity}', style: const TextStyle(fontSize: 13)),
+          decoration: BoxDecoration(color: Colors.white, border: Border.all(color: AppColors.border, width: 1)),
+          child: Text('${item.quantity}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF212121))),
         ),
         InkWell(
           onTap: () => _updateQty(item, item.quantity + 1),
@@ -213,28 +269,15 @@ class _CartScreenState extends State<CartScreen> {
 
   Widget _checkoutBar(BuildContext context) {
     return Container(
-      color: AppColors.card,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(color: AppColors.card, border: Border(top: BorderSide(color: AppColors.border)), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 10, offset: const Offset(0, -4))]),
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
       child: SafeArea(
+        top: false,
         child: Row(
           children: [
-            Flexible(child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Total: ', style: TextStyle(fontSize: 14)),
-                Flexible(child: Text(_fmt(_selectedSubtotal), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: AppColors.primary, fontSize: 16, fontWeight: FontWeight.bold))),
-              ],
-            )),
-            const SizedBox(width: 8),
-            Flexible(
-              child: ElevatedButton(
-                onPressed: _selected.isEmpty
-                    ? null
-                    : () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CheckoutScreen())),
-                style: ElevatedButton.styleFrom(minimumSize: const Size(110, 44), padding: const EdgeInsets.symmetric(horizontal: 12)),
-                child: const Text('Checkout', maxLines: 1, overflow: TextOverflow.ellipsis),
-              ),
-            ),
+            Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [Text('TOTAL', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.8, color: AppColors.textSecondary)), const SizedBox(height: 1), Text(_fmt(_selectedSubtotal), style: TextStyle(color: AppColors.warning, fontSize: 16, fontWeight: FontWeight.w900))]),
+            const Spacer(),
+            ElevatedButton(onPressed: _selected.isEmpty ? null : () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CheckoutScreen())), style: ElevatedButton.styleFrom(minimumSize: const Size(120, 40), backgroundColor: AppColors.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)), padding: const EdgeInsets.symmetric(horizontal: 16)), child: const Text('Checkout', style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white, fontSize: 13))),
           ],
         ),
       ),

@@ -150,32 +150,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   Widget _header(Order order) {
     final pay = order.payment;
     return Container(
-      decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(6)),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: AppColors.border)),
       padding: const EdgeInsets.all(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              const Text('Status: ', style: const TextStyle(fontSize: 14)),
-              Text(
-                order.status.replaceAll('_', ' ').toUpperCase(),
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: _color(order.status)),
-              ),
-            ],
-          ),
+          Row(children: [const Text('Status: ', style: TextStyle(fontSize: 14, color: Color(0xFF212121))), Text(order.status.replaceAll('_', ' ').toUpperCase(), style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: _color(order.status)))]),
           const SizedBox(height: 6),
-          Text('Placed on: ${_date(order.createdAt)}', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-          if (pay != null)
-            Text(
-              'Payment: ${pay.method.replaceAll('_', ' ').toUpperCase()} Â· ${pay.status.toUpperCase()}',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-            ),
-          if (order.delivery != null)
-            Text(
-              'Delivery: ${order.delivery!.status.replaceAll('_', ' ').toUpperCase()}',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-            ),
+          Text('Placed on: ${_date(order.createdAt)}', style: const TextStyle(fontSize: 12, color: Color(0xFF616161))),
+          if (pay != null) Text('Payment: ${pay.method.replaceAll('_', ' ').toUpperCase()} · ${pay.status.toUpperCase()}', style: const TextStyle(fontSize: 12, color: Color(0xFF616161))),
+          if (order.delivery != null) Text('Delivery: ${order.delivery!.status.replaceAll('_', ' ').toUpperCase()}', style: const TextStyle(fontSize: 12, color: Color(0xFF616161))),
         ],
       ),
     );
@@ -219,7 +203,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Order Progress', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+          const Text('Order Progress', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF212121))),
           const SizedBox(height: 16),
           Row(
             children: List.generate(steps.length, (i) {
@@ -301,7 +285,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Items', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+          const Text('Items', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF212121))),
           const SizedBox(height: 10),
           ...order.items.map((item) {
             return Padding(
@@ -309,23 +293,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(item.productName, style: const TextStyle(fontSize: 13)),
-                      ),
-                      Text(
-                        '${item.quantity} × ${_fmt(item.price)}',
-                        style: const TextStyle(fontSize: 13),
-                      ),
-                    ],
-                  ),
-                  if (item.variantLabel != null && item.variantLabel!.isNotEmpty)
-                    Text(item.variantLabel!, style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                  Row(children: [Expanded(child: Text(item.productName, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF212121)))), Text('${item.quantity} × ${_fmt(item.price)}', style: const TextStyle(fontSize: 13, color: Color(0xFF212121)))]),
+                  if (item.variantLabel != null && item.variantLabel!.isNotEmpty) Text(item.variantLabel!, style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
                   const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Text('Subtotal: ${_fmt(item.subtotal)}', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                  Row(children: [Text('Subtotal: ${_fmt(item.subtotal)}', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                       const Spacer(),
                       if (order.status == 'delivered')
                         OutlinedButton(
@@ -358,7 +329,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Subtotal', style: TextStyle(fontSize: 13)),
+              const Text('Subtotal', style: TextStyle(fontSize: 13, color: Color(0xFF212121))),
               Text(_fmt(subtotal), style: const TextStyle(fontSize: 13)),
             ],
           ),
@@ -367,7 +338,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Voucher Discount', style: TextStyle(fontSize: 13)),
+                const Text('Voucher Discount', style: TextStyle(fontSize: 13, color: Color(0xFF212121))),
                 Text('-${_fmt(discount)}', style: TextStyle(fontSize: 13, color: AppColors.primary)),
               ],
             ),
@@ -376,7 +347,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Total', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+              const Text('Total', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF212121))),
               Text(_fmt(order.totalAmount), style: TextStyle(color: AppColors.primary, fontSize: 18, fontWeight: FontWeight.bold)),
             ],
           ),
@@ -392,7 +363,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Order Timeline', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+          const Text('Order Timeline', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF212121))),
           const SizedBox(height: 10),
           if (order.statusHistories.isEmpty)
             Text('No status updates yet.', style: TextStyle(fontSize: 12, color: AppColors.textSecondary))
@@ -409,12 +380,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            h.toStatus.replaceAll('_', ' ').toUpperCase(),
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                          ),
-                          if (h.note != null) Text(h.note!, style: const TextStyle(fontSize: 12)),
-                          Text(_date(h.createdAt), style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                          Text(h.toStatus.replaceAll('_', ' ').toUpperCase(), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF212121))),
+                          if (h.note != null) Text(h.note!, style: const TextStyle(fontSize: 12, color: Color(0xFF212121))),
+                          Text(_date(h.createdAt), style: const TextStyle(fontSize: 11, color: Color(0xFF616161))),
                         ],
                       ),
                     ),

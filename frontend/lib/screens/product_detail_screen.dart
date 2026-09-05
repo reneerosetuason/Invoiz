@@ -276,7 +276,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             children: [
               const Text('Product Details', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF212121))),
               const SizedBox(height: 8),
-              Text(p.description ?? 'No description.', style: const TextStyle(fontSize: 13, height: 1.5, color: Color(0xFF212121))),
+              Text(p.description ?? 'No description.', style: const TextStyle(fontSize: 13, height: 1.6, color: Color(0xFF212121))),
             ],
           ),
         ),
@@ -425,9 +425,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
                       ),
                     ),
-                    Expanded(
-                      child: Text(s.$2, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-                    ),
+                    Expanded(child: Text(s.$2, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Color(0xFF212121)))),
                   ],
                 ),
               )),

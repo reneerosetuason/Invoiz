@@ -4,6 +4,7 @@ import '../services/api_service.dart';
 import '../theme.dart';
 import '../widgets/auth_service_provider.dart';
 import '../widgets/main_layout.dart';
+import 'cart_screen.dart';
 import 'chat_screen.dart';
 import 'login_screen.dart';
 import 'product_detail_screen.dart';
@@ -123,10 +124,39 @@ class _SellerStoreScreenState extends State<SellerStoreScreen>
 
   @override
   Widget build(BuildContext context) {
-    return MainLayout(
-      showBottomNav: false,
-      title: _store?['business_name'] as String? ?? 'Store',
-      child: _loading
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: AppColors.card,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => Navigator.pop(context)),
+        title: Container(
+          height: 38,
+          decoration: BoxDecoration(color: AppColors.surfaceSoft, borderRadius: BorderRadius.circular(10)),
+          child: Row(
+            children: [
+              const SizedBox(width: 10),
+              Icon(Icons.search, size: 18, color: AppColors.textSecondary),
+              const SizedBox(width: 6),
+              Expanded(
+                child: TextField(
+                  controller: _searchCtrl,
+                  textInputAction: TextInputAction.search,
+                  onSubmitted: (_) => _load(),
+                  style: const TextStyle(fontSize: 13),
+                  decoration: const InputDecoration(hintText: 'Search in this store...', border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.symmetric(vertical: 9)),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          IconButton(icon: const Icon(Icons.shopping_cart_outlined), onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen()))),
+          const SizedBox(width: 4),
+        ],
+      ),
+      body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _store == null
               ? const Center(child: Text('Store not found.'))
@@ -143,9 +173,7 @@ class _SellerStoreScreenState extends State<SellerStoreScreen>
                         Tab(text: 'Reviews'),
                       ],
                     ),
-                    Expanded(
-                      child: _tab == 0 ? _productsTab(context) : _reviewsTab(context),
-                    ),
+                    Expanded(child: _tab == 0 ? _productsTab(context) : _reviewsTab(context)),
                   ],
                 ),
     );
@@ -322,7 +350,7 @@ class _SellerStoreScreenState extends State<SellerStoreScreen>
     return Expanded(
       child: Column(
         children: [
-          Text(value, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800)),
+          Text(value, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Color(0xFF212121))),
           const SizedBox(height: 2),
           Text(label, style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
         ],
@@ -338,61 +366,20 @@ class _SellerStoreScreenState extends State<SellerStoreScreen>
       children: [
         Container(
           color: AppColors.card,
-          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
           child: Row(
             children: [
-              Expanded(
-                child: Container(
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceSoft,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 10),
-                      Icon(Icons.search, size: 18, color: AppColors.textSecondary),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: TextField(
-                          controller: _searchCtrl,
-                          onSubmitted: (_) => _load(),
-                          textInputAction: TextInputAction.search,
-                          style: const TextStyle(fontSize: 13),
-                          decoration: const InputDecoration(
-                            hintText: 'Search in this store...',
-                            border: InputBorder.none,
-                            isDense: true,
-                            contentPadding: EdgeInsets.symmetric(vertical: 10),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
+              const Spacer(),
               Container(
-                height: 40,
+                height: 36,
                 padding: const EdgeInsets.symmetric(horizontal: 10),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceSoft,
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                decoration: BoxDecoration(color: AppColors.surfaceSoft, borderRadius: BorderRadius.circular(10)),
                 child: PopupMenuButton<String>(
                   initialValue: _sort,
-                  onSelected: (v) {
-                    setState(() => _sort = v);
-                    _load();
-                  },
-                  icon: const Icon(Icons.sort, size: 20),
+                  onSelected: (v) { setState(() => _sort = v); _load(); },
+                  icon: const Icon(Icons.sort, size: 18),
                   tooltip: 'Sort',
-                  itemBuilder: (_) => const [
-                    PopupMenuItem(value: 'newest', child: Text('Newest')),
-                    PopupMenuItem(value: 'price_asc', child: Text('Price: Low to High')),
-                    PopupMenuItem(value: 'price_desc', child: Text('Price: High to Low')),
-                    PopupMenuItem(value: 'rating', child: Text('Rating')),
-                  ],
+                  itemBuilder: (_) => const [PopupMenuItem(value: 'newest', child: Text('Newest')), PopupMenuItem(value: 'price_asc', child: Text('Price: Low to High')), PopupMenuItem(value: 'price_desc', child: Text('Price: High to Low')), PopupMenuItem(value: 'rating', child: Text('Rating'))],
                 ),
               ),
             ],
@@ -439,7 +426,7 @@ class _SellerStoreScreenState extends State<SellerStoreScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Store Rating', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+              const Text('Store Rating', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF212121))),
               const SizedBox(height: 12),
               Row(
                 children: [
@@ -521,38 +508,16 @@ class _SellerStoreScreenState extends State<SellerStoreScreen>
   Widget _reviewTile(Map<String, dynamic> r) {
     final rating = (r['rating'] as int?) ?? 0;
     final buyer = r['buyer'];
-    final name = buyer is Map<String, dynamic>
-        ? '${buyer['first_name'] ?? ''} ${buyer['last_name'] ?? ''}'
-        : 'Anonymous';
+    final name = buyer is Map<String, dynamic> ? '${buyer['first_name'] ?? ''} ${buyer['last_name'] ?? ''}' : 'Anonymous';
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-      ),
+      decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.border)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Text(name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-              const SizedBox(width: 8),
-              Row(
-                children: List.generate(5, (i) => Icon(
-                  Icons.star,
-                  size: 13,
-                  color: i < rating ? AppColors.gold : AppColors.border,
-                )),
-              ),
-            ],
-          ),
-          if (r['comment'] != null && (r['comment'] as String).isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 6),
-              child: Text(r['comment'] as String, style: const TextStyle(fontSize: 13, height: 1.4)),
-            ),
+          Row(children: [Text(name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF212121))), const SizedBox(width: 8), Row(children: List.generate(5, (i) => Icon(Icons.star, size: 13, color: i < rating ? AppColors.gold : AppColors.border)))]),
+          if (r['comment'] != null && (r['comment'] as String).isNotEmpty) Padding(padding: const EdgeInsets.only(top: 6), child: Text(r['comment'] as String, style: const TextStyle(fontSize: 13, height: 1.4, color: Color(0xFF212121)))),
           if (r['product'] != null)
             Padding(
               padding: const EdgeInsets.only(top: 8),
@@ -599,31 +564,16 @@ class _SellerStoreScreenState extends State<SellerStoreScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      p['name'] as String,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 13, height: 1.25, fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      _formatPrice(price),
-                      style: TextStyle(
-                        color: AppColors.warning,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 15,
-                      ),
-                    ),
+                    Text(p['name'] as String, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13, height: 1.25, fontWeight: FontWeight.w600, color: Color(0xFF212121))),
+                    const SizedBox(height: 4),
+                    Text(_formatPrice(price), style: TextStyle(color: AppColors.warning, fontWeight: FontWeight.w800, fontSize: 14)),
                     const Spacer(),
                     Row(
                       children: [
                         if (rating != null) ...[
                           Icon(Icons.star, color: AppColors.gold, size: 12),
                           const SizedBox(width: 3),
-                          Text(
-                            rating.toStringAsFixed(1),
-                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-                          ),
+                          Text(rating.toStringAsFixed(1), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF212121))),
                           const SizedBox(width: 8),
                         ],
                         if (sold > 0)

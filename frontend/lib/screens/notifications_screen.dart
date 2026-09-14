@@ -40,6 +40,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget build(BuildContext context) {
     return MainLayout(
       title: 'Notifications',
+      currentIndex: -1,
+      showNotificationIcon: false,
+      showSettingsIcon: false,
       child: _loading
           ? const Center(child: CircularProgressIndicator())
           : _items.isEmpty
@@ -122,6 +125,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: read ? FontWeight.w500 : FontWeight.w700,
+                            color: const Color(0xFF212121),
                           ),
                         ),
                       ),

@@ -88,18 +88,20 @@ class _ChatScreenState extends State<ChatScreen> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('New Message'),
+        title: const Text('New Message', style: TextStyle(color: Color(0xFF212121))),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: subjectCtrl,
+              style: const TextStyle(color: Color(0xFF212121)),
               decoration: const InputDecoration(labelText: 'Subject'),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: bodyCtrl,
               maxLines: 3,
+              style: const TextStyle(color: Color(0xFF212121)),
               decoration: const InputDecoration(labelText: 'Message'),
             ),
           ],
@@ -126,6 +128,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return MainLayout(
       title: 'Messages',
+      currentIndex: -1,
+      showTopActions: false,
       child: _loading
           ? const Center(child: CircularProgressIndicator())
           : _conversations.isEmpty
@@ -135,7 +139,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     children: [
                       Icon(Icons.chat_bubble_outline, size: 60, color: AppColors.textSecondary),
                       const SizedBox(height: 12),
-                      const Text('No conversations yet.'),
+                      const Text('No conversations yet.', style: TextStyle(color: Color(0xFF212121))),
                       const SizedBox(height: 16),
                       ElevatedButton(onPressed: _newConversation, child: const Text('Start a Conversation')),
                     ],
@@ -199,7 +203,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: Text(c.displayName, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis),
+                        child: Text(c.displayName, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF212121)), overflow: TextOverflow.ellipsis),
                       ),
                       if (c.unreadCount > 0)
                         Container(
@@ -297,6 +301,8 @@ class _ChatThreadScreenState extends State<ChatThreadScreen> {
   Widget build(BuildContext context) {
     return MainLayout(
       title: widget.subject,
+      currentIndex: -1,
+      showTopActions: false,
       child: Column(
         children: [
           Expanded(

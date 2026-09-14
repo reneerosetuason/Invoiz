@@ -114,6 +114,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Widget build(BuildContext context) {
     return MainLayout(
       title: 'Checkout',
+      showBottomNav: false,
+      showSettingsIcon: false,
       child: _loading
           ? const Center(child: CircularProgressIndicator())
           : _cart == null || _cart!.items.isEmpty
@@ -174,7 +176,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             groupValue: _selectedAddressId,
             activeColor: AppColors.primary,
             onChanged: (v) => setState(() => _selectedAddressId = v),
-            title: Text(a.recipientName, style: const TextStyle(fontSize: 14)),
+            title: Text(a.recipientName, style: const TextStyle(fontSize: 14, color: Color(0xFF212121))),
             subtitle: Text(
               '${a.phone}\n${a.fullAddress}',
               style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
@@ -204,7 +206,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           groupValue: _paymentMethod,
           activeColor: AppColors.primary,
           onChanged: (v) => setState(() => _paymentMethod = v!),
-          title: const Text('Cash on Delivery (COD)', style: TextStyle(fontSize: 14)),
+          title: const Text('Cash on Delivery (COD)', style: TextStyle(fontSize: 14, color: Color(0xFF212121))),
           subtitle: const Text('Pay when your order arrives.', style: TextStyle(fontSize: 12)),
         ),
       ],
@@ -233,7 +235,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Voucher: $_selectedVoucher', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                      Text('Voucher: $_selectedVoucher', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFF212121))),
                       Text('Discount: -${_fmt(_validatedDiscount ?? 0)}', style: TextStyle(fontSize: 12, color: AppColors.primary)),
                     ],
                   ),
@@ -309,7 +311,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Best for you: ${best!.code}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                Text('Best for you: ${best!.code}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF212121))),
                 Text('Saves ${_fmt(bestSave)} on this order', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
               ],
             ),
@@ -329,40 +331,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final total = subtotal - discount;
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text('Subtotal', style: TextStyle(fontSize: 13)),
-            Text(_fmt(subtotal), style: const TextStyle(fontSize: 13)),
-          ],
-        ),
-        const SizedBox(height: 6),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text('Voucher Discount', style: TextStyle(fontSize: 13)),
-            Text('-${_fmt(discount)}', style: TextStyle(fontSize: 13, color: AppColors.primary)),
-          ],
-        ),
-        const SizedBox(height: 6),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text('Shipping', style: TextStyle(fontSize: 13)),
-            Text(discount > 0 ? 'FREE' : 'Calculated on delivery', style: const TextStyle(fontSize: 13)),
-          ],
-        ),
-        const Divider(height: 18),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text('Total', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-            Text(
-              _fmt(total),
-              style: TextStyle(color: AppColors.primary, fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text('Subtotal', style: TextStyle(fontSize: 13, color: Color(0xFF212121))), Text(_fmt(subtotal), style: const TextStyle(fontSize: 13, color: Color(0xFF212121)))]),
+          const SizedBox(height: 6),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text('Voucher Discount', style: TextStyle(fontSize: 13, color: Color(0xFF212121))), Text('-${_fmt(discount)}', style: TextStyle(fontSize: 13, color: AppColors.primary))]),
+          const SizedBox(height: 6),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text('Shipping', style: TextStyle(fontSize: 13, color: Color(0xFF212121))), Text(discount > 0 ? 'FREE' : 'Calculated on delivery', style: const TextStyle(fontSize: 13, color: Color(0xFF212121)))]),
+          const Divider(height: 18),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text('Total', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF212121))), Text(_fmt(total), style: TextStyle(color: AppColors.primary, fontSize: 18, fontWeight: FontWeight.bold))]),
       ],
     );
   }

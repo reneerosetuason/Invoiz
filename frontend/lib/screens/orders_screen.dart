@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import '../config.dart';
 import '../models/order.dart';
 import '../services/api_service.dart';
 import '../theme.dart';
@@ -134,14 +135,18 @@ class _OrdersScreenState extends State<OrdersScreen> {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               children: _tabs.map((t) {
+                final selected = _status == t.$1;
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: ChoiceChip(
                     label: Text(t.$2),
-                    selected: _status == t.$1,
+                    selected: selected,
                     selectedColor: AppColors.primary,
-                    backgroundColor: AppColors.surfaceSoft,
-                    labelStyle: TextStyle(color: _status == t.$1 ? Colors.white : AppColors.textPrimary, fontSize: 13),
+                    backgroundColor: Colors.white.withValues(alpha: 0.6),
+                    side: BorderSide.none,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                    labelStyle: TextStyle(color: selected ? Colors.white : AppColors.textPrimary, fontSize: 13, fontWeight: selected ? FontWeight.w700 : FontWeight.w500),
                     onSelected: (_) { setState(() => _status = t.$1); _applyFilters(); },
                   ),
                 );
@@ -194,13 +199,16 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   Icon(Icons.search, color: AppColors.textSecondary, size: 18),
                   const SizedBox(width: 6),
                   Expanded(
-                    child: TextField(
-                      controller: _searchCtrl,
-                      textInputAction: TextInputAction.search,
-                      onSubmitted: _onSearch,
-                      onChanged: (v) { if (v.isEmpty) _onSearch(''); },
-                      style: const TextStyle(fontSize: 13),
-                      decoration: const InputDecoration(hintText: 'Search orders...', hintStyle: TextStyle(color: Color(0xFF9E9E9E), fontSize: 13), border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.symmetric(vertical: 9)),
+                    child: Theme(
+                      data: Theme.of(context).copyWith(inputDecorationTheme: const InputDecorationTheme(border: InputBorder.none, enabledBorder: InputBorder.none, focusedBorder: InputBorder.none, disabledBorder: InputBorder.none, errorBorder: InputBorder.none, focusedErrorBorder: InputBorder.none)),
+                      child: TextField(
+                        controller: _searchCtrl,
+                        textInputAction: TextInputAction.search,
+                        onSubmitted: _onSearch,
+                        onChanged: (v) { if (v.isEmpty) _onSearch(''); },
+                        style: const TextStyle(fontSize: 13, color: Color(0xFF212121)),
+                        decoration: const InputDecoration(hintText: 'Search orders...', hintStyle: TextStyle(color: Color(0xFF9E9E9E), fontSize: 13), border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.symmetric(vertical: 9), filled: false),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -209,7 +217,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
             ),
           ),
           const SizedBox(width: 6),
-          IconButton(icon: const Icon(Icons.notifications_outlined, color: Colors.white, size: 22), padding: EdgeInsets.zero, constraints: const BoxConstraints(minWidth: 36, minHeight: 36), onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen()))),
+          const AppNotificationBell(iconColor: Colors.white),
           IconButton(icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 22), padding: EdgeInsets.zero, constraints: const BoxConstraints(minWidth: 36, minHeight: 36), onPressed: () {
             final auth = AuthServiceProvider.of(context);
             if (!auth.isLoggedIn) { Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen())); return; }
@@ -229,7 +237,18 @@ class _OrdersScreenState extends State<OrdersScreen> {
         MaterialPageRoute(builder: (_) => OrderDetailScreen(orderId: order.id)),
       ),
       child: Container(
-        decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(6)),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.8),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
         padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,10 +258,12 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 Text('Order #${order.id}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF212121))),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: _statusColor(order.status).withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(4),
+                    gradient: LinearGradient(
+                      colors: [_statusColor(order.status).withValues(alpha: 0.15), _statusColor(order.status).withValues(alpha: 0.08)],
+                    ),
+                    borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
                     _statusLabel(order.status),
@@ -255,9 +276,25 @@ class _OrdersScreenState extends State<OrdersScreen> {
             if (firstItem != null)
               Row(
                 children: [
-                  Text(firstItem.productName, style: const TextStyle(fontSize: 13, color: Color(0xFF212121)), overflow: TextOverflow.ellipsis),
-                  if (otherCount > 0)
-                    Text(' +$otherCount more', style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      color: AppColors.surfaceSoft,
+                      child: _thumb(firstItem.productImage),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(firstItem.productName, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF212121)), maxLines: 1, overflow: TextOverflow.ellipsis),
+                        if (otherCount > 0) Text('+$otherCount more item${otherCount == 1 ? '' : 's'}', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             const SizedBox(height: 8),
@@ -279,6 +316,12 @@ class _OrdersScreenState extends State<OrdersScreen> {
         ),
       ),
     );
+  }
+
+  Widget _thumb(String? url) {
+    if (url == null || url.isEmpty) return const Icon(Icons.image_not_supported_outlined, color: Colors.grey, size: 22);
+    return Image.network(AppConfig.storageUrl(url), fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => const Icon(Icons.image_not_supported_outlined, color: Colors.grey, size: 22));
   }
 
   String _fmt(double v) {

@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\EmailVerificationCode;
 use App\Models\Cart;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
@@ -46,14 +50,123 @@ class AuthController extends Controller
             'status'          => 'active',
         ]);
 
-        // Create an empty cart so the buyer can add items right away after approval.
-        Cart::create(['buyer_id' => $user->id]);
+          // Create an empty cart so the buyer can add items right away after approval.
+          Cart::create(['buyer_id' => $user->id]);
 
-        return response()->json([
-            'message' => 'Registration submitted. Please wait for the administrator approval, which will be sent to your email.',
-            'user'    => $user->only(['id', 'first_name', 'last_name', 'email', 'approval_status']),
-        ], 201);
-    }
+          // Send a 6-digit email verification code (valid 10 minutes).
+          $this->issueCode($user);
+
+          return response()->json([
+              'message' => 'Registration submitted. We sent a 6-digit verification code to your email — enter it to verify your account.',
+              'user'    => $user->only(['id', 'first_name', 'last_name', 'email', 'approval_status']),
+              'verification_required' => true,
+          ], 201);
+      }
+
+      /**
+       * Issue (and email) a fresh 6-digit verification code.
+       * Old unconsumed codes for the same email are discarded.
+       */
+      protected function issueCode(User $user): string
+      {
+          $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+          DB::table('email_verification_codes')
+              ->where('email', $user->email)
+              ->whereNull('consumed_at')
+              ->delete();
+
+          DB::table('email_verification_codes')->insert([
+              'email'      => $user->email,
+              'code'       => $code,
+              'expires_at' => now()->addMinutes(10),
+              'created_at' => now(),
+              'updated_at' => now(),
+          ]);
+
+          try {
+              Mail::to($user->email)->send(new EmailVerificationCode($user, $code));
+          } catch (\Throwable $e) {
+              // Never fail registration because of mail transport;
+              // with MAIL_MAILER=log the code lands in storage/logs/laravel.log.
+              Log::warning('Verification email failed for ' . $user->email . ': ' . $e->getMessage());
+          }
+
+          return $code;
+      }
+
+      /**
+       * Verify the emailed 6-digit code: POST /verify-email {email, code}.
+       */
+      public function verifyEmail(Request $request)
+      {
+          $validated = $request->validate([
+              'email' => ['required', 'email'],
+              'code'  => ['required', 'string', 'size:6'],
+          ]);
+
+          $record = DB::table('email_verification_codes')
+              ->where('email', $validated['email'])
+              ->whereNull('consumed_at')
+              ->latest('id')
+              ->first();
+
+          if (! $record) {
+              return response()->json(['message' => 'No verification code found. Please request a new one.'], 422);
+          }
+
+          if (now()->greaterThan($record->expires_at)) {
+              return response()->json(['message' => 'That code expired. Please request a new one.'], 422);
+          }
+
+          if ($record->attempts >= 5) {
+              return response()->json(['message' => 'Too many wrong attempts. Please request a new code.'], 429);
+          }
+
+          if (! hash_equals($record->code, $validated['code'])) {
+              DB::table('email_verification_codes')->where('id', $record->id)->increment('attempts');
+              return response()->json(['message' => 'Wrong code. Check the 6 digits and try again.'], 422);
+          }
+
+          DB::table('email_verification_codes')->where('id', $record->id)->update([
+              'consumed_at' => now(),
+              'updated_at'  => now(),
+          ]);
+
+          User::where('email', $validated['email'])->update(['email_verified_at' => now()]);
+
+          return response()->json([
+              'message' => 'Email verified. Please wait for the administrator approval, which will be sent to your email.',
+          ]);
+      }
+
+      /**
+       * Resend a fresh code: POST /resend-code {email}. Max once per 60s.
+       */
+      public function resendCode(Request $request)
+      {
+          $validated = $request->validate(['email' => ['required', 'email']]);
+
+          $user = User::where('email', $validated['email'])->first();
+          if (! $user) {
+              return response()->json(['message' => 'No account found for that email.'], 422);
+          }
+          if ($user->email_verified_at) {
+              return response()->json(['message' => 'This email is already verified.'], 422);
+          }
+
+          $recent = DB::table('email_verification_codes')
+              ->where('email', $user->email)
+              ->where('created_at', '>', now()->subMinute())
+              ->exists();
+          if ($recent) {
+              return response()->json(['message' => 'A code was just sent. Please wait a minute before requesting another.'], 429);
+          }
+
+          $this->issueCode($user);
+
+          return response()->json(['message' => 'A new verification code was sent to your email.']);
+      }
 
     public function login(Request $request)
     {
@@ -64,9 +177,16 @@ class AuthController extends Controller
 
         $user = User::where('email', $validated['email'])->first();
 
-        if (! $user || ! Hash::check($validated['password'], $user->password)) {
-            return response()->json(['message' => 'Invalid email or password.'], 401);
-        }
+          if (! $user || ! Hash::check($validated['password'], $user->password)) {
+              return response()->json(['message' => 'Invalid email or password.'], 401);
+          }
+
+          if (! $user->email_verified_at) {
+              return response()->json([
+                  'message' => 'Please verify your email first. Enter the 6-digit code we sent you.',
+                  'verification_required' => true,
+              ], 403);
+          }
 
         if ($user->approval_status === 'pending') {
             return response()->json([

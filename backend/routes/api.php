@@ -33,6 +33,8 @@ Route::get('/stores/{seller}/reviews', [StoreController::class, 'reviews']);
 // ---- Auth ----
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
+Route::post('/resend-code', [AuthController::class, 'resendCode']);
 
 // ---- Authenticated (buyer) access ----
 Route::middleware('auth:sanctum')->group(function () {

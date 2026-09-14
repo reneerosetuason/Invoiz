@@ -1,4 +1,6 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'dart:async';
+import 'dart:ui';
+import 'package:flutter/material.dart';
 import '../config.dart';
 import '../services/api_service.dart';
 import '../services/recently_viewed_service.dart';
@@ -8,7 +10,6 @@ import '../widgets/main_layout.dart';
 import 'cart_screen.dart';
 import 'chat_screen.dart';
 import 'login_screen.dart';
-import 'notifications_screen.dart';
 import 'product_detail_screen.dart';
 import 'product_list_screen.dart';
 import 'seller_store_screen.dart';
@@ -42,10 +43,17 @@ class _HomeScreenState extends State<HomeScreen> {
     ('top', 'Top Rated'),
   ];
 
+  Timer? _carouselTimer;
+
   @override
   void initState() {
     super.initState();
     _load();
+    _carouselTimer = Timer.periodic(const Duration(seconds: 4), (_) {
+      if (!mounted || !_carouselCtrl.hasClients) return;
+      final next = (_carouselIndex + 1) % 3;
+      _carouselCtrl.animateToPage(next, duration: const Duration(milliseconds: 450), curve: Curves.easeOut);
+    });
   }
 
   Future<void> _load() async {
@@ -132,6 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _carouselTimer?.cancel();
     _searchCtrl.dispose();
     _carouselCtrl.dispose();
     super.dispose();
@@ -160,26 +169,44 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _filterChipsBar() {
-    return Container(
-      color: AppColors.card,
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: _filterChips.map((f) {
-            final selected = _activeFilter == f.$1;
-            return Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: ChoiceChip(
-                label: Text(f.$2, style: TextStyle(fontSize: 12, color: selected ? Colors.white : AppColors.textPrimary)),
-                selected: selected,
-                selectedColor: AppColors.primary,
-                backgroundColor: AppColors.surfaceSoft,
-                side: BorderSide(color: selected ? AppColors.primary : AppColors.border, width: 1),
-                onSelected: (_) => _applyFilter(f.$1),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 2, 16, 10),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(999),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+            ),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: _filterChips.map((f) {
+                  final selected = _activeFilter == f.$1;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      child: ChoiceChip(
+                        label: Text(f.$2, style: TextStyle(fontSize: 12, fontWeight: selected ? FontWeight.w700 : FontWeight.w500, color: selected ? Colors.white : AppColors.textPrimary)),
+                        selected: selected,
+                        selectedColor: AppColors.primary,
+                        backgroundColor: Colors.transparent,
+                        side: BorderSide.none,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                        onSelected: (_) => _applyFilter(f.$1),
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
-            );
-          }).toList(),
+            ),
+          ),
         ),
       ),
     );
@@ -252,52 +279,94 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _headerIconButton({required IconData icon, required VoidCallback onTap, Widget? badge}) {
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.center,
+      children: [
+        Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+          ),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(12),
+            child: Icon(icon, color: Colors.white, size: 20),
+          ),
+        ),
+        if (badge != null) Positioned(right: 0, top: 0, child: badge),
+      ],
+    );
+  }
+
   Widget _shopeeHeader(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [AppColors.primary, const Color(0xFF1B8A8A)])),
-      padding: EdgeInsets.fromLTRB(12, MediaQuery.of(context).padding.top + 6, 12, 10),
-      child: Row(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.primaryDark, AppColors.primary, const Color(0xFF2AA198)]),
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(26)),
+        boxShadow: [BoxShadow(color: AppColors.primary.withValues(alpha: 0.30), blurRadius: 18, offset: const Offset(0, 8))],
+      ),
+      padding: EdgeInsets.fromLTRB(14, MediaQuery.of(context).padding.top + 10, 14, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Container(
-              height: 36,
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
-              child: Row(
-                children: [
-                  const SizedBox(width: 10),
-                  Icon(Icons.search, color: AppColors.textSecondary, size: 18),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Theme(
-                      data: Theme.of(context).copyWith(inputDecorationTheme: const InputDecorationTheme(border: InputBorder.none, enabledBorder: InputBorder.none, focusedBorder: InputBorder.none, disabledBorder: InputBorder.none, errorBorder: InputBorder.none, focusedErrorBorder: InputBorder.none)),
-                      child: TextField(
-                        controller: _searchCtrl,
-                        textInputAction: TextInputAction.search,
-                        onSubmitted: (_) => _searchProducts(),
-                        style: const TextStyle(fontSize: 13),
-                        decoration: const InputDecoration(
-                          hintText: 'Acoustic Guitar String',
-                          hintStyle: TextStyle(color: Color(0xFF9E9E9E), fontSize: 13),
-                          border: InputBorder.none,
-                          isDense: true,
-                          contentPadding: EdgeInsets.symmetric(vertical: 9),
-                          filled: false,
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.10), blurRadius: 10, offset: const Offset(0, 3))],
+                  ),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 12),
+                      Icon(Icons.search_rounded, color: AppColors.primary, size: 19),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Theme(
+                          data: Theme.of(context).copyWith(inputDecorationTheme: const InputDecorationTheme(border: InputBorder.none, enabledBorder: InputBorder.none, focusedBorder: InputBorder.none, disabledBorder: InputBorder.none, errorBorder: InputBorder.none, focusedErrorBorder: InputBorder.none)),
+                          child: TextField(
+                            controller: _searchCtrl,
+                            textInputAction: TextInputAction.search,
+                            onSubmitted: (_) => _searchProducts(),
+                            style: const TextStyle(fontSize: 13, color: Color(0xFF212121)),
+                            decoration: const InputDecoration(
+                              hintText: 'Search in Invoiz',
+                              hintStyle: TextStyle(color: Color(0xFF9E9E9E), fontSize: 13),
+                              border: InputBorder.none,
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(vertical: 10),
+                              filled: false,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      const SizedBox(width: 10),
+                    ],
                   ),
-                  const SizedBox(width: 10),
-                ],
+                ),
               ),
-            ),
+              const SizedBox(width: 8),
+              AppNotificationBell(iconColor: Colors.white, iconSize: 20, background: Colors.white.withValues(alpha: 0.18)),
+              const SizedBox(width: 8),
+              _headerIconButton(
+                icon: Icons.chat_bubble_outline_rounded,
+                onTap: () {
+                  final auth = AuthServiceProvider.of(context);
+                  if (!auth.isLoggedIn) { Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen())); return; }
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatScreen()));
+                },
+              ),
+            ],
           ),
-          const SizedBox(width: 8),
-          _HeaderNotificationBell(),
-          IconButton(icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 22), onPressed: () {
-            final auth = AuthServiceProvider.of(context);
-            if (!auth.isLoggedIn) { Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen())); return; }
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatScreen()));
-          }          ),
+          const SizedBox(height: 2),
         ],
       ),
     );
@@ -377,7 +446,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 TextButton(
                   onPressed: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const ProductListScreen()),
+                    MaterialPageRoute(builder: (_) => const ProductListScreen(showAll: true)),
                   ),
                   child: const Text('View all'),
                 ),
@@ -484,9 +553,16 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Container(
         width: 130,
         decoration: BoxDecoration(
-          color: AppColors.card,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border),
+          color: Colors.white.withValues(alpha: 0.8),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.05),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -635,30 +711,61 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       onTap: () => _selectCategory(cat['id'] as int),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
         width: 84,
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary : AppColors.card,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: selected ? AppColors.primary : AppColors.border.withValues(alpha: 0.6)),
+          gradient: selected
+              ? LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.primary, AppColors.primaryDark])
+              : null,
+          color: selected ? null : Colors.white.withValues(alpha: 0.6),
+          borderRadius: BorderRadius.circular(22),
+          border: selected ? null : Border.all(color: Colors.white.withValues(alpha: 0.4)),
           boxShadow: selected
               ? [
                   BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.25),
-                    blurRadius: 12,
-                    offset: const Offset(0, 5),
+                    color: AppColors.primary.withValues(alpha: 0.35),
+                    blurRadius: 14,
+                    offset: const Offset(0, 6),
                   ),
                 ]
-              : null,
+              : [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              _categoryIcon(cat['name'] as String),
-              color: selected ? Colors.white : AppColors.primary,
-              size: 26,
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                gradient: selected
+                    ? LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.white.withValues(alpha: 0.25), Colors.white.withValues(alpha: 0.1)])
+                    : null,
+                color: selected ? null : Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: selected
+                    ? null
+                    : [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.08),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+              ),
+              child: Icon(
+                _categoryIcon(cat['name'] as String),
+                color: selected ? Colors.white : AppColors.primary,
+                size: 22,
+              ),
             ),
             const SizedBox(height: 6),
             Padding(
@@ -683,6 +790,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _productCard(Map<String, dynamic> p) {
     final price = double.tryParse('${p['price']}') ?? 0;
+    final pct = (p['discount_percent'] as int?) ?? 0;
     final rating = p['rating'] != null ? double.tryParse('${p['rating']}') : null;
     final sold = p['sold'] is int ? (p['sold'] as int) : 0;
     final shop = p['shop'];
@@ -705,14 +813,19 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.card,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppColors.border),
+          color: Colors.white.withValues(alpha: 0.85),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: AppColors.primary.withValues(alpha: 0.06),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -723,7 +836,13 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               height: 132,
               width: double.infinity,
-              color: AppColors.surfaceSoft,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [AppColors.surfaceSoft, AppColors.surfaceSoft.withValues(alpha: 0.4)],
+                ),
+              ),
               child: Stack(
                 children: [
                   Positioned.fill(child: _productImage(_cover(p))),
@@ -749,15 +868,21 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          gradient: LinearGradient(colors: [Colors.white.withValues(alpha: 0.9), Colors.white.withValues(alpha: 0.7)]),
                           borderRadius: BorderRadius.circular(999),
-                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 6, offset: const Offset(0, 2))],
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.08),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.star, color: AppColors.gold, size: 14),
-                            const SizedBox(width: 4),
+                            Icon(Icons.star_rounded, color: AppColors.gold, size: 14),
+                            const SizedBox(width: 3),
                             Text(rating.toStringAsFixed(1), style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
                           ],
                         ),
@@ -770,7 +895,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                         decoration: BoxDecoration(
-                          color: AppColors.card,
+                          color: Colors.white.withValues(alpha: 0.8),
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
@@ -779,14 +904,24 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-                  if ((p['id'] as int) % 3 == 0)
+                  if (pct > 0)
                     Positioned(
                       bottom: 8,
                       left: 8,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                        decoration: BoxDecoration(color: AppColors.warning, borderRadius: BorderRadius.circular(6)),
-                        child: const Text('SALE', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(colors: [Color(0xFFFF6B35), Color(0xFFE05A33)]),
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFE05A33).withValues(alpha: 0.3),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Text('-$pct%', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800)),
                       ),
                     ),
                 ],
@@ -810,7 +945,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         const Spacer(),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(999)),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [AppColors.accent, AppColors.accent.withValues(alpha: 0.6)],
+                            ),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
                           child: Text('${p['stock']} left', maxLines: 1, softWrap: false, style: TextStyle(fontSize: 10, color: AppColors.primary, fontWeight: FontWeight.w600)),
                         ),
                       ],
@@ -890,41 +1030,4 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _HeaderNotificationBell extends StatefulWidget {
-  const _HeaderNotificationBell();
-  @override
-  State<_HeaderNotificationBell> createState() => _HeaderNotificationBellState();
-}
 
-class _HeaderNotificationBellState extends State<_HeaderNotificationBell> {
-  final _api = ApiService();
-  int _unread = 0;
-  @override
-  void initState() { super.initState(); _load(); }
-  Future<void> _load() async {
-    try {
-      final data = await _api.get('notifications');
-      if (!mounted) return;
-      final items = (data['notifications'] as List).cast<Map<String, dynamic>>();
-      setState(() => _unread = items.where((n) => n['read'] == false).length);
-    } catch (_) {}
-  }
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        IconButton(
-          icon: const Icon(Icons.notifications_outlined, color: Colors.white, size: 22),
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-          onPressed: () async {
-            await Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen()));
-            _load();
-          },
-        ),
-        if (_unread > 0) Positioned(right: 2, top: 2, child: Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1), decoration: BoxDecoration(color: AppColors.warning, borderRadius: BorderRadius.circular(999), border: Border.all(color: Colors.white, width: 1)), child: Text('$_unread', style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w700)))),
-      ],
-    );
-  }
-}

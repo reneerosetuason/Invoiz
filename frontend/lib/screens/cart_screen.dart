@@ -9,7 +9,6 @@ import 'chat_screen.dart';
 import 'checkout_screen.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
-import 'notifications_screen.dart';
 import 'product_detail_screen.dart';
 
 class CartScreen extends StatefulWidget {
@@ -21,9 +20,18 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   final _api = ApiService();
+  final _searchCtrl = TextEditingController();
   Cart? _cart;
   bool _loading = true;
   final Set<int> _selected = {};
+  String _search = '';
+
+  List<CartItem> get _visibleItems {
+    final items = _cart?.items ?? [];
+    if (_search.isEmpty) return items;
+    final q = _search.toLowerCase();
+    return items.where((i) => i.product.name.toLowerCase().contains(q)).toList();
+  }
 
   @override
   void initState() {
@@ -75,6 +83,12 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final auth = AuthServiceProvider.of(context);
     if (!auth.isLoggedIn) {
@@ -114,12 +128,14 @@ class _CartScreenState extends State<CartScreen> {
                 ? const Center(child: CircularProgressIndicator())
                 : _cart == null || _cart!.items.isEmpty
                     ? const Center(child: Text('Your cart is empty.', style: TextStyle(color: Color(0xFF212121))))
-                    : ListView.separated(
-                        padding: const EdgeInsets.all(12),
-                        itemCount: _cart!.items.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 8),
-                        itemBuilder: (context, i) => _cartItemTile(_cart!.items[i]),
-                      ),
+                    : _visibleItems.isEmpty
+                        ? const Center(child: Text('No matching items in your cart.', style: TextStyle(color: Color(0xFF212121))))
+                        : ListView.separated(
+                            padding: const EdgeInsets.all(12),
+                            itemCount: _visibleItems.length,
+                            separatorBuilder: (_, __) => const SizedBox(height: 8),
+                            itemBuilder: (context, i) => _cartItemTile(_visibleItems[i]),
+                          ),
           ),
           if (!_loading && _cart != null && _cart!.items.isNotEmpty) _checkoutBar(context),
         ],
@@ -155,18 +171,27 @@ class _CartScreenState extends State<CartScreen> {
                   const SizedBox(width: 10),
                   Icon(Icons.search, color: AppColors.textSecondary, size: 18),
                   const SizedBox(width: 6),
-                  const Expanded(child: Text('Search products...', style: TextStyle(color: Color(0xFF9E9E9E), fontSize: 13))),
+                  Expanded(
+                    child: Theme(
+                      data: Theme.of(context).copyWith(inputDecorationTheme: const InputDecorationTheme(border: InputBorder.none, enabledBorder: InputBorder.none, focusedBorder: InputBorder.none, disabledBorder: InputBorder.none, errorBorder: InputBorder.none, focusedErrorBorder: InputBorder.none)),
+                      child: TextField(
+                        controller: _searchCtrl,
+                        textInputAction: TextInputAction.search,
+                        onChanged: (v) => setState(() => _search = v.trim()),
+                        style: const TextStyle(fontSize: 13, color: Color(0xFF212121)),
+                        decoration: const InputDecoration(hintText: 'Search in your cart...', hintStyle: TextStyle(color: Color(0xFF9E9E9E), fontSize: 13), border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.symmetric(vertical: 9), filled: false),
+                      ),
+                    ),
+                  ),
+                  if (_search.isNotEmpty)
+                    IconButton(icon: const Icon(Icons.close, size: 16, color: Color(0xFF9E9E9E)), padding: EdgeInsets.zero, constraints: const BoxConstraints(minWidth: 30, minHeight: 30), onPressed: () { _searchCtrl.clear(); setState(() => _search = ''); }),
+                  const SizedBox(width: 4),
                 ],
               ),
             ),
           ),
           const SizedBox(width: 6),
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: Colors.white, size: 22),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen())),
-          ),
+          const AppNotificationBell(iconColor: Colors.white),
           IconButton(
             icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 22),
             padding: EdgeInsets.zero,
@@ -184,13 +209,25 @@ class _CartScreenState extends State<CartScreen> {
 
   Widget _cartItemTile(CartItem item) {
     return Container(
-      decoration: BoxDecoration(color: AppColors.card, borderRadius: BorderRadius.circular(6)),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       padding: const EdgeInsets.all(10),
       child: Row(
         children: [
           Checkbox(
             value: _selected.contains(item.id),
             activeColor: AppColors.primary,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
             onChanged: (v) => setState(() {
               if (v == true) {
                 _selected.add(item.id);
@@ -205,7 +242,7 @@ class _CartScreenState extends State<CartScreen> {
               MaterialPageRoute(builder: (_) => ProductDetailScreen(productId: item.productId)),
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(12),
               child: Container(
                 width: 64,
                 height: 64,
@@ -239,7 +276,10 @@ class _CartScreenState extends State<CartScreen> {
           child: Container(
             width: 28,
             height: 28,
-            decoration: BoxDecoration(border: Border.all(color: AppColors.border)),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceSoft,
+              borderRadius: BorderRadius.circular(8),
+            ),
             child: const Icon(Icons.remove, size: 16),
           ),
         ),
@@ -247,7 +287,6 @@ class _CartScreenState extends State<CartScreen> {
           width: 36,
           height: 28,
           alignment: Alignment.center,
-          decoration: BoxDecoration(color: Colors.white, border: Border.all(color: AppColors.border, width: 1)),
           child: Text('${item.quantity}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF212121))),
         ),
         InkWell(
@@ -255,8 +294,11 @@ class _CartScreenState extends State<CartScreen> {
           child: Container(
             width: 28,
             height: 28,
-            decoration: BoxDecoration(border: Border.all(color: AppColors.border)),
-            child: const Icon(Icons.add, size: 16),
+            decoration: BoxDecoration(
+              color: AppColors.accent,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(Icons.add, size: 16, color: AppColors.primary),
           ),
         ),
         IconButton(
@@ -269,7 +311,16 @@ class _CartScreenState extends State<CartScreen> {
 
   Widget _checkoutBar(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: AppColors.card, border: Border(top: BorderSide(color: AppColors.border)), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 10, offset: const Offset(0, -4))]),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.85),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, -6),
+          ),
+        ],
+      ),
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
       child: SafeArea(
         top: false,
@@ -277,7 +328,18 @@ class _CartScreenState extends State<CartScreen> {
           children: [
             Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [Text('TOTAL', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.8, color: AppColors.textSecondary)), const SizedBox(height: 1), Text(_fmt(_selectedSubtotal), style: TextStyle(color: AppColors.warning, fontSize: 16, fontWeight: FontWeight.w900))]),
             const Spacer(),
-            ElevatedButton(onPressed: _selected.isEmpty ? null : () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CheckoutScreen())), style: ElevatedButton.styleFrom(minimumSize: const Size(120, 40), backgroundColor: AppColors.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)), padding: const EdgeInsets.symmetric(horizontal: 16)), child: const Text('Checkout', style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white, fontSize: 13))),
+            ElevatedButton(
+              onPressed: _selected.isEmpty ? null : () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CheckoutScreen())),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(120, 40),
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                elevation: 0,
+                shadowColor: AppColors.primary.withValues(alpha: 0.3),
+              ),
+              child: const Text('Checkout', style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white, fontSize: 13)),
+            ),
           ],
         ),
       ),

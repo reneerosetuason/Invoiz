@@ -27,6 +27,11 @@ class ProductController extends Controller
             });
         }
 
+        if ($request->boolean('on_sale')) {
+            $query->whereNotNull('compare_at_price')
+                ->whereColumn('compare_at_price', '>', 'price');
+        }
+
         if ($request->has('sort')) {
             switch ($request->input('sort')) {
                 case 'price_asc':
@@ -37,6 +42,11 @@ class ProductController extends Controller
                     break;
                 case 'rating':
                     $query->orderByDesc('rating');
+                    break;
+                case 'discount':
+                    $query->whereNotNull('compare_at_price')
+                        ->whereColumn('compare_at_price', '>', 'price')
+                        ->orderByRaw('(compare_at_price - price) / compare_at_price DESC');
                     break;
                 default:
                     $query->latest();

@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'dart:ui';
+import 'package:flutter/material.dart';
 
 import '../screens/account_screen.dart';
 import '../screens/cart_screen.dart';
@@ -19,6 +20,10 @@ class MainLayout extends StatelessWidget {
   final String title;
   final bool showAppBar;
   final bool showBottomNav;
+  final bool showTopActions;
+  final bool showMessageIcon;
+  final bool showSettingsIcon;
+  final bool showNotificationIcon;
   final int currentIndex;
 
   const MainLayout({
@@ -27,6 +32,10 @@ class MainLayout extends StatelessWidget {
     this.title = '',
     this.showAppBar = true,
     this.showBottomNav = true,
+    this.showTopActions = true,
+    this.showMessageIcon = true,
+    this.showSettingsIcon = true,
+    this.showNotificationIcon = true,
     this.currentIndex = 0,
   });
 
@@ -45,65 +54,69 @@ class MainLayout extends StatelessWidget {
       titleSpacing: 14,
       elevation: 0,
       scrolledUnderElevation: 0,
-      backgroundColor: AppColors.card,
+      backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
+      flexibleSpace: ClipRRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          child: Container(
+            color: Colors.white.withValues(alpha: 0.7),
+          ),
+        ),
+      ),
       title: Row(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColors.accent,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.primary, AppColors.primaryDark],
+              ),
               borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                InvoizLogo.logoWidget(size: 26, radius: 7),
-                const SizedBox(width: 6),
-                const Text(
-                  'Invoiz',
-                  style: TextStyle(
-                    color: AppColors.primary,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.2,
-                  ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
+            child: InvoizLogo.logoWidget(size: 26, radius: 6),
           ),
           if (title.isNotEmpty)
             Flexible(
               child: Padding(
                 padding: const EdgeInsets.only(left: 12),
-                child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: -0.2)),
               ),
             ),
         ],
       ),
       actions: [
-        IconButton(
-          icon: const Icon(Icons.chat_bubble_outline, size: 22),
-          tooltip: 'Messages',
-          onPressed: () {
-            final auth = AuthServiceProvider.of(context);
-            if (!auth.isLoggedIn) {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
-              return;
-            }
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatScreen()));
-          },
-        ),
-        const _NotificationBell(),
-        IconButton(
-          icon: const Icon(Icons.settings_outlined, size: 22),
-          tooltip: 'Settings',
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AccountScreen()),
+        if (showTopActions && showMessageIcon)
+          _AppBarIcon(
+            icon: Icons.chat_bubble_outline_rounded,
+            onTap: () {
+              final auth = AuthServiceProvider.of(context);
+              if (!auth.isLoggedIn) {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+                return;
+              }
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatScreen()));
+            },
           ),
-        ),
-        const SizedBox(width: 4),
+        if (showNotificationIcon) const AppNotificationBell(),
+        if (showTopActions && showSettingsIcon)
+          _AppBarIcon(
+            icon: Icons.settings_outlined,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AccountScreen()),
+            ),
+          ),
+        const SizedBox(width: 8),
       ],
     );
   }
@@ -177,25 +190,26 @@ class _BottomNavState extends State<_BottomNav> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        border: Border(top: BorderSide(color: AppColors.border, width: 1)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 12,
-            offset: const Offset(0, -2),
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.08),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
           child: Row(
             children: [
               Expanded(child: _NavButton(icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Home', selected: widget.currentIndex == 0, onTap: () => _go(context, 0))),
-              Expanded(child: _NavButton(icon: Icons.search, activeIcon: Icons.search, label: 'Browse', selected: widget.currentIndex == 1, onTap: () => _go(context, 1))),
+              Expanded(child: _NavButton(icon: Icons.local_offer_outlined, activeIcon: Icons.local_offer, label: 'Sale', selected: widget.currentIndex == 1, onTap: () => _go(context, 1))),
               Expanded(
                 child: Stack(
                   clipBehavior: Clip.none,
@@ -204,11 +218,21 @@ class _BottomNavState extends State<_BottomNav> {
                     _NavButton(icon: Icons.shopping_cart_outlined, activeIcon: Icons.shopping_cart, label: 'Cart', selected: widget.currentIndex == 2, onTap: () => _go(context, 2)),
                     if (_cartCount > 0)
                       Positioned(
-                        right: 12,
-                        top: 0,
+                        right: 8,
+                        top: 2,
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                          decoration: BoxDecoration(color: AppColors.warning, borderRadius: BorderRadius.circular(999), border: Border.all(color: Colors.white, width: 1.2)),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(colors: [Color(0xFFFF6B35), Color(0xFFE05A33)]),
+                            borderRadius: BorderRadius.circular(999),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.warning.withValues(alpha: 0.4),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
                           child: Text('$_cartCount', style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)),
                         ),
                       ),
@@ -242,32 +266,53 @@ class _NavButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary.withValues(alpha: 0.10) : Colors.transparent,
+          gradient: selected
+              ? LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [AppColors.primary, AppColors.primaryDark],
+                )
+              : null,
           borderRadius: BorderRadius.circular(16),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.4),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              selected ? activeIcon : icon,
-              size: 24,
-              color: selected ? AppColors.primary : AppColors.textSecondary,
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                selected ? activeIcon : icon,
+                key: ValueKey(selected),
+                size: 22,
+                color: selected ? Colors.white : AppColors.textSecondary,
+              ),
             ),
             const SizedBox(height: 2),
-            Text(
-              label,
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 200),
               style: TextStyle(
-                fontSize: 11,
+                fontSize: 10,
                 fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                color: selected ? AppColors.primary : AppColors.textSecondary,
-                letterSpacing: 0.2,
+                color: selected ? Colors.white : AppColors.textSecondary,
+                letterSpacing: 0.1,
               ),
+              child: Text(label),
             ),
           ],
         ),
@@ -276,14 +321,44 @@ class _NavButton extends StatelessWidget {
   }
 }
 
-class _NotificationBell extends StatefulWidget {
-  const _NotificationBell();
+class _AppBarIcon extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  const _AppBarIcon({required this.icon, required this.onTap});
 
   @override
-  State<_NotificationBell> createState() => _NotificationBellState();
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 3),
+      width: 38,
+      height: 38,
+      decoration: BoxDecoration(
+        color: AppColors.surfaceSoft.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Icon(icon, color: AppColors.textPrimary, size: 20),
+      ),
+    );
+  }
 }
 
-class _NotificationBellState extends State<_NotificationBell> {
+/// Shared notification bell with unread badge. Used on every top bar
+/// (main layout, home header, cart header, orders header) so the count
+/// is always identical no matter which page the user is on.
+class AppNotificationBell extends StatefulWidget {
+  final Color iconColor;
+  final double iconSize;
+  final Color? background;
+  const AppNotificationBell({super.key, this.iconColor = AppColors.textPrimary, this.iconSize = 22, this.background});
+
+  @override
+  State<AppNotificationBell> createState() => _AppNotificationBellState();
+}
+
+class _AppNotificationBellState extends State<AppNotificationBell> {
   final _api = ApiService();
   int _unread = 0;
 
@@ -306,29 +381,48 @@ class _NotificationBellState extends State<_NotificationBell> {
   Widget build(BuildContext context) {
     final auth = AuthServiceProvider.of(context);
     if (!auth.isLoggedIn) return const SizedBox.shrink();
+    final bell = Container(
+      margin: const EdgeInsets.symmetric(horizontal: 3),
+      width: 38,
+      height: 38,
+      decoration: BoxDecoration(
+        color: widget.background ?? AppColors.surfaceSoft.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        onTap: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+          );
+          _load();
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Icon(Icons.notifications_outlined, size: widget.iconSize, color: widget.iconColor),
+      ),
+    );
     return Stack(
       clipBehavior: Clip.none,
+      alignment: Alignment.center,
       children: [
-        IconButton(
-          icon: const Icon(Icons.notifications_outlined, size: 22),
-          onPressed: () async {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const NotificationsScreen()),
-            );
-            _load();
-          },
-        ),
+        bell,
         if (_unread > 0)
           Positioned(
-            right: 4,
-            top: 6,
+            right: 0,
+            top: 0,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
               decoration: BoxDecoration(
-                color: AppColors.warning,
+                gradient: const LinearGradient(colors: [Color(0xFFFF6B35), Color(0xFFE05A33)]),
                 borderRadius: BorderRadius.circular(999),
                 border: Border.all(color: Colors.white, width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.warning.withValues(alpha: 0.4),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Text(
                 '$_unread',

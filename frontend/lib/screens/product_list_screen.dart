@@ -1,8 +1,11 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../config.dart';
 import '../services/api_service.dart';
 import '../theme.dart';
+import '../widgets/auth_service_provider.dart';
 import '../widgets/main_layout.dart';
+import 'login_screen.dart';
 import 'product_detail_screen.dart';
 import 'seller_store_screen.dart';
 
@@ -10,8 +13,9 @@ class ProductListScreen extends StatefulWidget {
   final int? categoryId;
   final String? categoryName;
   final String? search;
+  final bool showAll;
 
-  const ProductListScreen({super.key, this.categoryId, this.categoryName, this.search});
+  const ProductListScreen({super.key, this.categoryId, this.categoryName, this.search, this.showAll = false});
 
   @override
   State<ProductListScreen> createState() => _ProductListScreenState();
@@ -22,9 +26,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
   final _searchCtrl = TextEditingController();
   List _products = [];
   List _categories = [];
+  List _vouchers = [];
   int? _categoryId;
   bool _loading = true;
-  String _sort = 'newest';
+  String _sort = 'discount';
+
+  bool get _saleMode => !widget.showAll;
 
   @override
   void initState() {
@@ -40,14 +47,21 @@ class _ProductListScreenState extends State<ProductListScreen> {
       final cats = await _api.get('categories');
       final query = <String, String>{
         'per_page': '50',
+        if (_saleMode) 'on_sale': '1',
         if (_categoryId != null) 'category_id': '$_categoryId',
         if (_searchCtrl.text.trim().isNotEmpty) 'search': _searchCtrl.text.trim(),
-        if (_sort == 'price_asc' || _sort == 'price_desc' || _sort == 'rating') 'sort': _sort,
+        if (_sort == 'price_asc' || _sort == 'price_desc' || _sort == 'rating' || _sort == 'discount') 'sort': _sort,
       };
       final prods = await _api.get('products', query: query);
+      List vouchers = [];
+      try {
+        final v = await _api.get('vouchers');
+        vouchers = (v['vouchers'] as List?) ?? [];
+      } catch (_) {}
       setState(() {
         _categories = (cats['categories'] as List).cast<Map<String, dynamic>>();
         _products = (prods['data'] as List).cast<Map<String, dynamic>>();
+        _vouchers = vouchers;
         _loading = false;
       });
     } catch (e) {
@@ -66,9 +80,11 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Widget build(BuildContext context) {
     return MainLayout(
       currentIndex: 1,
-      title: 'Products',
+      showAppBar: false,
       child: Column(
         children: [
+          _saleHeader(context),
+          if (_saleMode) _voucherStrip(),
           Container(
             color: AppColors.card,
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
@@ -92,11 +108,11 @@ class _ProductListScreenState extends State<ProductListScreen> {
                             onSubmitted: (_) => _load(),
                             textInputAction: TextInputAction.search,
                             style: const TextStyle(fontSize: 14),
-                            decoration: const InputDecoration(
-                              hintText: 'Search products...',
+                            decoration: InputDecoration(
+                              hintText: _saleMode ? 'Search sale items...' : 'Search products...',
                               border: InputBorder.none,
                               isDense: true,
-                              contentPadding: EdgeInsets.symmetric(vertical: 10),
+                              contentPadding: const EdgeInsets.symmetric(vertical: 10),
                             ),
                           ),
                         ),
@@ -142,6 +158,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
+                        if (_saleMode) _sortChip('discount', 'Biggest Discount'),
                         _sortChip('newest', 'Newest'),
                         _sortChip('price_asc', 'Price: Low-High'),
                         _sortChip('price_desc', 'Price: High-Low'),
@@ -158,20 +175,137 @@ class _ProductListScreenState extends State<ProductListScreen> {
             child: _loading
                 ? const Center(child: CircularProgressIndicator())
                 : _products.isEmpty
-                    ? const Center(child: Text('No products found.'))
+                    ? const Center(child: Text('No sale items found.'))
                     : GridView.builder(
                         padding: const EdgeInsets.all(12),
                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                           mainAxisSpacing: 14,
                           crossAxisSpacing: 14,
-                          childAspectRatio: 0.64,
+                          childAspectRatio: 0.62,
                         ),
                         itemCount: _products.length,
                         itemBuilder: (context, i) => _card(_products[i]),
                       ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _saleHeader(BuildContext context) {
+    if (!_saleMode) return const SizedBox.shrink();
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [const Color(0xFFE65100), const Color(0xFFFFB700)],
+        ),
+      ),
+      padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 12, 16, 14),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 22),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            onPressed: () => Navigator.pop(context),
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
+                      child: const Text('MEGA SALE', style: TextStyle(color: Color(0xFFE65100), fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 0.8)),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text('Up to 38% off', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text('${_products.length} discounted item${_products.length == 1 ? '' : 's'} + vouchers below', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+              ],
+            ),
+          ),
+          const Icon(Icons.local_offer, color: Colors.white70, size: 40),
+        ],
+      ),
+    );
+  }
+
+  Widget _voucherStrip() {
+    if (_vouchers.isEmpty) return const SizedBox.shrink();
+    return Container(
+      color: AppColors.card,
+      padding: const EdgeInsets.fromLTRB(0, 10, 0, 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Text('Claim a voucher', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFF212121))),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 86,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: _vouchers.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (context, i) => _voucherCard(_vouchers[i] as Map<String, dynamic>),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _voucherCard(Map<String, dynamic> v) {
+    final type = '${v['discount_type'] ?? ''}';
+    final val = double.tryParse('${v['discount_value']}') ?? 0;
+    final label = type == 'percent' ? '${val.toStringAsFixed(0)}% OFF' : '₱${val.toStringAsFixed(0)} OFF';
+    return GestureDetector(
+      onTap: () {
+        Clipboard.setData(ClipboardData(text: '${v['code']}'));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Code ${v['code']} copied — paste it at checkout!')));
+      },
+      child: Container(
+        width: 200,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: AppColors.accent,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.primary, width: 1.2),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(10)),
+              child: const Icon(Icons.confirmation_number_outlined, color: Colors.white, size: 24),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.primary)),
+                  Text('${v['code']}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF212121))),
+                  Text('Min. ₱${double.tryParse('${v['min_spend']}')?.toStringAsFixed(0) ?? '0'} · tap to copy', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -209,6 +343,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
   Widget _card(Map<String, dynamic> p) {
     final price = double.tryParse('${p['price']}') ?? 0;
+    final compare = p['compare_at_price'] != null ? double.tryParse('${p['compare_at_price']}') : null;
+    final pct = (p['discount_percent'] as int?) ?? 0;
     final rating = p['rating'] != null ? double.tryParse('${p['rating']}') : null;
     final sold = p['sold'] is int ? (p['sold'] as int) : 0;
     final shop = p['shop'];
@@ -224,13 +360,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.card,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppColors.border),
+          borderRadius: BorderRadius.circular(22),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: AppColors.primary.withValues(alpha: 0.07),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
@@ -242,7 +377,21 @@ class _ProductListScreenState extends State<ProductListScreen> {
               height: 140,
               width: double.infinity,
               color: AppColors.surfaceSoft,
-              child: _image(_cover(p)),
+              child: Stack(
+                children: [
+                  Positioned.fill(child: _image(_cover(p))),
+                  if (pct > 0)
+                    Positioned(
+                      top: 8,
+                      left: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                        decoration: BoxDecoration(color: const Color(0xFFE65100), borderRadius: BorderRadius.circular(6)),
+                        child: Text('-$pct%', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800)),
+                      ),
+                    ),
+                ],
+              ),
             ),
             Expanded(
               child: Padding(
@@ -250,9 +399,17 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(p['name'] as String, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12.5, height: 1.2, fontWeight: FontWeight.w500)),
+                    Text(p['name'] as String, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12.5, height: 1.2, fontWeight: FontWeight.w500, color: Color(0xFF212121))),
                     const SizedBox(height: 4),
-                    Text(_fmt(price), style: TextStyle(color: AppColors.warning, fontWeight: FontWeight.w800, fontSize: 14)),
+                    Row(
+                      children: [
+                        Flexible(child: Text(_fmt(price), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: AppColors.warning, fontWeight: FontWeight.w800, fontSize: 14))),
+                        if (compare != null && compare > price) ...[
+                          const SizedBox(width: 6),
+                          Flexible(child: Text(_fmt(compare), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: AppColors.textSecondary, decoration: TextDecoration.lineThrough))),
+                        ],
+                      ],
+                    ),
                     const SizedBox(height: 6),
                     if (shopName != null && shopSellerId != null)
                       GestureDetector(

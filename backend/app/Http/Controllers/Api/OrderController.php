@@ -21,7 +21,7 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Order::with(['items', 'payment', 'delivery', 'orderVouchers.voucher'])
+        $query = Order::with(['items.product:id,image', 'payment', 'delivery', 'orderVouchers.voucher'])
             ->where('buyer_id', $request->user()->id)
             ->latest();
 
@@ -29,7 +29,14 @@ class OrderController extends Controller
             $query->where('status', $request->input('status'));
         }
 
-        return response()->json(['orders' => $query->get()]);
+        $orders = $query->get();
+        foreach ($orders as $order) {
+            foreach ($order->items as $item) {
+                $item->product_image = $item->product->image ?? null;
+            }
+        }
+
+        return response()->json(['orders' => $orders]);
     }
 
     public function checkout(Request $request)
@@ -175,9 +182,13 @@ class OrderController extends Controller
 
     public function show(Request $request, $id)
     {
-        $order = Order::with(['items', 'payment', 'delivery', 'orderVouchers.voucher', 'address', 'statusHistories'])
+        $order = Order::with(['items.product:id,image', 'payment', 'delivery', 'orderVouchers.voucher', 'address', 'statusHistories'])
             ->where('buyer_id', $request->user()->id)
             ->findOrFail($id);
+
+        foreach ($order->items as $item) {
+            $item->product_image = $item->product->image ?? null;
+        }
 
         return response()->json(['order' => $order]);
     }

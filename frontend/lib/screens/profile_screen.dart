@@ -150,7 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               value: _sex,
               decoration: const InputDecoration(labelText: 'Sex'),
               items: ['male', 'female', 'other']
-                  .map((s) => DropdownMenuItem(value: s, child: Text(s.toUpperCase())))
+                  .map((s) => DropdownMenuItem(value: s, child: Text(s.toUpperCase(), style: const TextStyle(color: Color(0xFF212121)))))
                   .toList(),
               onChanged: (v) => setState(() => _sex = v),
             ),
@@ -203,7 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Expanded(
                       child: Text(
                         _idImage == null ? 'Upload new ID (optional)' : _idImage!.name,
-                        style: const TextStyle(fontSize: 14),
+                        style: const TextStyle(fontSize: 14, color: Color(0xFF212121)),
                       ),
                     ),
                   ],

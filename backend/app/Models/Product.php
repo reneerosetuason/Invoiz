@@ -20,19 +20,34 @@ class Product extends Model
         'warranty',
         'origin',
         'price',
+        'compare_at_price',
         'stock',
         'image',
         'rating',
         'status',
     ];
 
+    protected $appends = ['discount_percent'];
+
     protected function casts(): array
     {
         return [
             'price' => 'decimal:2',
+            'compare_at_price' => 'decimal:2',
             'rating' => 'decimal:1',
             'status' => 'string',
         ];
+    }
+
+    /**
+     * Whole-number discount, e.g. 25 for "−25%". 0 when not on sale.
+     */
+    public function getDiscountPercentAttribute(): int
+    {
+        $compare = (float) ($this->compare_at_price ?? 0);
+        $price = (float) ($this->price ?? 0);
+        if ($compare <= 0 || $price >= $compare) return 0;
+        return (int) round(($compare - $price) / $compare * 100);
     }
 
     public function category()

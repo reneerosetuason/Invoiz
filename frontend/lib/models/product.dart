@@ -100,6 +100,8 @@ class Product {
   final String? warranty;
   final String? origin;
   final double price;
+  final double? compareAtPrice;
+  final int discountPercent;
   final int stock;
   final String? image;
   final double? rating;
@@ -127,6 +129,8 @@ class Product {
     this.warranty,
     this.origin,
     required this.price,
+    this.compareAtPrice,
+    this.discountPercent = 0,
     this.stock = 0,
     this.image,
     this.rating,
@@ -161,6 +165,8 @@ class Product {
       warranty: json['warranty'] as String?,
       origin: json['origin'] as String?,
       price: double.tryParse('${json['price']}') ?? 0,
+      compareAtPrice: json['compare_at_price'] != null ? double.tryParse('${json['compare_at_price']}') : null,
+      discountPercent: (json['discount_percent'] as int?) ?? 0,
       stock: (json['stock'] as int?) ?? 0,
       image: json['image'] as String?,
       rating: json['rating'] != null ? double.tryParse('${json['rating']}') : null,

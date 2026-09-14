@@ -6,6 +6,7 @@ class OrderItem {
   final int quantity;
   final double price;
   final double subtotal;
+  final String? productImage;
 
   OrderItem({
     required this.id,
@@ -15,6 +16,7 @@ class OrderItem {
     required this.quantity,
     required this.price,
     required this.subtotal,
+    this.productImage,
   });
 
   factory OrderItem.fromJson(Map<String, dynamic> json) => OrderItem(
@@ -25,6 +27,7 @@ class OrderItem {
         quantity: json['quantity'] as int,
         price: double.tryParse('${json['price']}') ?? 0,
         subtotal: double.tryParse('${json['subtotal']}') ?? 0,
+        productImage: json['product_image'] as String?,
       );
 }
 

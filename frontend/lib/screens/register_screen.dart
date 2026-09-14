@@ -4,8 +4,9 @@ import 'package:http/http.dart' as http;
 import '../config.dart';
 import '../services/api_service.dart';
 import '../theme.dart';
+import '../widgets/entrance.dart';
 import '../widgets/invoiz_logo.dart';
-import 'login_screen.dart';
+import 'verify_email_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -143,29 +144,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
       });
 
       if (!mounted) return;
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Registration Submitted'),
-          content: const Text(
-            'After submitting your registration, please wait for the administrator\'s approval, '
-            'which will be sent to your email.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                  (route) => false,
-                );
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: const Text('Verification code sent to your email.', style: TextStyle(color: Color(0xFF212121))), backgroundColor: Colors.green.shade100),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => VerifyEmailScreen(email: _email.text.trim())),
       );
     } on ApiException catch (e) {
       _show(e.message);
@@ -225,33 +209,57 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
-                  Hero(
-                    tag: 'invoiz_logo',
-                    child: InvoizLogo.logoWidget(size: 88, radius: 24),
+                  FadeSlideIn(
+                    delayMs: 0,
+                    child: Hero(
+                      tag: 'invoiz_logo',
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(26),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.25),
+                              blurRadius: 24,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: InvoizLogo.logoWidget(size: 88, radius: 24),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 14),
-                  const Text(
-                    'Create your account',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w800,
+                  const FadeSlideIn(
+                    delayMs: 120,
+                    child: Text(
+                      'Create your account',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 26,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.5,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'Register as a buyer to start shopping',
-                    style: TextStyle(color: Colors.white70, fontSize: 13),
+                  const FadeSlideIn(
+                    delayMs: 200,
+                    child: Text(
+                      'Register as a buyer to start shopping',
+                      style: TextStyle(color: Colors.white70, fontSize: 13),
+                    ),
                   ),
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _sectionTitle('Personal Information'),
+            FadeSlideIn(
+              delayMs: 280,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _sectionTitle('Personal Information'),
                   _field('Last name*', _lastName, icon: Icons.person, required: true),
                   _field('First name*', _firstName, icon: Icons.person_outline, required: true),
                   _field('Middle initial', _middleInitial, icon: Icons.person_pin),
@@ -262,7 +270,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     value: _sex,
                     decoration: const InputDecoration(prefixIcon: Icon(Icons.wc)),
                     items: ['male', 'female', 'other']
-                        .map((s) => DropdownMenuItem(value: s, child: Text(s.toUpperCase())))
+                        .map((s) => DropdownMenuItem(value: s, child: Text(s.toUpperCase(), style: const TextStyle(color: Color(0xFF212121)))))
                         .toList(),
                     onChanged: (v) => setState(() => _sex = v),
                     validator: (v) => v == null ? 'Select sex' : null,
@@ -278,7 +286,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         labelText: 'Birthday*',
                         prefixIcon: Icon(Icons.cake_outlined),
                       ),
-                      child: Text(_birthday.text.isEmpty ? 'YYYY-MM-DD' : _birthday.text),
+                      child: Text(_birthday.text.isEmpty ? 'YYYY-MM-DD' : _birthday.text, style: const TextStyle(color: Color(0xFF212121))),
                     ),
                   ),
                   if (_birthDate != null)
@@ -289,6 +297,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         style: TextStyle(color: AppColors.success, fontSize: 13, fontWeight: FontWeight.w600),
                       ),
                     ),
+                  const SizedBox(height: 12),
                   _field('Password*', _password, icon: Icons.lock_outline, obscure: true, required: true),
                   _field('Confirm Password*', _passwordConfirm, icon: Icons.lock, obscure: true, required: true,
                       confirmWith: _password),
@@ -332,7 +341,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
                   ),
                   const SizedBox(height: 20),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
@@ -345,19 +355,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             width: 4,
             height: 18,
+            margin: const EdgeInsets.only(top: 2),
             decoration: BoxDecoration(
               color: AppColors.primary,
               borderRadius: BorderRadius.circular(999),
             ),
           ),
           const SizedBox(width: 8),
-          Text(
-            title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: -0.2),
+          Expanded(
+            child: Text(
+              title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: -0.2, color: Color(0xFF212121)),
+            ),
           ),
         ],
       ),
@@ -407,12 +423,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
         value: value != null
             ? items.firstWhere((i) => i['name'] == value, orElse: () => {'code': ''})['code']
             : null,
-        hint: Text(label),
+        hint: Text(label, style: const TextStyle(color: Color(0xFF9E9E9E))),
         decoration: const InputDecoration(prefixIcon: Icon(Icons.location_on_outlined)),
         isExpanded: true,
         items: items
             .map<DropdownMenuItem<String>>(
-                (i) => DropdownMenuItem(value: i['code'] as String, child: Text(i['name'] as String, overflow: TextOverflow.ellipsis)))
+                (i) => DropdownMenuItem(value: i['code'] as String, child: Text(i['name'] as String, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF212121)))))
             .toList(),
         onChanged: (v) {
           if (v != null) onChanged(v);

@@ -2,10 +2,11 @@
 import '../services/api_service.dart';
 import '../theme.dart';
 import '../widgets/auth_service_provider.dart';
+import '../widgets/entrance.dart';
 import '../widgets/invoiz_logo.dart';
 import 'home_screen.dart';
 import 'register_screen.dart';
-import 'role_picker_screen.dart';
+import 'verify_email_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -37,22 +38,19 @@ class _LoginScreenState extends State<LoginScreen> {
       final auth = AuthServiceProvider.of(context);
       await auth.login(_emailCtrl.text.trim(), _passCtrl.text);
       if (!mounted) return;
-      // If the account can act as both buyer and seller, let them choose
-      // which dashboard to enter first.
-      if (auth.canActAsSeller) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => const RolePickerScreen()),
-          (route) => false,
-        );
-        return;
-      }
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => const HomeScreen()),
         (route) => false,
       );
     } on ApiException catch (e) {
+      if (e.message.toLowerCase().contains('verify')) {
+        final email = _emailCtrl.text.trim();
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => VerifyEmailScreen(email: email)));
+        return;
+      }
       _show(e.message);
     } catch (e) {
       _show('Unable to connect to server.');
@@ -73,51 +71,79 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [AppColors.primary, AppColors.primaryDark],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [AppColors.primaryDark, AppColors.primary, const Color(0xFF2AA198)],
           ),
         ),
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  Hero(
-                    tag: 'invoiz_logo',
-                    child: InvoizLogo.logoWidget(size: 92, radius: 26),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Welcome back',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Log in to continue shopping',
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
-                  ),
-                  const SizedBox(height: 28),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(22),
-                    decoration: BoxDecoration(
-                      color: AppColors.card,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.16),
-                          blurRadius: 30,
-                          offset: const Offset(0, 12),
+        child: Stack(
+          children: [
+            const GlowBlob(size: 220, color: Colors.white10, left: -70, top: -60),
+            const GlowBlob(size: 160, color: Colors.white10, left: 250, top: 140),
+            SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      FadeSlideIn(
+                        delayMs: 0,
+                        child: Hero(
+                          tag: 'invoiz_logo',
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(28),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.25),
+                                  blurRadius: 24,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            child: InvoizLogo.logoWidget(size: 92, radius: 26),
+                          ),
                         ),
-                      ],
-                    ),
-                    child: Column(
+                      ),
+                      const SizedBox(height: 16),
+                      const FadeSlideIn(
+                        delayMs: 120,
+                        child: Text(
+                          'Welcome back',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const FadeSlideIn(
+                        delayMs: 200,
+                        child: Text(
+                          'Log in to continue shopping',
+                          style: TextStyle(color: Colors.white70, fontSize: 14),
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+                      FadeSlideIn(
+                        delayMs: 300,
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(22),
+                          decoration: BoxDecoration(
+                            color: AppColors.card,
+                            borderRadius: BorderRadius.circular(28),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.20),
+                                blurRadius: 30,
+                                offset: const Offset(0, 12),
+                              ),
+                            ],
+                          ),
+                          child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         TextField(
@@ -207,12 +233,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
-      ),
-    );
+        ),
+      ],
+    ),
+  ),
+  );
   }
 }
+

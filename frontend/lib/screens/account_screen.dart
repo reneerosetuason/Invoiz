@@ -1,5 +1,6 @@
 ﻿import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../config.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
 import '../theme.dart';
@@ -49,19 +50,9 @@ class _AccountScreenState extends State<AccountScreen> {
         children: [
           Container(
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [AppColors.primary, AppColors.primaryDark],
-              ),
+              color: Colors.transparent,
               borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.3),
-                  blurRadius: 16,
-                  offset: const Offset(0, 8),
-                ),
-              ],
+              border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
             ),
             padding: const EdgeInsets.all(16),
             child: Row(
@@ -70,14 +61,20 @@ class _AccountScreenState extends State<AccountScreen> {
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(16),
+                    shape: BoxShape.circle,
+                    color: Colors.transparent,
+                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
                   ),
-                  child: Center(
-                    child: Text(
-                      (user?.firstName ?? '?').substring(0, 1).toUpperCase(),
-                      style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700),
-                    ),
+                  child: ClipOval(
+                    child: user?.profilePicture != null && user!.profilePicture!.isNotEmpty
+                        ? Image.network(
+                            AppConfig.storageUrl(user.profilePicture),
+                            fit: BoxFit.cover,
+                            width: 56,
+                            height: 56,
+                            errorBuilder: (_, __, ___) => _initialAvatar(user),
+                          )
+                        : _initialAvatar(user),
                   ),
                 ),
                 const SizedBox(width: 14),
@@ -85,12 +82,12 @@ class _AccountScreenState extends State<AccountScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(user?.fullName ?? 'User', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
-                      Text(user?.email ?? '', style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.7))),
+                      Text(user?.fullName ?? 'User', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF212121))),
+                      Text(user?.email ?? '', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                       const SizedBox(height: 4),
                       Text(
-                        'Member since ${_shortDate(user?.birthday)}',
-                        style: TextStyle(fontSize: 11, color: Colors.white.withValues(alpha: 0.6)),
+                        'Member since ${_shortDate(user?.createdAt)}',
+                        style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
                       ),
                     ],
                   ),
@@ -144,32 +141,38 @@ class _AccountScreenState extends State<AccountScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.7),
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(color: AppColors.border),
       ),
       child: ListTile(
         leading: Container(
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [AppColors.accent, AppColors.accent.withValues(alpha: 0.6)],
-            ),
+            color: Colors.transparent,
             borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
           ),
           child: Icon(icon, color: AppColors.primary, size: 20),
         ),
         title: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
         trailing: Icon(Icons.chevron_right, color: AppColors.textSecondary),
         onTap: onTap,
+      ),
+    );
+  }
+
+  Widget _initialAvatar(dynamic user) {
+    return Container(
+      width: 56,
+      height: 56,
+      color: Colors.transparent,
+      child: Center(
+        child: Text(
+          (user?.firstName ?? '?').substring(0, 1).toUpperCase(),
+          style: TextStyle(color: AppColors.primary, fontSize: 24, fontWeight: FontWeight.w700),
+        ),
       ),
     );
   }

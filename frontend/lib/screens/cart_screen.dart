@@ -277,8 +277,9 @@ class _CartScreenState extends State<CartScreen> {
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              color: AppColors.surfaceSoft,
+              color: Colors.transparent,
               borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.border),
             ),
             child: const Icon(Icons.remove, size: 16),
           ),
@@ -295,8 +296,9 @@ class _CartScreenState extends State<CartScreen> {
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              color: AppColors.accent,
+              color: Colors.transparent,
               borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
             ),
             child: const Icon(Icons.add, size: 16, color: AppColors.primary),
           ),

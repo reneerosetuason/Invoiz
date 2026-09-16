@@ -260,10 +260,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [_statusColor(order.status).withValues(alpha: 0.15), _statusColor(order.status).withValues(alpha: 0.08)],
-                    ),
+                    color: Colors.transparent,
                     borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: _statusColor(order.status).withValues(alpha: 0.4)),
                   ),
                   child: Text(
                     _statusLabel(order.status),

@@ -208,40 +208,33 @@ class _HomeScreenState extends State<HomeScreen> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
         decoration: BoxDecoration(
+          gradient: selected
+              ? LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [AppColors.primary, AppColors.primaryDark],
+                )
+              : null,
+          color: selected ? null : Colors.white,
           borderRadius: BorderRadius.circular(999),
-          boxShadow: [
-            BoxShadow(
-              color: selected ? AppColors.primary.withValues(alpha: 0.22) : Colors.black.withValues(alpha: 0.07),
-              blurRadius: selected ? 16 : 14,
-              offset: const Offset(0, 6),
-            ),
-          ],
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.22),
+                    blurRadius: 14,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(999),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeOutCubic,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-            decoration: BoxDecoration(
-              color: selected ? null : Colors.white.withValues(alpha: 0.92),
-              gradient: selected
-                  ? LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [AppColors.primary, AppColors.primaryDark],
-                    )
-                  : null,
-            ),
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
-                color: selected ? Colors.white : AppColors.textPrimary,
-              ),
-            ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+            color: selected ? Colors.white : AppColors.textPrimary,
           ),
         ),
       ),
@@ -637,6 +630,20 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _greetingFallback(dynamic auth) {
+    return Container(
+      width: 40,
+      height: 40,
+      color: Colors.transparent,
+      child: Center(
+        child: Text(
+          (auth.user?.firstName ?? '?').substring(0, 1).toUpperCase(),
+          style: TextStyle(color: AppColors.primary, fontSize: 18, fontWeight: FontWeight.w700),
+        ),
+      ),
+    );
+  }
+
   Widget _heroBanner(BuildContext context) {
     final auth = AuthServiceProvider.of(context);
     final slides = [
@@ -666,6 +673,50 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
       child: Column(
         children: [
+          if (auth.isLoggedIn) ...[
+            Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 1.5),
+                  ),
+                  child: ClipOval(
+                    child: auth.user?.profilePicture != null && auth.user!.profilePicture!.isNotEmpty
+                        ? Image.network(
+                            AppConfig.storageUrl(auth.user!.profilePicture),
+                            fit: BoxFit.cover,
+                            width: 40,
+                            height: 40,
+                            errorBuilder: (_, __, ___) => _greetingFallback(auth),
+                          )
+                        : _greetingFallback(auth),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Hi, ${auth.user?.firstName ?? 'there'}!',
+                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Color(0xFF212121)),
+                      ),
+                      Text(
+                        'Everyday essentials at your fingertips.',
+                        style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+          ],
           SizedBox(
             height: 164,
             child: PageView.builder(
@@ -753,24 +804,9 @@ class _HomeScreenState extends State<HomeScreen> {
           gradient: selected
               ? LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.primary, AppColors.primaryDark])
               : null,
-          color: selected ? null : Colors.white.withValues(alpha: 0.6),
+          color: selected ? null : Colors.transparent,
           borderRadius: BorderRadius.circular(22),
-          border: selected ? null : Border.all(color: Colors.white.withValues(alpha: 0.4)),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.35),
-                    blurRadius: 14,
-                    offset: const Offset(0, 6),
-                  ),
-                ]
-              : [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+          border: selected ? null : Border.all(color: AppColors.border),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -783,17 +819,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 gradient: selected
                     ? LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.white.withValues(alpha: 0.25), Colors.white.withValues(alpha: 0.1)])
                     : null,
-                color: selected ? null : Colors.white,
+                color: selected ? null : Colors.transparent,
                 borderRadius: BorderRadius.circular(14),
-                boxShadow: selected
-                    ? null
-                    : [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.08),
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
+                border: selected ? null : Border.all(color: AppColors.border),
               ),
               child: Icon(
                 _categoryIcon(cat['name'] as String),
@@ -944,17 +972,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(colors: [Color(0xFFFF6B35), Color(0xFFE05A33)]),
+                          color: Colors.white.withValues(alpha: 0.9),
                           borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFFE05A33).withValues(alpha: 0.3),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
+                          border: Border.all(color: const Color(0xFFE05A33).withValues(alpha: 0.4)),
                         ),
-                        child: Text('-$pct%', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800)),
+                        child: Text('-$pct%', style: const TextStyle(color: Color(0xFFE05A33), fontSize: 11, fontWeight: FontWeight.w800)),
                       ),
                     ),
                 ],
@@ -979,10 +1001,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [AppColors.accent, AppColors.accent.withValues(alpha: 0.6)],
-                            ),
+                            color: Colors.transparent,
                             borderRadius: BorderRadius.circular(999),
+                            border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
                           ),
                           child: Text('${p['stock']} left', maxLines: 1, softWrap: false, style: TextStyle(fontSize: 10, color: AppColors.primary, fontWeight: FontWeight.w600)),
                         ),

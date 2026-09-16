@@ -17,6 +17,9 @@ class User {
   final String? barangay;
   final String? addressLine;
   final String? idImage;
+  final String? profilePicture;
+  final String? bio;
+  final String? createdAt;
   final Seller? seller;
 
   User({
@@ -36,6 +39,9 @@ class User {
     this.barangay,
     this.addressLine,
     this.idImage,
+    this.profilePicture,
+    this.bio,
+    this.createdAt,
     this.seller,
   });
 
@@ -56,6 +62,9 @@ class User {
         barangay: json['barangay'] as String?,
         addressLine: json['address_line'] as String?,
         idImage: json['id_image'] as String?,
+        profilePicture: json['profile_picture'] as String?,
+        bio: json['bio'] as String?,
+        createdAt: json['created_at'] as String?,
         seller: json['seller'] != null
             ? Seller.fromJson(json['seller'] as Map<String, dynamic>)
             : null,

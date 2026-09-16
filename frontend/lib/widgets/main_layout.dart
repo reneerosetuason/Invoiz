@@ -419,20 +419,13 @@ class _AppNotificationBellState extends State<AppNotificationBell> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [Color(0xFFFF6B35), Color(0xFFE05A33)]),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: Colors.white, width: 1.5),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.warning.withValues(alpha: 0.4),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                border: Border.all(color: AppColors.warning, width: 1.5),
               ),
               child: Text(
                 '$_unread',
-                style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700),
+                style: const TextStyle(color: AppColors.warning, fontSize: 9, fontWeight: FontWeight.w700),
               ),
             ),
           ),
@@ -500,20 +493,13 @@ class _AppMessageBadgeState extends State<AppMessageBadge> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [Color(0xFFFF6B35), Color(0xFFE05A33)]),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: Colors.white, width: 1.5),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.warning.withValues(alpha: 0.4),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                border: Border.all(color: AppColors.warning, width: 1.5),
               ),
               child: Text(
                 '$_unread',
-                style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700),
+                style: const TextStyle(color: AppColors.warning, fontSize: 9, fontWeight: FontWeight.w700),
               ),
             ),
           ),

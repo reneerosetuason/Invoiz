@@ -214,6 +214,7 @@ class AuthController extends Controller
                     'id', 'first_name', 'last_name', 'middle_initial', 'email',
                     'sex', 'phone', 'birthday', 'age', 'role', 'approval_status',
                     'province', 'municipality', 'barangay', 'address_line', 'id_image',
+                    'profile_picture', 'bio', 'created_at',
                 ]),
                 ['seller' => $user->seller],
             ),
@@ -237,6 +238,7 @@ class AuthController extends Controller
                     'id', 'last_name', 'first_name', 'middle_initial', 'sex',
                     'email', 'phone', 'birthday', 'age', 'role', 'approval_status',
                     'province', 'municipality', 'barangay', 'address_line', 'id_image',
+                    'profile_picture', 'bio', 'created_at',
                 ]),
                 ['seller' => $user->seller],
             ),
@@ -257,8 +259,16 @@ class AuthController extends Controller
             'municipality'   => ['nullable', 'string', 'max:100'],
             'barangay'       => ['nullable', 'string', 'max:100'],
             'address_line'   => ['nullable', 'string', 'max:255'],
+            'bio'            => ['nullable', 'string', 'max:200'],
             'password'       => ['nullable', 'string', 'min:8', 'confirmed'],
         ]);
+
+        if ($request->hasFile('profile_picture')) {
+            if ($user->profile_picture) {
+                Storage::disk('public')->delete($user->profile_picture);
+            }
+            $validated['profile_picture'] = $request->file('profile_picture')->store('avatars', 'public');
+        }
 
         if ($request->hasFile('id_image')) {
             if ($user->id_image) {
@@ -279,6 +289,7 @@ class AuthController extends Controller
                 'id', 'last_name', 'first_name', 'middle_initial', 'sex',
                 'email', 'phone', 'birthday', 'age', 'role', 'approval_status',
                 'province', 'municipality', 'barangay', 'address_line', 'id_image',
+                'profile_picture', 'bio', 'created_at',
             ]),
         ]);
     }

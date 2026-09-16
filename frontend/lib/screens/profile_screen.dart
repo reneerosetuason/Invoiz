@@ -1,6 +1,9 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import '../config.dart';
 import '../services/api_service.dart';
 import '../theme.dart';
 import '../widgets/auth_service_provider.dart';
@@ -25,9 +28,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _barangay = TextEditingController();
   final _password = TextEditingController();
   final _passwordConfirm = TextEditingController();
+  final _bio = TextEditingController();
 
   String? _sex;
   XFile? _idImage;
+  XFile? _profilePicture;
   bool _busy = false;
   bool _loaded = false;
 
@@ -51,6 +56,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _province.text = user.province ?? '';
         _municipality.text = user.municipality ?? '';
         _barangay.text = user.barangay ?? '';
+        _bio.text = user.bio ?? '';
         _sex = user.sex;
       }
     }
@@ -68,7 +74,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _barangay.dispose();
     _password.dispose();
     _passwordConfirm.dispose();
+    _bio.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickProfilePicture() async {
+    final picked = await ImagePicker().pickImage(source: ImageSource.gallery, maxWidth: 800);
+    if (picked != null) setState(() => _profilePicture = picked);
   }
 
   Future<void> _pickImage() async {
@@ -88,6 +100,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       final api = ApiService();
       final files = <http.MultipartFile>[];
+      if (_profilePicture != null) {
+        final bytes = await _profilePicture!.readAsBytes();
+        files.add(http.MultipartFile.fromBytes('profile_picture', bytes, filename: _profilePicture!.name));
+      }
       if (_idImage != null) {
         final bytes = await _idImage!.readAsBytes();
         files.add(http.MultipartFile.fromBytes('id_image', bytes, filename: _idImage!.name));
@@ -102,6 +118,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'municipality': _municipality.text.trim(),
         'barangay': _barangay.text.trim(),
         'address_line': _street.text.trim(),
+        'bio': _bio.text.trim(),
         if (_password.text.isNotEmpty) 'password': _password.text,
         if (_password.text.isNotEmpty) 'password_confirmation': _passwordConfirm.text,
       }, files: files);
@@ -123,6 +140,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = AuthServiceProvider.of(context).user;
+    final hasNetworkAvatar = user?.profilePicture != null && user!.profilePicture!.isNotEmpty;
+    final hasLocalAvatar = _profilePicture != null;
+
     return MainLayout(
       title: 'Edit Profile',
       child: Form(
@@ -130,6 +151,72 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            Center(
+              child: GestureDetector(
+                onTap: _pickProfilePicture,
+                child: Stack(
+                  children: [
+                    Container(
+                      width: 90,
+                      height: 90,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.transparent,
+                        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3), width: 2),
+                      ),
+                      child: ClipOval(
+                        child: hasLocalAvatar
+                            ? (kIsWeb
+                                ? Image.network(_profilePicture!.path, fit: BoxFit.cover, width: 90, height: 90)
+                                : Image.file(File(_profilePicture!.path), fit: BoxFit.cover, width: 90, height: 90))
+                            : hasNetworkAvatar
+                                ? Image.network(
+                                    AppConfig.storageUrl(user!.profilePicture),
+                                    fit: BoxFit.cover,
+                                    width: 90,
+                                    height: 90,
+                                    errorBuilder: (_, __, ___) => _avatarFallback(user),
+                                  )
+                                : _avatarFallback(user),
+                      ),
+                    ),
+                    Positioned(
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppColors.border),
+                        ),
+                        child: Icon(Icons.camera_alt, size: 16, color: AppColors.primary),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Center(
+              child: Text(
+                'Tap to change photo',
+                style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text('Bio', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary)),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _bio,
+              maxLength: 200,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                labelText: 'Tell us about yourself',
+                alignLabelWithHint: true,
+              ),
+            ),
+            const Divider(height: 30),
             Text('Personal Information', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary)),
             const SizedBox(height: 12),
             TextFormField(
@@ -220,6 +307,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 20),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _avatarFallback(dynamic user) {
+    return Container(
+      width: 90,
+      height: 90,
+      color: Colors.transparent,
+      child: Center(
+        child: Text(
+          (user?.firstName ?? '?').substring(0, 1).toUpperCase(),
+          style: TextStyle(color: AppColors.primary, fontSize: 32, fontWeight: FontWeight.w700),
         ),
       ),
     );

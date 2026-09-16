@@ -26,6 +26,8 @@ class User extends Authenticatable
         'barangay',
         'address_line',
         'id_image',
+        'profile_picture',
+        'bio',
         'approval_status',
         'role',
         'status',

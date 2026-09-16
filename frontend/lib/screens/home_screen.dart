@@ -1,5 +1,4 @@
 ﻿import 'dart:async';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../config.dart';
 import '../services/api_service.dart';
@@ -154,14 +153,26 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         children: [
           _shopeeHeader(context),
-          _filterChipsBar(),
           if (_selectedCategory != null) _selectedCategoryBar(),
           Expanded(
-            child: _loading
-                ? _shimmerBody()
-                : _products.isEmpty
-                    ? _emptyState()
-                    : _buildBody(context),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned.fill(
+                  child: _loading
+                      ? _shimmerBody()
+                      : _products.isEmpty
+                          ? _emptyState()
+                          : _buildBody(context),
+                ),
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: _filterChipsBar(),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -171,39 +182,64 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _filterChipsBar() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 2, 16, 10),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(999),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        clipBehavior: Clip.none,
+        child: Row(
+          children: _filterChips.map((f) {
+            final selected = _activeFilter == f.$1;
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: _filterPill(
+                label: f.$2,
+                selected: selected,
+                onTap: () => _applyFilter(f.$1),
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  Widget _filterPill({required String label, required bool selected, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(999),
+          boxShadow: [
+            BoxShadow(
+              color: selected ? AppColors.primary.withValues(alpha: 0.22) : Colors.black.withValues(alpha: 0.07),
+              blurRadius: selected ? 16 : 14,
+              offset: const Offset(0, 6),
             ),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: _filterChips.map((f) {
-                  final selected = _activeFilter == f.$1;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 4),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      child: ChoiceChip(
-                        label: Text(f.$2, style: TextStyle(fontSize: 12, fontWeight: selected ? FontWeight.w700 : FontWeight.w500, color: selected ? Colors.white : AppColors.textPrimary)),
-                        selected: selected,
-                        selectedColor: AppColors.primary,
-                        backgroundColor: Colors.transparent,
-                        side: BorderSide.none,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
-                        onSelected: (_) => _applyFilter(f.$1),
-                      ),
-                    ),
-                  );
-                }).toList(),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(999),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOutCubic,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+            decoration: BoxDecoration(
+              color: selected ? null : Colors.white.withValues(alpha: 0.92),
+              gradient: selected
+                  ? LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [AppColors.primary, AppColors.primaryDark],
+                    )
+                  : null,
+            ),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                color: selected ? Colors.white : AppColors.textPrimary,
               ),
             ),
           ),
@@ -431,105 +467,105 @@ class _HomeScreenState extends State<HomeScreen> {
       color: AppColors.primary,
       onRefresh: _load,
       child: CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(child: _heroBanner(context)),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 22, 16, 12),
-            child: Row(
-              children: [
-                Text(
-                  'Categories',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.3, color: AppColors.textPrimary),
-                ),
-                const Spacer(),
-                TextButton(
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ProductListScreen(showAll: true)),
-                  ),
-                  child: const Text('View all'),
-                ),
-              ],
-            ),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: SizedBox(
-            height: 100,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _categories.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (context, i) => _categoryChip(_categories[i]),
-            ),
-          ),
-        ),
-        if (_recent.isNotEmpty) ...[
+        slivers: [
+          SliverToBoxAdapter(child: _heroBanner(context)),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 10),
+              padding: const EdgeInsets.fromLTRB(16, 22, 16, 12),
               child: Row(
                 children: [
                   Text(
-                    'Recently Viewed',
+                    'Categories',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.3, color: AppColors.textPrimary),
                   ),
                   const Spacer(),
-                  IconButton(
-                    icon: Icon(Icons.history, size: 20, color: AppColors.textSecondary),
-                    tooltip: 'Clear history',
-                    onPressed: () async {
-                      await RecentlyViewedService.clear();
-                      if (mounted) setState(() => _recent = []);
-                    },
+                  TextButton(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ProductListScreen(showAll: true)),
+                    ),
+                    child: const Text('View all'),
                   ),
                 ],
               ),
             ),
           ),
           SliverToBoxAdapter(
-          child: SizedBox(
-            height: 185,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _recent.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (context, i) => _recentCard(_recent[i]),
+            child: SizedBox(
+              height: 100,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: _categories.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                itemBuilder: (context, i) => _categoryChip(_categories[i]),
+              ),
             ),
           ),
+          if (_recent.isNotEmpty) ...[
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 10),
+                child: Row(
+                  children: [
+                    Text(
+                      'Recently Viewed',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.3, color: AppColors.textPrimary),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: Icon(Icons.history, size: 20, color: AppColors.textSecondary),
+                      tooltip: 'Clear history',
+                      onPressed: () async {
+                        await RecentlyViewedService.clear();
+                        if (mounted) setState(() => _recent = []);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 185,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: _recent.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 12),
+                  itemBuilder: (context, i) => _recentCard(_recent[i]),
+                ),
+              ),
+            ),
+          ],
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 10),
+              child: Row(
+                children: [
+                  Text('For You', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.3, color: AppColors.textPrimary)),
+                  const Spacer(),
+                  Text('${_products.length} items', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                ],
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+            sliver: SliverGrid(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 14,
+                crossAxisSpacing: 14,
+                childAspectRatio: 0.64,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                (context, i) => _productCard(_products[i]),
+                childCount: _products.length,
+              ),
+            ),
           ),
         ],
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 10),
-            child: Row(
-              children: [
-                Text('For You', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.3, color: AppColors.textPrimary)),
-                const Spacer(),
-                Text('${_products.length} items', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-              ],
-            ),
-          ),
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
-          sliver: SliverGrid(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 14,
-              crossAxisSpacing: 14,
-              childAspectRatio: 0.64,
-            ),
-            delegate: SliverChildBuilderDelegate(
-              (context, i) => _productCard(_products[i]),
-              childCount: _products.length,
-            ),
-          ),
-        ),
-      ],
       ),
     );
   }
@@ -555,7 +591,6 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
           boxShadow: [
             BoxShadow(
               color: AppColors.primary.withValues(alpha: 0.05),
@@ -815,7 +850,6 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.85),
           borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
           boxShadow: [
             BoxShadow(
               color: AppColors.primary.withValues(alpha: 0.06),

@@ -42,6 +42,7 @@ class MainLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       backgroundColor: AppColors.background,
       appBar: showAppBar ? _buildAppBar(context) : null,
       body: child,
@@ -192,56 +193,61 @@ class _BottomNavState extends State<_BottomNav> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+        padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(999),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.08),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
+                blurRadius: 24,
+                offset: const Offset(0, 10),
               ),
             ],
           ),
-          child: Row(
-            children: [
-              Expanded(child: _NavButton(icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Home', selected: widget.currentIndex == 0, onTap: () => _go(context, 0))),
-              Expanded(child: _NavButton(icon: Icons.local_offer_outlined, activeIcon: Icons.local_offer, label: 'Sale', selected: widget.currentIndex == 1, onTap: () => _go(context, 1))),
-              Expanded(
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  alignment: Alignment.center,
-                  children: [
-                    _NavButton(icon: Icons.shopping_cart_outlined, activeIcon: Icons.shopping_cart, label: 'Cart', selected: widget.currentIndex == 2, onTap: () => _go(context, 2)),
-                    if (_cartCount > 0)
-                      Positioned(
-                        right: 8,
-                        top: 2,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(colors: [Color(0xFFFF6B35), Color(0xFFE05A33)]),
-                            borderRadius: BorderRadius.circular(999),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.warning.withValues(alpha: 0.4),
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+              color: Colors.white.withValues(alpha: 0.92),
+              child: Row(
+                children: [
+                  Expanded(child: _NavButton(icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Home', selected: widget.currentIndex == 0, onTap: () => _go(context, 0))),
+                  Expanded(child: _NavButton(icon: Icons.local_offer_outlined, activeIcon: Icons.local_offer, label: 'Sale', selected: widget.currentIndex == 1, onTap: () => _go(context, 1))),
+                  Expanded(
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      alignment: Alignment.center,
+                      children: [
+                        _NavButton(icon: Icons.shopping_cart_outlined, activeIcon: Icons.shopping_cart, label: 'Cart', selected: widget.currentIndex == 2, onTap: () => _go(context, 2)),
+                        if (_cartCount > 0)
+                          Positioned(
+                            right: 8,
+                            top: 2,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(colors: [Color(0xFFFF6B35), Color(0xFFE05A33)]),
+                                borderRadius: BorderRadius.circular(999),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.warning.withValues(alpha: 0.4),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                               ),
-                            ],
+                              child: Text('$_cartCount', style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)),
+                            ),
                           ),
-                          child: Text('$_cartCount', style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)),
-                        ),
-                      ),
-                  ],
-                ),
+                      ],
+                    ),
+                  ),
+                  Expanded(child: _NavButton(icon: Icons.receipt_long_outlined, activeIcon: Icons.receipt_long, label: 'Orders', selected: widget.currentIndex == 3, onTap: () => _go(context, 3))),
+                  Expanded(child: _NavButton(icon: Icons.person_outline, activeIcon: Icons.person, label: 'Me', selected: widget.currentIndex == 4, onTap: () => _go(context, 4))),
+                ],
               ),
-              Expanded(child: _NavButton(icon: Icons.receipt_long_outlined, activeIcon: Icons.receipt_long, label: 'Orders', selected: widget.currentIndex == 3, onTap: () => _go(context, 3))),
-              Expanded(child: _NavButton(icon: Icons.person_outline, activeIcon: Icons.person, label: 'Me', selected: widget.currentIndex == 4, onTap: () => _go(context, 4))),
-            ],
+            ),
           ),
         ),
       ),
@@ -434,5 +440,3 @@ class _AppNotificationBellState extends State<AppNotificationBell> {
     );
   }
 }
-
-

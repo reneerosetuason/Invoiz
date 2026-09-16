@@ -15,6 +15,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   final _api = ApiService();
   List<Map<String, dynamic>> _items = [];
   bool _loading = true;
+  int _unreadCount = 0;
 
   @override
   void initState() {
@@ -28,12 +29,36 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       final data = await _api.get('notifications');
       setState(() {
         _items = (data['notifications'] as List).cast<Map<String, dynamic>>();
+        _unreadCount = data['unread_count'] as int? ?? 0;
         _loading = false;
       });
     } catch (e) {
       setState(() => _loading = false);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
     }
+  }
+
+  Future<void> _markRead(Map<String, dynamic> n) async {
+    if (n['read'] == true) return;
+    try {
+      await _api.post('notifications/${n['id']}/read', {});
+      setState(() {
+        n['read'] = true;
+        _unreadCount = (_unreadCount - 1).clamp(0, 999);
+      });
+    } catch (_) {}
+  }
+
+  Future<void> _markAllRead() async {
+    try {
+      await _api.post('notifications/read-all', {});
+      setState(() {
+        for (final n in _items) {
+          n['read'] = true;
+        }
+        _unreadCount = 0;
+      });
+    } catch (_) {}
   }
 
   @override
@@ -58,11 +83,43 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 )
               : RefreshIndicator(
                   onRefresh: _load,
-                  child: ListView.separated(
-                    padding: const EdgeInsets.all(12),
-                    itemCount: _items.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 8),
-                    itemBuilder: (context, i) => _item(_items[i]),
+                  child: Column(
+                    children: [
+                      if (_unreadCount > 0)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Text('$_unreadCount unread', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primary)),
+                              ),
+                              const Spacer(),
+                              TextButton.icon(
+                                onPressed: _markAllRead,
+                                icon: const Icon(Icons.done_all, size: 16),
+                                label: const Text('Mark all as read'),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: AppColors.primary,
+                                  textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      Expanded(
+                        child: ListView.separated(
+                          padding: const EdgeInsets.all(12),
+                          itemCount: _items.length,
+                          separatorBuilder: (_, __) => const SizedBox(height: 8),
+                          itemBuilder: (context, i) => _item(_items[i]),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
     );
@@ -87,12 +144,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     return InkWell(
       borderRadius: BorderRadius.circular(12),
-      onTap: orderId != null
-          ? () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => OrderDetailScreen(orderId: orderId)),
-              )
-          : null,
+      onTap: () {
+        _markRead(n);
+        if (orderId != null) {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => OrderDetailScreen(orderId: orderId)));
+        }
+      },
       child: Container(
         decoration: BoxDecoration(
           color: read ? AppColors.card : AppColors.accent,

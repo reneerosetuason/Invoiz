@@ -3,19 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\NotificationRead;
 use App\Models\OrderStatusHistory;
 use App\Models\Review;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
-    /**
-     * Lightweight, schema-free notification inbox derived from the buyer's
-     * order status activity and review responses.
-     */
     public function index(Request $request)
     {
         $user = $request->user();
+        $readKeys = NotificationRead::where('user_id', $user->id)
+            ->pluck('notification_key')
+            ->flip();
 
         $items = [];
 
@@ -27,14 +27,15 @@ class NotificationController extends Controller
             ->get();
 
         foreach ($histories as $h) {
+            $key = 'order-'.$h->id;
             $items[] = [
-                'id'         => 'order-'.$h->id,
+                'id'         => $key,
                 'type'       => 'order',
                 'title'      => 'Order #'.$h->order_id.' updated',
                 'body'       => $this->statusMessage($h->to_status, $h->note),
                 'order_id'   => $h->order_id,
                 'created_at' => $h->created_at->toIso8601String(),
-                'read'       => false,
+                'read'       => $readKeys->has($key),
             ];
         }
 
@@ -45,20 +46,82 @@ class NotificationController extends Controller
             ->get();
 
         foreach ($reviews as $r) {
+            $key = 'review-'.$r->id;
             $items[] = [
-                'id'         => 'review-'.$r->id,
+                'id'         => $key,
                 'type'       => 'review',
                 'title'      => 'Thanks for your feedback!',
                 'body'       => 'You rated a product '.$r->rating.'/5.',
                 'order_id'   => $r->order_id,
                 'created_at' => $r->created_at?->toIso8601String() ?? now()->toIso8601String(),
-                'read'       => true,
+                'read'       => $readKeys->has($key),
             ];
         }
 
         usort($items, fn ($a, $b) => strcmp($b['created_at'], $a['created_at']));
 
-        return response()->json(['notifications' => array_slice($items, 0, 40)]);
+        $items = array_slice($items, 0, 40);
+
+        $unread = collect($items)->where('read', false)->count();
+
+        return response()->json([
+            'notifications' => $items,
+            'unread_count'  => $unread,
+        ]);
+    }
+
+    public function markRead(Request $request, string $id)
+    {
+        $user = $request->user();
+        NotificationRead::firstOrCreate([
+            'user_id'         => $user->id,
+            'notification_key' => $id,
+        ]);
+
+        return response()->json(['ok' => true]);
+    }
+
+    public function markAllRead(Request $request)
+    {
+        $user = $request->user();
+
+        $keys = $this->allNotificationKeys($user->id);
+
+        foreach ($keys as $key) {
+            NotificationRead::firstOrCreate([
+                'user_id'         => $user->id,
+                'notification_key' => $key,
+            ]);
+        }
+
+        return response()->json(['ok' => true]);
+    }
+
+    protected function allNotificationKeys(int $userId): array
+    {
+        $keys = [];
+
+        $histories = OrderStatusHistory::query()
+            ->whereHas('order', fn ($q) => $q->where('buyer_id', $userId))
+            ->latest('created_at')
+            ->limit(30)
+            ->pluck('id');
+
+        foreach ($histories as $id) {
+            $keys[] = 'order-'.$id;
+        }
+
+        $reviews = Review::query()
+            ->where('buyer_id', $userId)
+            ->latest()
+            ->limit(10)
+            ->pluck('id');
+
+        foreach ($reviews as $id) {
+            $keys[] = 'review-'.$id;
+        }
+
+        return $keys;
     }
 
     protected function statusMessage(string $status, ?string $note): string

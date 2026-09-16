@@ -392,8 +392,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(width: 8),
               AppNotificationBell(iconColor: Colors.white, iconSize: 20, background: Colors.white.withValues(alpha: 0.18)),
               const SizedBox(width: 8),
-              _headerIconButton(
-                icon: Icons.chat_bubble_outline_rounded,
+              AppMessageBadge(
                 onTap: () {
                   final auth = AuthServiceProvider.of(context);
                   if (!auth.isLoggedIn) { Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen())); return; }

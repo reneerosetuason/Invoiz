@@ -22,6 +22,16 @@ class ChatController extends Controller
         return response()->json(['conversations' => $conversations]);
     }
 
+    public function unreadCount(Request $request)
+    {
+        $count = Message::where('is_read', false)
+            ->where('sender_id', '!=', $request->user()->id)
+            ->whereHas('conversation', fn ($q) => $q->where('buyer_id', $request->user()->id))
+            ->count();
+
+        return response()->json(['unread_count' => $count]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

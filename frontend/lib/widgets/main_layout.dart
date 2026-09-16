@@ -97,8 +97,9 @@ class MainLayout extends StatelessWidget {
       ),
       actions: [
         if (showTopActions && showMessageIcon)
-          _AppBarIcon(
-            icon: Icons.chat_bubble_outline_rounded,
+          AppMessageBadge(
+            iconColor: AppColors.textPrimary,
+            background: AppColors.surfaceSoft.withValues(alpha: 0.7),
             onTap: () {
               final auth = AuthServiceProvider.of(context);
               if (!auth.isLoggedIn) {
@@ -378,8 +379,7 @@ class _AppNotificationBellState extends State<AppNotificationBell> {
     try {
       final data = await _api.get('notifications');
       if (!mounted) return;
-      final items = (data['notifications'] as List).cast<Map<String, dynamic>>();
-      setState(() => _unread = items.where((n) => n['read'] == false).length);
+      setState(() => _unread = data['unread_count'] as int? ?? 0);
     } catch (_) {}
   }
 
@@ -412,6 +412,87 @@ class _AppNotificationBellState extends State<AppNotificationBell> {
       alignment: Alignment.center,
       children: [
         bell,
+        if (_unread > 0)
+          Positioned(
+            right: 0,
+            top: 0,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(colors: [Color(0xFFFF6B35), Color(0xFFE05A33)]),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: Colors.white, width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.warning.withValues(alpha: 0.4),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Text(
+                '$_unread',
+                style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// Shared message badge widget for the chat icon.
+class AppMessageBadge extends StatefulWidget {
+  final Color iconColor;
+  final double iconSize;
+  final Color? background;
+  final VoidCallback onTap;
+  const AppMessageBadge({super.key, this.iconColor = Colors.white, this.iconSize = 20, this.background, required this.onTap});
+
+  @override
+  State<AppMessageBadge> createState() => _AppMessageBadgeState();
+}
+
+class _AppMessageBadgeState extends State<AppMessageBadge> {
+  final _api = ApiService();
+  int _unread = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final data = await _api.get('conversations/unread-count');
+      if (!mounted) return;
+      setState(() => _unread = data['unread_count'] as int? ?? 0);
+    } catch (_) {}
+  }
+
+  void refresh() => _load();
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.center,
+      children: [
+        Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            color: widget.background ?? Colors.white.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+          ),
+          child: InkWell(
+            onTap: widget.onTap,
+            borderRadius: BorderRadius.circular(12),
+            child: Icon(Icons.chat_bubble_outline_rounded, size: widget.iconSize, color: widget.iconColor),
+          ),
+        ),
         if (_unread > 0)
           Positioned(
             right: 0,

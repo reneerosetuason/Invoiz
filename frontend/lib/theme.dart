@@ -1,153 +1,289 @@
 import 'package:flutter/material.dart';
 
-/// Invoiz brand colors — light theme only.
+/// Warm Sand theme — matches the design guide exactly.
 class AppColors {
-  // Invoiz palette: deep teal + warm amber. Warm, trustworthy, distinctive.
-  static const Color primary = Color(0xFF16697A);
-  static const Color primaryDark = Color(0xFF0E4A57);
-  static const Color secondary = Color(0xFFF0A202);
-  static const Color accent = Color(0xFFEAF4F3);
-  static const Color background = Color(0xFFF2F0EB);
-  static const Color card = Colors.white;
-  static const Color textPrimary = Color(0xFF1B1B1E);
-  static const Color textSecondary = Color(0xFF6E6E73);
-  static const Color success = Color(0xFF2E8B57);
-  static const Color warning = Color(0xFFE05A33);
+  AppColors._();
+
+  // Backgrounds
+  static const Color background = Color(0xFFF1EFE8);
+  static const Color surface = Color(0xFFFFFFFF);
+  static const Color surfaceTint = Color(0xFFEFE4D3);
+
+  // Neutrals
+  static const Color border = Color(0xFFD3D1C7);
+  static const Color textPrimary = Color(0xFF2C2C2A);
+  static const Color textSecondary = Color(0xFF5F5E5A);
+  static const Color textMuted = Color(0xFF888780);
+
+  // Accent (terracotta)
+  static const Color primary = Color(0xFFD85A30);
+  static const Color primaryDark = Color(0xFF993C1D);
+  static const Color accentOnLight = Color(0xFFFAECE7);
+
+  // Semantic
+  static const Color success = Color(0xFF639922);
+  static const Color danger = Color(0xFFE24B4A);
+  static const Color warning = Color(0xFFE24B4A);
+
+  // Aliases for backward compat
+  static const Color accent = surfaceTint;
+  static const Color card = surface;
   static const Color gold = Color(0xFFF5A623);
-  static const Color border = Color(0xFFE8E6E0);
-  static const Color surfaceSoft = Color(0xFFF0EEE9);
+  static const Color secondary = surfaceTint;
+  static const Color sandLight = surfaceTint;
+  static const Color sandMid = Color(0xFFE7D9C6);
+  static const Color sandDark = Color(0xFFDCCBB3);
+  static const Color surfaceSoft = surfaceTint;
 }
 
 class AppTheme {
+  AppTheme._();
+
   static ThemeData get light => _build();
   static ThemeData get dark => light;
 
   static ThemeData _build() {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: AppColors.primary,
+    final colorScheme = ColorScheme.light(
       primary: AppColors.primary,
-      secondary: AppColors.secondary,
-      surface: AppColors.card,
-      brightness: Brightness.light,
+      onPrimary: AppColors.accentOnLight,
+      secondary: AppColors.primaryDark,
+      onSecondary: AppColors.accentOnLight,
+      surface: AppColors.surface,
+      onSurface: AppColors.textPrimary,
+      error: AppColors.danger,
+      onError: Colors.white,
+      outline: AppColors.border,
     );
 
-    final base = ThemeData(
+    final baseTextTheme = ThemeData.light().textTheme;
+
+    return ThemeData(
       useMaterial3: true,
-      colorScheme: scheme,
+      colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.background,
-      fontFamily: 'Segoe UI',
-    );
 
-    return base.copyWith(
-      textTheme: base.textTheme.copyWith(
-        displaySmall: const TextStyle(fontWeight: FontWeight.w700, letterSpacing: -0.5),
-        headlineSmall: const TextStyle(fontWeight: FontWeight.w700, letterSpacing: -0.3),
-        titleLarge: const TextStyle(fontWeight: FontWeight.w600),
-        titleMedium: const TextStyle(fontWeight: FontWeight.w600),
-        bodyMedium: const TextStyle(height: 1.4),
-        labelLarge: const TextStyle(fontWeight: FontWeight.w600, letterSpacing: 0.2),
+      textTheme: baseTextTheme.copyWith(
+        displayLarge: baseTextTheme.displayLarge?.copyWith(
+          fontFamily: 'Georgia',
+          fontWeight: FontWeight.w400,
+          fontSize: 34,
+          height: 1.25,
+          color: AppColors.textPrimary,
+        ),
+        displaySmall: baseTextTheme.displaySmall?.copyWith(
+          fontFamily: 'Georgia',
+          fontWeight: FontWeight.w400,
+          fontSize: 34,
+          height: 1.25,
+          color: AppColors.textPrimary,
+        ),
+        headlineMedium: baseTextTheme.headlineMedium?.copyWith(
+          fontFamily: 'Georgia',
+          fontWeight: FontWeight.w400,
+          fontSize: 22,
+          color: AppColors.textPrimary,
+        ),
+        headlineSmall: baseTextTheme.headlineSmall?.copyWith(
+          fontFamily: 'Georgia',
+          fontWeight: FontWeight.w400,
+          fontSize: 20,
+          color: AppColors.textPrimary,
+        ),
+        titleLarge: baseTextTheme.titleLarge?.copyWith(
+          fontFamily: 'Georgia',
+          fontWeight: FontWeight.w400,
+          fontSize: 19,
+          color: AppColors.textPrimary,
+          letterSpacing: 0.5,
+        ),
+        titleMedium: baseTextTheme.titleMedium?.copyWith(
+          fontFamily: 'Segoe UI',
+          fontWeight: FontWeight.w500,
+          fontSize: 15,
+          color: AppColors.textPrimary,
+        ),
+        bodyLarge: baseTextTheme.bodyLarge?.copyWith(
+          fontFamily: 'Segoe UI',
+          fontSize: 14,
+          height: 1.6,
+          color: AppColors.textSecondary,
+        ),
+        bodyMedium: baseTextTheme.bodyMedium?.copyWith(
+          fontFamily: 'Segoe UI',
+          fontSize: 13,
+          color: AppColors.textSecondary,
+        ),
+        bodySmall: baseTextTheme.bodySmall?.copyWith(
+          fontFamily: 'Segoe UI',
+          fontSize: 12,
+          color: AppColors.textSecondary,
+        ),
+        labelLarge: baseTextTheme.labelLarge?.copyWith(
+          fontFamily: 'Segoe UI',
+          fontWeight: FontWeight.w500,
+          fontSize: 13,
+          color: AppColors.textPrimary,
+        ),
+        labelSmall: baseTextTheme.labelSmall?.copyWith(
+          fontFamily: 'Segoe UI',
+          fontSize: 12,
+          letterSpacing: 1.2,
+          color: AppColors.primary,
+        ),
       ),
-      appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.card,
+
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.background,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
-        centerTitle: false,
         surfaceTintColor: Colors.transparent,
         titleTextStyle: TextStyle(
+          fontFamily: 'Georgia',
+          fontSize: 19,
+          fontWeight: FontWeight.w400,
           color: AppColors.textPrimary,
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
-          letterSpacing: -0.2,
+          letterSpacing: 0.5,
         ),
       ),
+
       cardTheme: CardThemeData(
-        color: AppColors.card,
+        color: AppColors.surface,
         elevation: 0,
-        surfaceTintColor: Colors.transparent,
+        margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-          side: BorderSide(color: AppColors.border),
+          borderRadius: BorderRadius.circular(10),
+          side: const BorderSide(color: AppColors.border, width: 0.5),
         ),
       ),
+
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.accentOnLight,
           elevation: 0,
-          minimumSize: const Size(64, 48),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+          padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          textStyle: const TextStyle(
+            fontFamily: 'Segoe UI',
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
+
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          side: BorderSide(color: AppColors.primary),
-          minimumSize: const Size(64, 48),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+          foregroundColor: AppColors.textPrimary,
+          side: const BorderSide(color: AppColors.border, width: 0.5),
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
         ),
       ),
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          textStyle: const TextStyle(fontWeight: FontWeight.w600),
+
+      chipTheme: ChipThemeData(
+        backgroundColor: AppColors.surfaceTint,
+        labelStyle: const TextStyle(
+          fontFamily: 'Segoe UI',
+          fontSize: 12,
+          color: AppColors.textPrimary,
+        ),
+        side: BorderSide.none,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
         ),
       ),
+
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        hintStyle: TextStyle(color: AppColors.textSecondary),
-        labelStyle: TextStyle(color: AppColors.textSecondary),
-        prefixIconColor: AppColors.textSecondary,
+        fillColor: AppColors.surface,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: AppColors.border),
+          borderRadius: BorderRadius.circular(8),
+          borderSide:
+              const BorderSide(color: AppColors.border, width: 0.5),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: AppColors.border),
+          borderRadius: BorderRadius.circular(8),
+          borderSide:
+              const BorderSide(color: AppColors.border, width: 0.5),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: AppColors.primary, width: 1.6),
+          borderRadius: BorderRadius.circular(8),
+          borderSide:
+              const BorderSide(color: AppColors.primary, width: 1),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: AppColors.warning.withValues(alpha: 0.5)),
+          borderRadius: BorderRadius.circular(8),
+          borderSide:
+              const BorderSide(color: AppColors.danger, width: 0.5),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: AppColors.warning, width: 1.6),
+          borderRadius: BorderRadius.circular(8),
+          borderSide:
+              const BorderSide(color: AppColors.danger, width: 1),
         ),
+        hintStyle: const TextStyle(
+          fontFamily: 'Segoe UI',
+          fontSize: 13,
+          color: AppColors.textMuted,
+        ),
+        labelStyle: const TextStyle(
+          fontFamily: 'Segoe UI',
+          fontSize: 13,
+          color: AppColors.textSecondary,
+        ),
+        prefixIconColor: AppColors.textSecondary,
       ),
-      chipTheme: ChipThemeData(
-        backgroundColor: AppColors.card,
-        selectedColor: AppColors.accent,
-        side: BorderSide(color: AppColors.border),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
-        labelStyle: TextStyle(fontSize: 13, color: AppColors.textPrimary),
+
+      dividerTheme: const DividerThemeData(
+        color: AppColors.border,
+        thickness: 0.5,
+        space: 1,
       ),
+
+      iconTheme: const IconThemeData(
+        color: AppColors.textSecondary,
+        size: 20,
+      ),
+
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: AppColors.background,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: AppColors.textMuted,
+        elevation: 0,
+        type: BottomNavigationBarType.fixed,
+      ),
+
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.accentOnLight,
+        elevation: 0,
+      ),
+
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppColors.textPrimary,
-        contentTextStyle: const TextStyle(color: Colors.white),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        contentTextStyle: const TextStyle(
+          color: Colors.white,
+          fontFamily: 'Segoe UI',
+          fontSize: 13,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
+
       dialogTheme: DialogThemeData(
-        backgroundColor: AppColors.card,
+        backgroundColor: AppColors.surface,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
-      dividerTheme: DividerThemeData(color: AppColors.border, thickness: 1),
-      progressIndicatorTheme: ProgressIndicatorThemeData(color: AppColors.primary),
-      navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: AppColors.card,
-        indicatorColor: AppColors.accent,
-        surfaceTintColor: Colors.transparent,
-      ),
+
+      progressIndicatorTheme:
+          const ProgressIndicatorThemeData(color: AppColors.primary),
     );
   }
 }

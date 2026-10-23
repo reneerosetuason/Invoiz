@@ -70,19 +70,9 @@ class MainLayout extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [AppColors.primary, AppColors.primaryDark],
-              ),
+              color: Colors.white,
               borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
+              border: Border.all(color: AppColors.border, width: 0.5),
             ),
             child: InvoizLogo.logoWidget(size: 26, radius: 6),
           ),
@@ -90,7 +80,7 @@ class MainLayout extends StatelessWidget {
             Flexible(
               child: Padding(
                 padding: const EdgeInsets.only(left: 12),
-                child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: -0.2)),
+                child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, letterSpacing: 0.3, fontFamily: 'Georgia', color: AppColors.textPrimary)),
               ),
             ),
         ],
@@ -99,7 +89,7 @@ class MainLayout extends StatelessWidget {
         if (showTopActions && showMessageIcon)
           AppMessageBadge(
             iconColor: AppColors.textPrimary,
-            background: AppColors.surfaceSoft.withValues(alpha: 0.7),
+            background: Colors.white,
             onTap: () {
               final auth = AuthServiceProvider.of(context);
               if (!auth.isLoggedIn) {
@@ -210,7 +200,7 @@ class _BottomNavState extends State<_BottomNav> {
             borderRadius: BorderRadius.circular(999),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-              color: Colors.white.withValues(alpha: 0.92),
+              color: AppColors.background,
               child: Row(
                 children: [
                   Expanded(child: _NavButton(icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Home', selected: widget.currentIndex == 0, onTap: () => _go(context, 0))),
@@ -228,17 +218,11 @@ class _BottomNavState extends State<_BottomNav> {
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                               decoration: BoxDecoration(
-                                gradient: const LinearGradient(colors: [Color(0xFFFF6B35), Color(0xFFE05A33)]),
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(999),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.warning.withValues(alpha: 0.4),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
+                                border: Border.all(color: AppColors.primary, width: 1),
                               ),
-                              child: Text('$_cartCount', style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)),
+                              child: Text('$_cartCount', style: TextStyle(color: AppColors.primary, fontSize: 9, fontWeight: FontWeight.w700)),
                             ),
                           ),
                       ],
@@ -280,23 +264,8 @@ class _NavButton extends StatelessWidget {
         curve: Curves.easeOutCubic,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          gradient: selected
-              ? LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [AppColors.primary, AppColors.primaryDark],
-                )
-              : null,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.4),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
+          color: selected ? AppColors.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -307,7 +276,7 @@ class _NavButton extends StatelessWidget {
                 selected ? activeIcon : icon,
                 key: ValueKey(selected),
                 size: 22,
-                color: selected ? Colors.white : AppColors.textSecondary,
+                color: selected ? const Color(0xFFFAECE7) : AppColors.textSecondary,
               ),
             ),
             const SizedBox(height: 2),
@@ -315,9 +284,10 @@ class _NavButton extends StatelessWidget {
               duration: const Duration(milliseconds: 200),
               style: TextStyle(
                 fontSize: 10,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                color: selected ? Colors.white : AppColors.textSecondary,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                color: selected ? const Color(0xFFFAECE7) : AppColors.textSecondary,
                 letterSpacing: 0.1,
+                fontFamily: 'Segoe UI',
               ),
               child: Text(label),
             ),
@@ -340,12 +310,13 @@ class _AppBarIcon extends StatelessWidget {
       width: 38,
       height: 38,
       decoration: BoxDecoration(
-        color: AppColors.surfaceSoft.withValues(alpha: 0.7),
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.border, width: 0.5),
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         child: Icon(icon, color: AppColors.textPrimary, size: 20),
       ),
     );
@@ -392,8 +363,9 @@ class _AppNotificationBellState extends State<AppNotificationBell> {
       width: 38,
       height: 38,
       decoration: BoxDecoration(
-        color: widget.background ?? AppColors.surfaceSoft.withValues(alpha: 0.7),
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.border, width: 0.5),
       ),
       child: InkWell(
         onTap: () async {

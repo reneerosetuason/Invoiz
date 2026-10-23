@@ -1,5 +1,4 @@
-﻿import 'dart:async';
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../config.dart';
 import '../services/api_service.dart';
 import '../services/recently_viewed_service.dart';
@@ -23,7 +22,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _api = ApiService();
   final _searchCtrl = TextEditingController();
-  final _carouselCtrl = PageController();
 
   List _categories = [];
   List _products = [];
@@ -32,7 +30,6 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _loading = true;
   int? _selectedCategory;
   String _search = '';
-  int _carouselIndex = 0;
   String _activeFilter = 'all';
 
   static const _filterChips = [
@@ -42,17 +39,10 @@ class _HomeScreenState extends State<HomeScreen> {
     ('top', 'Top Rated'),
   ];
 
-  Timer? _carouselTimer;
-
   @override
   void initState() {
     super.initState();
     _load();
-    _carouselTimer = Timer.periodic(const Duration(seconds: 4), (_) {
-      if (!mounted || !_carouselCtrl.hasClients) return;
-      final next = (_carouselIndex + 1) % 3;
-      _carouselCtrl.animateToPage(next, duration: const Duration(milliseconds: 450), curve: Curves.easeOut);
-    });
   }
 
   Future<void> _load() async {
@@ -139,9 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    _carouselTimer?.cancel();
     _searchCtrl.dispose();
-    _carouselCtrl.dispose();
     super.dispose();
   }
 
@@ -210,31 +198,17 @@ class _HomeScreenState extends State<HomeScreen> {
         curve: Curves.easeOutCubic,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
         decoration: BoxDecoration(
-          gradient: selected
-              ? LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [AppColors.primary, AppColors.primaryDark],
-                )
-              : null,
-          color: selected ? null : Colors.white,
-          borderRadius: BorderRadius.circular(999),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.22),
-                    blurRadius: 14,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
+          color: selected ? AppColors.primary : Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppColors.border, width: 0.5),
         ),
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 12,
-            fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
-            color: selected ? Colors.white : AppColors.textPrimary,
+            fontSize: 13,
+            fontWeight: selected ? FontWeight.w500 : FontWeight.w400,
+            color: selected ? const Color(0xFFFAECE7) : AppColors.textSecondary,
+            fontFamily: 'Segoe UI',
           ),
         ),
       ),
@@ -646,29 +620,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _heroBanner(BuildContext context) {
     final auth = AuthServiceProvider.of(context);
-    final slides = [
-      {
-        'title': auth.isLoggedIn ? 'Hi, ${auth.user?.firstName ?? 'there'}!' : 'Welcome to Invoiz',
-        'subtitle': 'Everyday essentials at your fingertips.\nCash on delivery, nationwide.',
-        'cta': 'Start shopping →',
-        'gradient': [const Color(0xFF16697A), const Color(0xFF2EC4B6)],
-        'icon': Icons.shopping_bag_rounded,
-      },
-      {
-        'title': 'Flash Sale is Live!',
-        'subtitle': 'Up to 50% off on selected items.\nLimited time only.',
-        'cta': 'Shop now →',
-        'gradient': [const Color(0xFFFF6B35), const Color(0xFFFFB700)],
-        'icon': Icons.bolt_rounded,
-      },
-      {
-        'title': 'Free Delivery',
-        'subtitle': 'On orders over ₱500.\nNationwide coverage.',
-        'cta': 'Explore →',
-        'gradient': [const Color(0xFF0E7C6B), const Color(0xFF4ECDC4)],
-        'icon': Icons.delivery_dining_rounded,
-      },
-    ];
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
       child: Column(
@@ -681,7 +632,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 40,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 1.5),
+                    color: AppColors.sandMid,
                   ),
                   child: ClipOval(
                     child: auth.user?.profilePicture != null && auth.user!.profilePicture!.isNotEmpty
@@ -702,7 +653,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Text(
                         'Hi, ${auth.user?.firstName ?? 'there'}!',
-                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Color(0xFF212121)),
+                        style: TextStyle(fontSize: 17, fontWeight: FontWeight.w400, fontFamily: 'Georgia', color: AppColors.textPrimary),
                       ),
                       Text(
                         'Everyday essentials at your fingertips.',
@@ -717,74 +668,71 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 12),
           ],
-          SizedBox(
-            height: 164,
-            child: PageView.builder(
-              controller: _carouselCtrl,
-              onPageChanged: (i) => setState(() => _carouselIndex = i),
-              itemCount: slides.length,
-              itemBuilder: (context, i) {
-                final s = slides[i];
-                return Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: s['gradient'] as List<Color>,
-                    ),
-                    borderRadius: BorderRadius.circular(22),
-                    boxShadow: [
-                      BoxShadow(
-                        color: (s['gradient'] as List<Color>).first.withValues(alpha: 0.25),
-                        blurRadius: 18,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: Stack(
+          Container(
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+            decoration: BoxDecoration(
+              color: AppColors.sandLight,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Positioned(
-                        right: -24,
-                        bottom: -28,
-                        child: Icon(s['icon'] as IconData, size: 150, color: Colors.white.withValues(alpha: 0.10)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(s['title'] as String, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
-                            const SizedBox(height: 5),
-                            Text(s['subtitle'] as String, maxLines: 2, style: const TextStyle(color: Colors.white70, fontSize: 12.5, height: 1.35)),
-                            const SizedBox(height: 12),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999)),
-                              child: Text(s['cta'] as String, style: TextStyle(color: (s['gradient'] as List<Color>).first, fontSize: 12, fontWeight: FontWeight.w700)),
-                            ),
-                          ],
+                      Text(
+                        'Sale',
+                        style: TextStyle(
+                          fontSize: 11,
+                          letterSpacing: 1.5,
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Quiet pieces for\neveryday warmth',
+                        style: TextStyle(
+                          fontFamily: 'Georgia',
+                          fontWeight: FontWeight.w400,
+                          fontSize: 22,
+                          height: 1.25,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Small-batch finds, made slow and built to last.',
+                        style: TextStyle(fontSize: 12, color: AppColors.textSecondary, height: 1.5),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: const Color(0xFFFAECE7),
+                          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: const Text('Shop the edit', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                      ),
                     ],
                   ),
-                );
-              },
+                ),
+                const SizedBox(width: 16),
+                Container(
+                  width: 120,
+                  height: 140,
+                  decoration: BoxDecoration(
+                    color: AppColors.sandDark,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Icon(Icons.photo_outlined, size: 32, color: AppColors.textMuted),
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(slides.length, (i) => AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              width: _carouselIndex == i ? 22 : 8,
-              height: 8,
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              decoration: BoxDecoration(
-                color: _carouselIndex == i ? AppColors.primary : AppColors.border,
-                borderRadius: BorderRadius.circular(999),
-              ),
-            )),
           ),
         ],
       ),
@@ -796,37 +744,29 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       onTap: () => _selectCategory(cat['id'] as int),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeOutCubic,
+        duration: const Duration(milliseconds: 200),
         width: 84,
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        height: 90,
+        padding: const EdgeInsets.symmetric(horizontal: 6),
         decoration: BoxDecoration(
-          gradient: selected
-              ? LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.primary, AppColors.primaryDark])
-              : null,
-          color: selected ? null : Colors.transparent,
-          borderRadius: BorderRadius.circular(22),
-          border: selected ? null : Border.all(color: AppColors.border),
+          color: selected ? AppColors.primary : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border, width: 0.5),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
+            Container(
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                gradient: selected
-                    ? LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.white.withValues(alpha: 0.25), Colors.white.withValues(alpha: 0.1)])
-                    : null,
-                color: selected ? null : Colors.transparent,
-                borderRadius: BorderRadius.circular(14),
-                border: selected ? null : Border.all(color: AppColors.border),
+                color: selected ? Colors.white.withValues(alpha: 0.2) : AppColors.sandLight,
+                borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
                 _categoryIcon(cat['name'] as String),
                 color: selected ? Colors.white : AppColors.primary,
-                size: 22,
+                size: 20,
               ),
             ),
             const SizedBox(height: 6),
@@ -839,8 +779,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 10.5,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                   color: selected ? Colors.white : AppColors.textPrimary,
+                  fontFamily: 'Segoe UI',
                 ),
               ),
             ),
@@ -875,20 +816,9 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.85),
-          borderRadius: BorderRadius.circular(22),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.06),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border, width: 0.5),
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -898,11 +828,8 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 132,
               width: double.infinity,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [AppColors.surfaceSoft, AppColors.surfaceSoft.withValues(alpha: 0.4)],
-                ),
+                color: AppColors.sandLight,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
               ),
               child: Stack(
                 children: [
@@ -929,22 +856,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(colors: [Colors.white.withValues(alpha: 0.9), Colors.white.withValues(alpha: 0.7)]),
-                          borderRadius: BorderRadius.circular(999),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.08),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppColors.border, width: 0.5),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.star_rounded, color: AppColors.gold, size: 14),
                             const SizedBox(width: 3),
-                            Text(rating.toStringAsFixed(1), style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                            Text(rating.toStringAsFixed(1), style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
                           ],
                         ),
                       ),
@@ -956,12 +877,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.8),
-                          borderRadius: BorderRadius.circular(999),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppColors.border, width: 0.5),
                         ),
                         child: Text(
                           '$sold sold',
-                          style: TextStyle(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+                          style: TextStyle(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
                         ),
                       ),
                     ),
@@ -972,11 +894,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.9),
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFE05A33).withValues(alpha: 0.4)),
+                          border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
                         ),
-                        child: Text('-$pct%', style: const TextStyle(color: Color(0xFFE05A33), fontSize: 11, fontWeight: FontWeight.w800)),
+                        child: Text('-$pct%', style: TextStyle(color: AppColors.primary, fontSize: 11, fontWeight: FontWeight.w700)),
                       ),
                     ),
                 ],
@@ -988,24 +910,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(p['name'] as String, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, height: 1.25, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+                    Text(p['name'] as String, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.5, height: 1.25, fontWeight: FontWeight.w500, color: AppColors.textPrimary, fontFamily: 'Segoe UI')),
                     const SizedBox(height: 4),
-                    Text(_formatPrice(price), style: TextStyle(color: AppColors.warning, fontWeight: FontWeight.w800, fontSize: 14)),
+                    Text(_formatPrice(price), style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w700, fontSize: 14, fontFamily: 'Segoe UI')),
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Icon(Icons.local_shipping_outlined, size: 12, color: AppColors.textSecondary),
+                        Icon(Icons.local_shipping_outlined, size: 12, color: AppColors.textMuted),
                         const SizedBox(width: 3),
-                        Flexible(child: Text('COD', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 10.5, color: AppColors.textSecondary.withValues(alpha: 0.9)))),
+                        Flexible(child: Text('COD', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 10.5, color: AppColors.textMuted))),
                         const Spacer(),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
                             color: Colors.transparent,
-                            borderRadius: BorderRadius.circular(999),
-                            border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: AppColors.border, width: 0.5),
                           ),
-                          child: Text('${p['stock']} left', maxLines: 1, softWrap: false, style: TextStyle(fontSize: 10, color: AppColors.primary, fontWeight: FontWeight.w600)),
+                          child: Text('${p['stock']} left', maxLines: 1, softWrap: false, style: TextStyle(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
                         ),
                       ],
                     ),

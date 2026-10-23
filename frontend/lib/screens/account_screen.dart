@@ -1,5 +1,4 @@
-﻿import 'dart:ui';
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../config.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
@@ -50,9 +49,9 @@ class _AccountScreenState extends State<AccountScreen> {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.border, width: 0.5),
             ),
             padding: const EdgeInsets.all(16),
             child: Row(
@@ -62,8 +61,7 @@ class _AccountScreenState extends State<AccountScreen> {
                   height: 56,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.transparent,
-                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                    color: AppColors.sandMid,
                   ),
                   child: ClipOval(
                     child: user?.profilePicture != null && user!.profilePicture!.isNotEmpty
@@ -82,12 +80,12 @@ class _AccountScreenState extends State<AccountScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(user?.fullName ?? 'User', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF212121))),
+                      Text(user?.fullName ?? 'User', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, fontFamily: 'Georgia', color: AppColors.textPrimary)),
                       Text(user?.email ?? '', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                       const SizedBox(height: 4),
                       Text(
                         'Member since ${_shortDate(user?.createdAt)}',
-                        style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                        style: TextStyle(fontSize: 11, color: AppColors.textMuted),
                       ),
                     ],
                   ),
@@ -107,29 +105,23 @@ class _AccountScreenState extends State<AccountScreen> {
             Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen()));
           }),
           const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.6),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
-                ),
-                child: ListTile(
-                  leading: const Icon(Icons.logout, color: Colors.red),
-                  title: const Text('Logout', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600)),
-                  onTap: () {
-                    auth.logout();
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
-                      (route) => false,
-                    );
-                  },
-                ),
-              ),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.border, width: 0.5),
+            ),
+            child: ListTile(
+              leading: const Icon(Icons.logout, color: Colors.red),
+              title: const Text('Logout', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600)),
+              onTap: () {
+                auth.logout();
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (route) => false,
+                );
+              },
             ),
           ),
         ],
@@ -141,23 +133,22 @@ class _AccountScreenState extends State<AccountScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border, width: 0.5),
       ),
       child: ListTile(
         leading: Container(
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: Colors.transparent,
+            color: AppColors.sandLight,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
           ),
           child: Icon(icon, color: AppColors.primary, size: 20),
         ),
-        title: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-        trailing: Icon(Icons.chevron_right, color: AppColors.textSecondary),
+        title: Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textPrimary, fontFamily: 'Segoe UI')),
+        trailing: Icon(Icons.chevron_right, color: AppColors.textMuted),
         onTap: onTap,
       ),
     );

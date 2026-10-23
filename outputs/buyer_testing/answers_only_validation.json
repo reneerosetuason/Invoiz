@@ -1,0 +1,22 @@
+[
+  {
+    "file": "C:\\Users\\LENOVO\\OneDrive\\Desktop\\Invoiz e-commerce\\Invoiz buyer acc\\outputs\\buyer_testing\\Invoiz_Buyer_Account_Creation_Answers.xlsx",
+    "cases_answered": 42,
+    "columns_edited": [
+      "K (Actual Result)",
+      "M (Remarks)"
+    ],
+    "all_other_content_and_formatting": "unchanged",
+    "validation": "passed"
+  },
+  {
+    "file": "C:\\Users\\LENOVO\\OneDrive\\Desktop\\Invoiz e-commerce\\Invoiz buyer acc\\outputs\\buyer_testing\\Invoiz_Buyer_Modules_Answers.xlsx",
+    "cases_answered": 131,
+    "columns_edited": [
+      "K (Actual Result)",
+      "M (Remarks)"
+    ],
+    "all_other_content_and_formatting": "unchanged",
+    "validation": "passed"
+  }
+]

@@ -8,7 +8,7 @@ class Message extends Model
 {
     public const UPDATED_AT = null;
 
-    protected $fillable = ['conversation_id', 'sender_id', 'body', 'is_read'];
+    protected $fillable = ['conversation_id', 'sender_id', 'receiver_id', 'body', 'is_read'];
 
     protected function casts(): array
     {

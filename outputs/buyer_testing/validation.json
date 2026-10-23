@@ -1,0 +1,18 @@
+[
+  {
+    "workbook": "Invoiz_Buyer_Account_Creation_Reviewed.xlsx",
+    "cases_answered": 42,
+    "assumptions_filled": 30,
+    "formulas_and_caches_preserved": 17,
+    "zip_xml_checks": "passed",
+    "original_test_cases_and_data": "unchanged"
+  },
+  {
+    "workbook": "Invoiz_Buyer_Modules_Reviewed.xlsx",
+    "cases_answered": 131,
+    "assumptions_filled": 55,
+    "formulas_and_caches_preserved": 90,
+    "zip_xml_checks": "passed",
+    "original_test_cases_and_data": "unchanged"
+  }
+]

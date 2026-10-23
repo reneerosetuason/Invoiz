@@ -1,0 +1,1851 @@
+[
+  {
+    "id": "TC-BUY-001",
+    "sheet": "Buyer",
+    "review_finding": "Partial",
+    "answer": "The registration flow leads to email verification, but Invoiz also asks for sex and a complete province, municipality, and barangay address. The account stays pending until an admin approves it.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-002",
+    "sheet": "Buyer",
+    "review_finding": "Partial",
+    "answer": "Empty name, email, phone, sex, and password fields have required checks. Birthday and address use separate messages, so they are not all highlighted together.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-003",
+    "sheet": "Buyer",
+    "review_finding": "Partial",
+    "answer": "Required fields are checked before submission, and entered values stay in the form. Birthday uses a separate message rather than an error directly below the field.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-004",
+    "sheet": "Buyer",
+    "review_finding": "Gap",
+    "answer": "The current name checks do not reject numbers or symbols, so names like Juan123 are not specifically blocked.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-005",
+    "sheet": "Buyer",
+    "review_finding": "Supported",
+    "answer": "The name fields allow accented letters and punctuation, including Niño and Peñaflor-O'Hara. Saving the exact spelling still needs a live registration check.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-006",
+    "sheet": "Buyer",
+    "review_finding": "Gap",
+    "answer": "Invoiz allows names up to 100 characters and has no two-character minimum. The workbook's one- and 51-character rejection rules are not implemented.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-007",
+    "sheet": "Buyer",
+    "review_finding": "Gap",
+    "answer": "The app calculates age but does not require buyers to be 18. Use dates relative to the actual test day when checking this boundary.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-008",
+    "sheet": "Buyer",
+    "review_finding": "Supported",
+    "answer": "The date picker excludes future birthdays, and the server also requires a date before today. The date labelled tomorrow in the workbook should be checked against the actual test day.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-009",
+    "sheet": "Buyer",
+    "review_finding": "Partial",
+    "answer": "The app checks for an @ sign, and the server applies a stricter email check. The exact messages and all five examples still need a live test.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-010",
+    "sheet": "Buyer",
+    "review_finding": "Supported",
+    "answer": "Registration checks whether the email is already used and rejects a duplicate. This needs an existing test account to confirm the message on the phone.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-011",
+    "sheet": "Buyer",
+    "review_finding": "Supported",
+    "answer": "The supplied database schema treats email addresses without regard to letter case, so the uppercase address should count as a duplicate. The running database still needs checking.",
+    "sources": [
+      "database/invoizdb.sql"
+    ]
+  },
+  {
+    "id": "TC-BUY-012",
+    "sheet": "Buyer",
+    "review_finding": "Supported",
+    "answer": "Spaces at the start and end of the email are removed before registration is sent.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-013",
+    "sheet": "Buyer",
+    "review_finding": "Gap",
+    "answer": "Phone numbers are checked as required text, without a Philippine mobile-number format rule. The invalid examples are not specifically rejected for their format.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-014",
+    "sheet": "Buyer",
+    "review_finding": "Gap",
+    "answer": "There is no 11-digit phone-number rule in the current form or server checks. Both shorter and longer numbers can pass those checks.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-015",
+    "sheet": "Buyer",
+    "review_finding": "Gap",
+    "answer": "The current registration checks do not require a unique phone number, so an existing number is not blocked on that basis.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-016",
+    "sheet": "Buyer",
+    "review_finding": "Gap",
+    "answer": "Invoiz does not normalise +63 and 09 phone numbers or check whether they belong to an existing account.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-017",
+    "sheet": "Buyer",
+    "review_finding": "Supported",
+    "answer": "The server requires at least eight password characters. The seven-character example should be rejected, while the eight-character example meets the length rule.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-018",
+    "sheet": "Buyer",
+    "review_finding": "Gap",
+    "answer": "Passwords only need eight characters and a matching confirmation. Uppercase letters, lowercase letters, numbers, and symbols are not all required.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-019",
+    "sheet": "Buyer",
+    "review_finding": "Supported",
+    "answer": "A different confirmation password is blocked with a passwords-do-not-match message.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-020",
+    "sheet": "Buyer",
+    "review_finding": "Partial",
+    "answer": "Passwords are hidden while typing. The registration form does not include an eye icon to reveal and hide them.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-021",
+    "sheet": "Buyer",
+    "review_finding": "Missing",
+    "answer": "I couldn't find a Terms and Privacy checkbox on the registration screen. Submitting does not depend on accepting those terms.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-022",
+    "sheet": "Buyer",
+    "review_finding": "Needs live check",
+    "answer": "Register is disabled while a request is running, and email addresses must be unique. Repeated taps still need testing to confirm only one account and one email are created.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-023",
+    "sheet": "Buyer",
+    "review_finding": "Gap",
+    "answer": "A correct code verifies the email and returns the buyer to login. It does not approve the account; admin approval is still needed.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-024",
+    "sheet": "Buyer",
+    "review_finding": "Supported",
+    "answer": "A wrong code returns a clear error and leaves the email unverified. Five wrong attempts lock that code until a new one is requested.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-025",
+    "sheet": "Buyer",
+    "review_finding": "Partial",
+    "answer": "The OTP field accepts six digits, filters out letters, and blocks a blank or short code. Pasting a longer value is limited to six digits rather than necessarily showing an error.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-026",
+    "sheet": "Buyer",
+    "review_finding": "Gap",
+    "answer": "Invoiz codes last 10 minutes, so a code entered just after five minutes has not expired yet.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-027",
+    "sheet": "Buyer",
+    "review_finding": "Supported",
+    "answer": "Resending replaces the previous unused code, and another resend is limited to once a minute. Actual email delivery still needs checking.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-028",
+    "sheet": "Buyer",
+    "review_finding": "Supported",
+    "answer": "Login is refused until the email is verified, and the response tells the buyer to verify it first.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-029",
+    "sheet": "Buyer",
+    "review_finding": "Gap",
+    "answer": "A newly verified buyer still cannot log in while approval is pending. The test needs an admin-approved account before expecting the home screen.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-030",
+    "sheet": "Buyer",
+    "review_finding": "Needs access test",
+    "answer": "This project provides buyer screens and seller-application endpoints, rather than all the dashboards listed here. The listed role links and direct requests need separate access checks; login protection alone does not prove role isolation.",
+    "sources": [
+      "backend/routes/api.php",
+      "frontend/android/app/src/main/AndroidManifest.xml"
+    ]
+  },
+  {
+    "id": "TC-BUY-031",
+    "sheet": "Buyer",
+    "review_finding": "Partial",
+    "answer": "Email, phone, and OTP fields request suitable keyboards. Name capitalisation and password suggestion settings are not explicitly configured, so the full case needs a phone check.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-032",
+    "sheet": "Buyer",
+    "review_finding": "Device check",
+    "answer": "The form scrolls and Android is set to resize around the keyboard. Visibility of every field, error, and Register button still needs checking on a phone.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-033",
+    "sheet": "Buyer",
+    "review_finding": "Device check",
+    "answer": "Typed values are held while the registration screen stays alive. Returning after a call, lock, or app switch needs testing, especially if the phone closes the app in the background.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-034",
+    "sheet": "Buyer",
+    "review_finding": "Device check",
+    "answer": "No portrait-only lock is declared, and form values are kept in screen state. Rotation and error-message layout still need checking on a phone.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-035",
+    "sheet": "Buyer",
+    "review_finding": "Partial",
+    "answer": "A failed registration request shows a connection message and leaves the form values available. Reconnecting and confirming a single saved account still needs a live test.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-036",
+    "sheet": "Buyer",
+    "review_finding": "Needs live check",
+    "answer": "A connection error is handled, but there is no recovery step to check whether the first registration already succeeded. A dropped response could leave the buyer needing to log in to continue verification.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-037",
+    "sheet": "Buyer",
+    "review_finding": "Partial",
+    "answer": "The OTP uses one field that accepts pasted digits. A valid code verifies the email, but the account still needs admin approval.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-038",
+    "sheet": "Buyer",
+    "review_finding": "Gap",
+    "answer": "The OTP screen has a resend cooldown, rather than a code-expiry countdown. Codes expire after 10 minutes, so the five-minute behaviour in this case does not match Invoiz.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-039",
+    "sheet": "Buyer",
+    "review_finding": "Gap",
+    "answer": "Leaving the registration form does not ask to discard typed information. Login can send an unverified buyer back to email verification, but Back behaviour still needs a phone check.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-040",
+    "sheet": "Buyer",
+    "review_finding": "Device check",
+    "answer": "The form is scrollable, but that alone does not confirm readability at the largest font size. A small-screen phone check is still needed.",
+    "sources": [
+      "frontend/lib/screens/register_screen.dart",
+      "frontend/lib/screens/verify_email_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "TC-BUY-041",
+    "sheet": "Buyer",
+    "review_finding": "Needs live check",
+    "answer": "Invoiz saves the login session and reloads it when the app starts. Closing the app and restarting a phone still need testing to confirm the correct buyer stays signed in.",
+    "sources": [
+      "frontend/lib/services/auth_service.dart",
+      "frontend/lib/main.dart"
+    ]
+  },
+  {
+    "id": "TC-BUY-042",
+    "sheet": "Buyer",
+    "review_finding": "Needs live check",
+    "answer": "Logout removes the saved session and clears the navigation stack to login. Pressing Back and reopening the app still need a phone check.",
+    "sources": [
+      "frontend/lib/services/auth_service.dart",
+      "frontend/lib/screens/account_screen.dart"
+    ]
+  },
+  {
+    "id": "BUY-ACCT-001",
+    "sheet": "B1 Account",
+    "review_finding": "Supported",
+    "answer": "The profile form supports saving a new name and gallery photo, then refreshing the buyer's details. The photo and name still need checking after re-login.",
+    "sources": [
+      "frontend/lib/screens/profile_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "BUY-ACCT-002",
+    "sheet": "B1 Account",
+    "review_finding": "Gap",
+    "answer": "Blank names are checked, but one-character names and names containing numbers are not specifically blocked. Profile uploads also have no explicit five-megabyte or image-content validation in the controller.",
+    "sources": [
+      "frontend/lib/screens/profile_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "BUY-ACCT-003",
+    "sheet": "B1 Account",
+    "review_finding": "Partial",
+    "answer": "A new password can be saved from Edit Profile with a matching confirmation. There is no current-password field, so the exact flow in this case is different.",
+    "sources": [
+      "frontend/lib/screens/profile_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "BUY-ACCT-004",
+    "sheet": "B1 Account",
+    "review_finding": "Gap",
+    "answer": "The password-change form does not ask for the old password, and the server does not check it before updating the password.",
+    "sources": [
+      "frontend/lib/screens/profile_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "BUY-ACCT-005",
+    "sheet": "B1 Account",
+    "review_finding": "Gap",
+    "answer": "Invoiz checks the eight-character minimum and matching confirmation. It does not enforce all character types or reject reusing the old password.",
+    "sources": [
+      "frontend/lib/screens/profile_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "BUY-ACCT-006",
+    "sheet": "B1 Account",
+    "review_finding": "Missing",
+    "answer": "Email is not an editable profile field, and I couldn't find an email-change verification flow.",
+    "sources": [
+      "frontend/lib/screens/profile_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "BUY-ACCT-007",
+    "sheet": "B1 Account",
+    "review_finding": "Missing",
+    "answer": "There is no email-change OTP process to try with a wrong or expired code. The registration OTP process is a separate feature.",
+    "sources": [
+      "frontend/lib/screens/profile_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "BUY-ACCT-008",
+    "sheet": "B1 Account",
+    "review_finding": "Missing",
+    "answer": "Changing the login email is not available in the current buyer profile. Duplicate-email checks exist for registration instead.",
+    "sources": [
+      "frontend/lib/screens/profile_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "BUY-ACCT-009",
+    "sheet": "B1 Account",
+    "review_finding": "Gap",
+    "answer": "Phone numbers can be edited directly in the profile. There is no phone OTP, unique-number check, or Philippine-number format check in that update.",
+    "sources": [
+      "frontend/lib/screens/profile_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "BUY-ACCT-010",
+    "sheet": "B1 Account",
+    "review_finding": "Partial",
+    "answer": "Profile photos can be selected from the gallery. There is no Take Photo choice or custom camera-permission recovery flow on this screen.",
+    "sources": [
+      "frontend/lib/screens/profile_screen.dart",
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "BUY-ACCT-011",
+    "sheet": "B1 Account",
+    "review_finding": "Gap",
+    "answer": "Changing a password does not revoke the account's other login tokens. Signing out another phone after the change is not implemented in this update.",
+    "sources": [
+      "backend/app/Http/Controllers/Api/AuthController.php"
+    ]
+  },
+  {
+    "id": "BUY-ACCT-012",
+    "sheet": "B1 Account",
+    "review_finding": "Needs live check",
+    "answer": "The app saves the login session and clears navigation to login on logout. Closing, reopening, and pressing Back still need testing on a phone.",
+    "sources": [
+      "frontend/lib/services/auth_service.dart",
+      "frontend/lib/screens/account_screen.dart"
+    ]
+  },
+  {
+    "id": "BUY-ADDR-001",
+    "sheet": "B2 Address Book",
+    "review_finding": "Partial",
+    "answer": "A new address can be added and left unmarked as default. The current address form uses typed place names, and the account menu opens Add Address rather than an address-book list.",
+    "sources": [
+      "frontend/lib/screens/add_address_screen.dart",
+      "backend/app/Http/Controllers/Api/AddressController.php"
+    ]
+  },
+  {
+    "id": "BUY-ADDR-002",
+    "sheet": "B2 Address Book",
+    "review_finding": "Gap",
+    "answer": "The shipping-address form uses text fields for province, city, and barangay. The linked dropdowns belong to registration, so this address-book cascade is not available.",
+    "sources": [
+      "frontend/lib/screens/add_address_screen.dart",
+      "backend/app/Http/Controllers/Api/AddressController.php"
+    ]
+  },
+  {
+    "id": "BUY-ADDR-003",
+    "sheet": "B2 Address Book",
+    "review_finding": "Partial",
+    "answer": "Recipient, phone, street, barangay, city, and province have required checks. There is no Region field in this form.",
+    "sources": [
+      "frontend/lib/screens/add_address_screen.dart",
+      "backend/app/Http/Controllers/Api/AddressController.php"
+    ]
+  },
+  {
+    "id": "BUY-ADDR-004",
+    "sheet": "B2 Address Book",
+    "review_finding": "Gap",
+    "answer": "The address form checks that a phone value is present but does not enforce the two Philippine mobile formats. Short and long numbers are not specifically rejected for their length.",
+    "sources": [
+      "frontend/lib/screens/add_address_screen.dart",
+      "backend/app/Http/Controllers/Api/AddressController.php"
+    ]
+  },
+  {
+    "id": "BUY-ADDR-005",
+    "sheet": "B2 Address Book",
+    "review_finding": "Gap",
+    "answer": "I couldn't find a ten-address limit in the address controller. The eleventh address is not specifically blocked by that rule.",
+    "sources": [
+      "frontend/lib/screens/add_address_screen.dart",
+      "backend/app/Http/Controllers/Api/AddressController.php"
+    ]
+  },
+  {
+    "id": "BUY-ADDR-006",
+    "sheet": "B2 Address Book",
+    "review_finding": "Partial",
+    "answer": "A newly added address can be marked default, and checkout prefers the default address. The app has no address-book screen for selecting and changing an existing default.",
+    "sources": [
+      "frontend/lib/screens/add_address_screen.dart",
+      "backend/app/Http/Controllers/Api/AddressController.php"
+    ]
+  },
+  {
+    "id": "BUY-ADDR-007",
+    "sheet": "B2 Address Book",
+    "review_finding": "Gap",
+    "answer": "The delete endpoint does not protect the default address or select a replacement. A database restriction may block deleting an address used by an order, but it does not enforce the default-address rule.",
+    "sources": [
+      "frontend/lib/screens/add_address_screen.dart",
+      "backend/app/Http/Controllers/Api/AddressController.php"
+    ]
+  },
+  {
+    "id": "BUY-ADDR-008",
+    "sheet": "B2 Address Book",
+    "review_finding": "Gap",
+    "answer": "An order links to the saved address instead of keeping a separate address copy. Editing that address could change the order's address details, while deleting a referenced address is restricted by the supplied schema.",
+    "sources": [
+      "backend/app/Models/Order.php",
+      "database/invoizdb.sql"
+    ]
+  },
+  {
+    "id": "BUY-ADDR-009",
+    "sheet": "B2 Address Book",
+    "review_finding": "Supported",
+    "answer": "Address updates and deletions are restricted to the signed-in buyer's records. There is no public endpoint for viewing another buyer's address.",
+    "sources": [
+      "frontend/lib/screens/add_address_screen.dart",
+      "backend/app/Http/Controllers/Api/AddressController.php"
+    ]
+  },
+  {
+    "id": "BUY-ADDR-010",
+    "sheet": "B2 Address Book",
+    "review_finding": "Missing",
+    "answer": "I couldn't find a Use My Location option or location lookup in the shipping-address form. Addresses are entered manually.",
+    "sources": [
+      "frontend/lib/screens/add_address_screen.dart",
+      "backend/app/Http/Controllers/Api/AddressController.php"
+    ]
+  },
+  {
+    "id": "BUY-ADDR-011",
+    "sheet": "B2 Address Book",
+    "review_finding": "Device check",
+    "answer": "Phone uses a phone keyboard, while recipient and street use text fields in a scrollable form. Reaching Save with the keyboard open still needs a phone check.",
+    "sources": [
+      "frontend/lib/screens/add_address_screen.dart",
+      "backend/app/Http/Controllers/Api/AddressController.php"
+    ]
+  },
+  {
+    "id": "BUY-SRCH-001",
+    "sheet": "B3 Browse & Search",
+    "review_finding": "Supported",
+    "answer": "Category browsing filters active products by their category. The named sample product and complete result list need checking with the workbook's test data loaded.",
+    "sources": [
+      "frontend/lib/screens/home_screen.dart",
+      "frontend/lib/screens/product_list_screen.dart",
+      "backend/app/Http/Controllers/Api/ProductController.php"
+    ]
+  },
+  {
+    "id": "BUY-SRCH-002",
+    "sheet": "B3 Browse & Search",
+    "review_finding": "Missing",
+    "answer": "The store page offers products, search, sorting, and reviews. The seller-defined category tree described in this case is not available.",
+    "sources": [
+      "frontend/lib/screens/home_screen.dart",
+      "frontend/lib/screens/product_list_screen.dart",
+      "backend/app/Http/Controllers/Api/ProductController.php"
+    ]
+  },
+  {
+    "id": "BUY-SRCH-003",
+    "sheet": "B3 Browse & Search",
+    "review_finding": "Supported",
+    "answer": "Searches use product names and descriptions, and the app trims outer spaces. The supplied database uses case-insensitive text matching, so the named test product needs checking in that database.",
+    "sources": [
+      "database/invoizdb.sql",
+      "backend/app/Http/Controllers/Api/ProductController.php"
+    ]
+  },
+  {
+    "id": "BUY-SRCH-004",
+    "sheet": "B3 Browse & Search",
+    "review_finding": "Partial",
+    "answer": "An unmatched search has a no-results state. There is no spelling correction or Did You Mean suggestion for the typo.",
+    "sources": [
+      "frontend/lib/screens/home_screen.dart",
+      "frontend/lib/screens/product_list_screen.dart",
+      "backend/app/Http/Controllers/Api/ProductController.php"
+    ]
+  },
+  {
+    "id": "BUY-SRCH-005",
+    "sheet": "B3 Browse & Search",
+    "review_finding": "Partial",
+    "answer": "Search values are passed as query values, and product text is shown as plain text. Percent signs are not escaped as literal search characters, so searching % can match many products.",
+    "sources": [
+      "frontend/lib/screens/home_screen.dart",
+      "frontend/lib/screens/product_list_screen.dart",
+      "backend/app/Http/Controllers/Api/ProductController.php"
+    ]
+  },
+  {
+    "id": "BUY-SRCH-006",
+    "sheet": "B3 Browse & Search",
+    "review_finding": "Supported",
+    "answer": "An empty search returns the normal listing instead of submitting a special empty-result search.",
+    "sources": [
+      "frontend/lib/screens/home_screen.dart",
+      "frontend/lib/screens/product_list_screen.dart",
+      "backend/app/Http/Controllers/Api/ProductController.php"
+    ]
+  },
+  {
+    "id": "BUY-SRCH-007",
+    "sheet": "B3 Browse & Search",
+    "review_finding": "Missing",
+    "answer": "There is an Under ₱500 shortcut, but no editable minimum-and-maximum price range. The requested boundary values cannot be entered through the current filters.",
+    "sources": [
+      "frontend/lib/screens/home_screen.dart",
+      "frontend/lib/screens/product_list_screen.dart",
+      "backend/app/Http/Controllers/Api/ProductController.php"
+    ]
+  },
+  {
+    "id": "BUY-SRCH-008",
+    "sheet": "B3 Browse & Search",
+    "review_finding": "Gap",
+    "answer": "The Home shortcuts filter the original loaded product list rather than combining every active search and category filter. The full combined-filter result is not guaranteed.",
+    "sources": [
+      "frontend/lib/screens/home_screen.dart",
+      "frontend/lib/screens/product_list_screen.dart",
+      "backend/app/Http/Controllers/Api/ProductController.php"
+    ]
+  },
+  {
+    "id": "BUY-SRCH-009",
+    "sheet": "B3 Browse & Search",
+    "review_finding": "Partial",
+    "answer": "Price, rating, and discount sorting are available. The screens load a fixed first page and do not implement loading further pages while scrolling.",
+    "sources": [
+      "frontend/lib/screens/home_screen.dart",
+      "frontend/lib/screens/product_list_screen.dart",
+      "backend/app/Http/Controllers/Api/ProductController.php"
+    ]
+  },
+  {
+    "id": "BUY-SRCH-010",
+    "sheet": "B3 Browse & Search",
+    "review_finding": "Partial",
+    "answer": "Product listings and detail requests filter for active products. Opening the listed links and confirming the unavailable screen still needs a live test.",
+    "sources": [
+      "frontend/lib/screens/home_screen.dart",
+      "frontend/lib/screens/product_list_screen.dart",
+      "backend/app/Http/Controllers/Api/ProductController.php"
+    ]
+  },
+  {
+    "id": "BUY-SRCH-011",
+    "sheet": "B3 Browse & Search",
+    "review_finding": "Missing",
+    "answer": "I couldn't find a vacation-store flag or an On Vacation purchase block in the buyer app.",
+    "sources": [
+      "frontend/lib/screens/home_screen.dart",
+      "frontend/lib/screens/product_list_screen.dart",
+      "backend/app/Http/Controllers/Api/ProductController.php"
+    ]
+  },
+  {
+    "id": "BUY-SRCH-012",
+    "sheet": "B3 Browse & Search",
+    "review_finding": "Partial",
+    "answer": "The keyboard Search action is connected, and Home has pull to refresh. Home refresh reloads the general list, so it does not preserve the same filtered search results.",
+    "sources": [
+      "frontend/lib/screens/home_screen.dart",
+      "frontend/lib/screens/product_list_screen.dart",
+      "backend/app/Http/Controllers/Api/ProductController.php"
+    ]
+  },
+  {
+    "id": "BUY-SRCH-013",
+    "sheet": "B3 Browse & Search",
+    "review_finding": "Needs live check",
+    "answer": "Failed searches show an error message, but the app has no dedicated offline search or retry state. Airplane-mode recovery needs testing with the named product available.",
+    "sources": [
+      "frontend/lib/screens/home_screen.dart",
+      "frontend/lib/screens/product_list_screen.dart",
+      "backend/app/Http/Controllers/Api/ProductController.php"
+    ]
+  },
+  {
+    "id": "BUY-PDP-001",
+    "sheet": "B4 Product Detail",
+    "review_finding": "Gap",
+    "answer": "A buyer can submit without selecting a variant, and the page stores only one selected variant at a time. It does not require both colour and size selections as described.",
+    "sources": [
+      "frontend/lib/screens/product_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/CartController.php"
+    ]
+  },
+  {
+    "id": "BUY-PDP-002",
+    "sheet": "B4 Product Detail",
+    "review_finding": "Partial",
+    "answer": "Choosing a variant changes the displayed price. The stock text and gallery do not switch to that variant's stock and image.",
+    "sources": [
+      "frontend/lib/screens/product_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/CartController.php"
+    ]
+  },
+  {
+    "id": "BUY-PDP-003",
+    "sheet": "B4 Product Detail",
+    "review_finding": "Gap",
+    "answer": "Variant chips are still selectable when their stock is zero. The server checks stock when adding the item instead of disabling the choice.",
+    "sources": [
+      "frontend/lib/screens/product_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/CartController.php"
+    ]
+  },
+  {
+    "id": "BUY-PDP-004",
+    "sheet": "B4 Product Detail",
+    "review_finding": "Partial",
+    "answer": "Quantity buttons keep the number at one or above, and the server rejects quantities beyond available stock. The page uses product stock for its upper limit rather than the selected variant's stock.",
+    "sources": [
+      "frontend/lib/screens/product_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/CartController.php"
+    ]
+  },
+  {
+    "id": "BUY-PDP-005",
+    "sheet": "B4 Product Detail",
+    "review_finding": "Missing",
+    "answer": "I couldn't find a per-buyer purchase limit that carries across previous orders. Quantity checks only compare against available stock.",
+    "sources": [
+      "frontend/lib/screens/product_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/CartController.php"
+    ]
+  },
+  {
+    "id": "BUY-PDP-006",
+    "sheet": "B4 Product Detail",
+    "review_finding": "Gap",
+    "answer": "Sale listings support comparison prices, but the detail page has no flash-sale countdown, remaining flash allocation, or voucher Claim button.",
+    "sources": [
+      "frontend/lib/screens/product_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/CartController.php"
+    ]
+  },
+  {
+    "id": "BUY-PDP-007",
+    "sheet": "B4 Product Detail",
+    "review_finding": "Gap",
+    "answer": "Buy Now adds the item to the shared cart and opens that cart. It does not start a checkout containing only the selected product.",
+    "sources": [
+      "frontend/lib/screens/product_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/CartController.php"
+    ]
+  },
+  {
+    "id": "BUY-PDP-008",
+    "sheet": "B4 Product Detail",
+    "review_finding": "Supported",
+    "answer": "A failed product lookup has a Product Not Found state, and inactive products are excluded by the API. The unavailable-link flow still needs checking in the app.",
+    "sources": [
+      "frontend/lib/screens/product_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/CartController.php"
+    ]
+  },
+  {
+    "id": "BUY-PDP-009",
+    "sheet": "B4 Product Detail",
+    "review_finding": "Needs live check",
+    "answer": "The product gallery supports swiping, a position indicator, and a full-screen zoom viewer. Image quality and keeping the selection after closing the viewer still need a phone check.",
+    "sources": [
+      "frontend/lib/screens/product_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/CartController.php"
+    ]
+  },
+  {
+    "id": "BUY-PDP-010",
+    "sheet": "B4 Product Detail",
+    "review_finding": "Missing",
+    "answer": "The product page has no share action, and no product-link handler is declared in the Android manifest. This cross-phone sharing flow is not implemented.",
+    "sources": [
+      "frontend/android/app/src/main/AndroidManifest.xml",
+      "frontend/lib/screens/product_detail_screen.dart"
+    ]
+  },
+  {
+    "id": "BUY-WISH-001",
+    "sheet": "B5 Wishlist & Follow",
+    "review_finding": "Supported",
+    "answer": "A signed-in buyer can toggle a product in Favorites and remove it from the list. The heart is updated from the toggle response; reopening the product still needs a live check.",
+    "sources": [
+      "frontend/lib/screens/favorites_screen.dart",
+      "frontend/lib/screens/seller_store_screen.dart",
+      "backend/app/Http/Controllers/Api/FavoriteController.php",
+      "backend/app/Http/Controllers/Api/StoreController.php"
+    ]
+  },
+  {
+    "id": "BUY-WISH-002",
+    "sheet": "B5 Wishlist & Follow",
+    "review_finding": "Needs live check",
+    "answer": "The database allows only one favorite per buyer and product. Rapid taps are not disabled, so the final heart state and any request errors still need checking.",
+    "sources": [
+      "database/invoizdb.sql",
+      "backend/app/Http/Controllers/Api/FavoriteController.php"
+    ]
+  },
+  {
+    "id": "BUY-WISH-003",
+    "sheet": "B5 Wishlist & Follow",
+    "review_finding": "Gap",
+    "answer": "Favorites do not provide the described Sold Out and Unavailable placeholders. A missing product is also not handled when the list reads its saved items.",
+    "sources": [
+      "frontend/lib/screens/favorites_screen.dart",
+      "frontend/lib/screens/seller_store_screen.dart",
+      "backend/app/Http/Controllers/Api/FavoriteController.php",
+      "backend/app/Http/Controllers/Api/StoreController.php"
+    ]
+  },
+  {
+    "id": "BUY-WISH-004",
+    "sheet": "B5 Wishlist & Follow",
+    "review_finding": "Partial",
+    "answer": "Follow and Unfollow update the store's follower count. There is no separate Following list in the current buyer screens.",
+    "sources": [
+      "frontend/lib/screens/favorites_screen.dart",
+      "frontend/lib/screens/seller_store_screen.dart",
+      "backend/app/Http/Controllers/Api/FavoriteController.php",
+      "backend/app/Http/Controllers/Api/StoreController.php"
+    ]
+  },
+  {
+    "id": "BUY-WISH-005",
+    "sheet": "B5 Wishlist & Follow",
+    "review_finding": "Supported",
+    "answer": "Saving favorites and following a store require login in the app and authenticated API access.",
+    "sources": [
+      "frontend/lib/screens/favorites_screen.dart",
+      "frontend/lib/screens/seller_store_screen.dart",
+      "backend/app/Http/Controllers/Api/FavoriteController.php",
+      "backend/app/Http/Controllers/Api/StoreController.php"
+    ]
+  },
+  {
+    "id": "BUY-CART-001",
+    "sheet": "B6 Cart",
+    "review_finding": "Supported",
+    "answer": "Adding the same product and variant again increases the existing cart line's quantity. The exact subtotal depends on the product and variant prices in the test database.",
+    "sources": [
+      "frontend/lib/screens/cart_screen.dart",
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/CartController.php"
+    ]
+  },
+  {
+    "id": "BUY-CART-002",
+    "sheet": "B6 Cart",
+    "review_finding": "Supported",
+    "answer": "Different variant IDs are saved as separate cart lines, each with its own price adjustment.",
+    "sources": [
+      "frontend/lib/screens/cart_screen.dart",
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/CartController.php"
+    ]
+  },
+  {
+    "id": "BUY-CART-003",
+    "sheet": "B6 Cart",
+    "review_finding": "Missing",
+    "answer": "The cart shows a flat list of items. It does not group them under store headings.",
+    "sources": [
+      "frontend/lib/screens/cart_screen.dart",
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/CartController.php"
+    ]
+  },
+  {
+    "id": "BUY-CART-004",
+    "sheet": "B6 Cart",
+    "review_finding": "Gap",
+    "answer": "Selecting items changes the subtotal shown in the cart. Checkout reloads the whole cart, so unselected items are included too.",
+    "sources": [
+      "frontend/lib/screens/cart_screen.dart",
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/CartController.php"
+    ]
+  },
+  {
+    "id": "BUY-CART-005",
+    "sheet": "B6 Cart",
+    "review_finding": "Supported",
+    "answer": "Quantity cannot go below one through the cart buttons, and the server rejects an amount above stock. The 20-unit boundary needs a product with exactly 20 units available.",
+    "sources": [
+      "frontend/lib/screens/cart_screen.dart",
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/CartController.php"
+    ]
+  },
+  {
+    "id": "BUY-CART-006",
+    "sheet": "B6 Cart",
+    "review_finding": "Supported",
+    "answer": "Cart prices are recalculated from the current product price and variant adjustment when the cart is loaded. The screen needs reloading to see a seller's price change.",
+    "sources": [
+      "frontend/lib/screens/cart_screen.dart",
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/CartController.php"
+    ]
+  },
+  {
+    "id": "BUY-CART-007",
+    "sheet": "B6 Cart",
+    "review_finding": "Gap",
+    "answer": "Cart items are not disabled based on product availability. Checkout checks stock for the whole cart, and missing product records are not handled as unavailable placeholders.",
+    "sources": [
+      "frontend/lib/screens/cart_screen.dart",
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/CartController.php"
+    ]
+  },
+  {
+    "id": "BUY-CART-008",
+    "sheet": "B6 Cart",
+    "review_finding": "Supported",
+    "answer": "Cart items are saved against the buyer account on the server. The same cart should load after login on another device, but that still needs a two-device test.",
+    "sources": [
+      "frontend/lib/screens/cart_screen.dart",
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/CartController.php"
+    ]
+  },
+  {
+    "id": "BUY-CART-009",
+    "sheet": "B6 Cart",
+    "review_finding": "Supported",
+    "answer": "Removing an item deletes that buyer's cart line and reloads the cart so the subtotal can be recalculated.",
+    "sources": [
+      "frontend/lib/screens/cart_screen.dart",
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/CartController.php"
+    ]
+  },
+  {
+    "id": "BUY-CART-010",
+    "sheet": "B6 Cart",
+    "review_finding": "Supported",
+    "answer": "Cart updates and deletions look up the item inside the signed-in buyer's cart. Another buyer's line is excluded from that lookup.",
+    "sources": [
+      "frontend/lib/screens/cart_screen.dart",
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/CartController.php"
+    ]
+  },
+  {
+    "id": "BUY-CART-011",
+    "sheet": "B6 Cart",
+    "review_finding": "Needs live check",
+    "answer": "The displayed quantity changes only after the update succeeds and the cart reloads. A failed request shows an error; recovery after reconnecting still needs a phone check.",
+    "sources": [
+      "frontend/lib/screens/cart_screen.dart",
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/CartController.php"
+    ]
+  },
+  {
+    "id": "BUY-CART-012",
+    "sheet": "B6 Cart",
+    "review_finding": "Partial",
+    "answer": "The bottom badge counts cart lines, not individual units. It loads when the navigation bar is created, so immediate updates after every cart change are not guaranteed.",
+    "sources": [
+      "frontend/lib/widgets/main_layout.dart"
+    ]
+  },
+  {
+    "id": "BUY-VOU-001",
+    "sheet": "B7 Vouchers",
+    "review_finding": "Missing",
+    "answer": "Vouchers are listed for selection or code entry, but there is no claimable voucher wallet or Claimed state.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/VoucherController.php",
+      "backend/app/Models/Voucher.php",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-VOU-002",
+    "sheet": "B7 Vouchers",
+    "review_finding": "Gap",
+    "answer": "A single voucher discounts the whole cart subtotal. There is no store-specific discount group or shipping fee in this checkout.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/VoucherController.php",
+      "backend/app/Models/Voucher.php",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-VOU-003",
+    "sheet": "B7 Vouchers",
+    "review_finding": "Gap",
+    "answer": "Checkout accepts only one voucher code. Store, platform, and shipping vouchers cannot be stacked as in the worked example.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/VoucherController.php",
+      "backend/app/Models/Voucher.php",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-VOU-004",
+    "sheet": "B7 Vouchers",
+    "review_finding": "Partial",
+    "answer": "Voucher validation rejects a subtotal below the minimum and accepts it at the minimum. The message states the required spend rather than calculating Spend ₱0.01 More.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/VoucherController.php",
+      "backend/app/Models/Voucher.php",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-VOU-005",
+    "sheet": "B7 Vouchers",
+    "review_finding": "Partial",
+    "answer": "Expired, future, exhausted, and unknown codes are rejected. They share an Invalid or Expired Voucher message instead of separate explanations.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/VoucherController.php",
+      "backend/app/Models/Voucher.php",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-VOU-006",
+    "sheet": "B7 Vouchers",
+    "review_finding": "Missing",
+    "answer": "Voucher usage is tracked globally, without a per-buyer redemption limit. The Already Used rule in this case is not implemented.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/VoucherController.php",
+      "backend/app/Models/Voucher.php",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-VOU-007",
+    "sheet": "B7 Vouchers",
+    "review_finding": "Partial",
+    "answer": "Checkout rechecks the voucher against the current subtotal before placing an order. There is no automatic removal notice when the cart falls below the minimum.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/VoucherController.php",
+      "backend/app/Models/Voucher.php",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-VOU-008",
+    "sheet": "B7 Vouchers",
+    "review_finding": "Supported",
+    "answer": "Percentage discounts use the voucher's maximum discount and are rounded to two decimal places. The stated amounts need matching voucher and product records to verify live.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/VoucherController.php",
+      "backend/app/Models/Voucher.php",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-VOU-009",
+    "sheet": "B7 Vouchers",
+    "review_finding": "Missing",
+    "answer": "There is no separate shipping charge or shipping-voucher type in the current checkout. A code named FREESHIP does not by itself add that feature.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/VoucherController.php",
+      "backend/app/Models/Voucher.php",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-VOU-010",
+    "sheet": "B7 Vouchers",
+    "review_finding": "Partial",
+    "answer": "The server caps a discount at the cart subtotal so the merchandise total cannot go below zero. Separate shipping charges are not implemented.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/VoucherController.php",
+      "backend/app/Models/Voucher.php",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-VOU-011",
+    "sheet": "B7 Vouchers",
+    "review_finding": "Partial",
+    "answer": "Vouchers are calculated from the current selling price rather than the comparison price. The workbook's extra shipping charge is not part of Invoiz's total.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/VoucherController.php",
+      "backend/app/Models/Voucher.php",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-VOU-012",
+    "sheet": "B7 Vouchers",
+    "review_finding": "Gap",
+    "answer": "Cancellation does not return a voucher or reduce its used count. There is also no buyer voucher wallet to restore it to.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/VoucherController.php",
+      "backend/app/Models/Voucher.php",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-CHK-001",
+    "sheet": "B8 Checkout",
+    "review_finding": "Gap",
+    "answer": "Invoiz creates one order for the whole cart and accepts one voucher. It does not split orders by store or include the shipping charges and stacked discounts in this example.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-CHK-002",
+    "sheet": "B8 Checkout",
+    "review_finding": "Missing",
+    "answer": "Changing the selected address does not calculate a shipping fee. The current total is the cart subtotal minus one voucher discount.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-CHK-003",
+    "sheet": "B8 Checkout",
+    "review_finding": "Missing",
+    "answer": "I couldn't find weight-based shipping calculations in checkout. The one-kilogram boundary is not applied.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-CHK-004",
+    "sheet": "B8 Checkout",
+    "review_finding": "Missing",
+    "answer": "Checkout checks that the address belongs to the buyer, but it does not check whether a delivery area is serviceable.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-CHK-005",
+    "sheet": "B8 Checkout",
+    "review_finding": "Gap",
+    "answer": "The buyer checkout has no Note to Seller field. The API allows notes up to 1,000 characters rather than the workbook's 200-character rule.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-CHK-006",
+    "sheet": "B8 Checkout",
+    "review_finding": "Partial",
+    "answer": "COD is selected by default, so the buyer cannot leave the payment method blank through this screen. A direct request without a method is rejected by the server.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-CHK-007",
+    "sheet": "B8 Checkout",
+    "review_finding": "Needs live check",
+    "answer": "Place Order is disabled while a request runs, and a successful checkout clears the cart. There is no server request key to guarantee the same order under simultaneous duplicate requests.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-CHK-008",
+    "sheet": "B8 Checkout",
+    "review_finding": "Gap",
+    "answer": "Checkout recalculates the latest price on the server but does not ask the buyer to confirm a price change. The saved total can therefore differ from the earlier displayed summary.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-CHK-009",
+    "sheet": "B8 Checkout",
+    "review_finding": "Partial",
+    "answer": "Stock is checked again before the order is saved. The check happens outside the transaction without a stock lock, so simultaneous purchases still need testing.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-CHK-010",
+    "sheet": "B8 Checkout",
+    "review_finding": "Partial",
+    "answer": "The server rejects a voucher that is no longer active and shows an error. The app does not automatically remove it and refresh the displayed total.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-CHK-011",
+    "sheet": "B8 Checkout",
+    "review_finding": "Supported",
+    "answer": "Checkout builds prices and totals from server-side product records. A submitted replacement total is not used in that calculation.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-CHK-012",
+    "sheet": "B8 Checkout",
+    "review_finding": "Needs live check",
+    "answer": "Connection errors are shown, but checkout does not look up a possibly saved order after a lost response. A dropped connection needs testing to confirm the order and stock change happen only once.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-CHK-013",
+    "sheet": "B8 Checkout",
+    "review_finding": "Device check",
+    "answer": "Address, voucher, and COD selections stay in screen state while checkout remains open. Calls, app switching, and recovery after the phone closes the app need a device test.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-PAY-001",
+    "sheet": "B9 Payment",
+    "review_finding": "Partial",
+    "answer": "A COD checkout creates a pending order shown under To Ship, with payment still pending. The stated ₱500 total is not reproduced automatically because this app adds no shipping fee.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php",
+      "backend/routes/api.php"
+    ]
+  },
+  {
+    "id": "BUY-PAY-002",
+    "sheet": "B9 Payment",
+    "review_finding": "Missing",
+    "answer": "Checkout only supports Cash on Delivery. There is no e-wallet or card gateway flow to test.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php",
+      "backend/routes/api.php"
+    ]
+  },
+  {
+    "id": "BUY-PAY-003",
+    "sheet": "B9 Payment",
+    "review_finding": "Missing",
+    "answer": "There is no online payment failure state or Pay Again action in this buyer app.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php",
+      "backend/routes/api.php"
+    ]
+  },
+  {
+    "id": "BUY-PAY-004",
+    "sheet": "B9 Payment",
+    "review_finding": "Missing",
+    "answer": "No payment gateway is opened, so there is no gateway cancellation or return flow.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php",
+      "backend/routes/api.php"
+    ]
+  },
+  {
+    "id": "BUY-PAY-005",
+    "sheet": "B9 Payment",
+    "review_finding": "Missing",
+    "answer": "Online payment callbacks and gateway references are not implemented. Closing the app during that flow cannot be tested here.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php",
+      "backend/routes/api.php"
+    ]
+  },
+  {
+    "id": "BUY-PAY-006",
+    "sheet": "B9 Payment",
+    "review_finding": "Missing",
+    "answer": "I couldn't find an unpaid-payment auto-cancel process. Current checkout creates COD orders rather than unpaid online orders.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php",
+      "backend/routes/api.php"
+    ]
+  },
+  {
+    "id": "BUY-PAY-007",
+    "sheet": "B9 Payment",
+    "review_finding": "Missing",
+    "answer": "There is no one-hour payment deadline or gateway payment flow, so the 59- and 61-minute boundary is not implemented.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php",
+      "backend/routes/api.php"
+    ]
+  },
+  {
+    "id": "BUY-PAY-008",
+    "sheet": "B9 Payment",
+    "review_finding": "Missing",
+    "answer": "The app does not open an external e-wallet or handle a payment return link. Only COD is available.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php",
+      "backend/routes/api.php"
+    ]
+  },
+  {
+    "id": "BUY-PAY-009",
+    "sheet": "B9 Payment",
+    "review_finding": "Missing",
+    "answer": "There is no gateway-processing screen or Back-handling flow for online payments in this app.",
+    "sources": [
+      "frontend/lib/screens/checkout_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php",
+      "backend/routes/api.php"
+    ]
+  },
+  {
+    "id": "BUY-TRK-001",
+    "sheet": "B10 Order Tracking",
+    "review_finding": "Gap",
+    "answer": "The buyer tabs are All, To Ship, In Transit, Delivered, and Cancelled. They do not include To Pay, Completed, or Return/Refund as listed in this test.",
+    "sources": [
+      "frontend/lib/screens/orders_screen.dart",
+      "frontend/lib/screens/order_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-TRK-002",
+    "sheet": "B10 Order Tracking",
+    "review_finding": "Partial",
+    "answer": "Order details show saved status-history entries and a basic progress indicator. The complete hub, courier, and handover flow needs connected seller and logistics updates that were not tested.",
+    "sources": [
+      "frontend/lib/screens/orders_screen.dart",
+      "frontend/lib/screens/order_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-TRK-003",
+    "sheet": "B10 Order Tracking",
+    "review_finding": "Missing",
+    "answer": "There is no Order Received button or buyer completion endpoint. Seller earnings becoming available is not handled by this buyer flow.",
+    "sources": [
+      "frontend/lib/screens/orders_screen.dart",
+      "frontend/lib/screens/order_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-TRK-004",
+    "sheet": "B10 Order Tracking",
+    "review_finding": "Partial",
+    "answer": "Order Received is absent at every stage, including before delivery. That does not confirm the intended delivery-to-completion feature, which is missing altogether.",
+    "sources": [
+      "frontend/lib/screens/orders_screen.dart",
+      "frontend/lib/screens/order_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-TRK-005",
+    "sheet": "B10 Order Tracking",
+    "review_finding": "Missing",
+    "answer": "I couldn't find a seven-day automatic completion process in the supplied buyer backend.",
+    "sources": [
+      "frontend/lib/screens/orders_screen.dart",
+      "frontend/lib/screens/order_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-TRK-006",
+    "sheet": "B10 Order Tracking",
+    "review_finding": "Supported",
+    "answer": "Order details are looked up using both the order ID and the signed-in buyer's ID. Another buyer's order is excluded from that lookup.",
+    "sources": [
+      "frontend/lib/screens/orders_screen.dart",
+      "frontend/lib/screens/order_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-TRK-007",
+    "sheet": "B10 Order Tracking",
+    "review_finding": "Missing",
+    "answer": "Order updates appear in the in-app inbox, but push notifications and notification links into order tracking are not implemented.",
+    "sources": [
+      "frontend/pubspec.yaml",
+      "frontend/lib/screens/notifications_screen.dart"
+    ]
+  },
+  {
+    "id": "BUY-CAN-001",
+    "sheet": "B11 Cancellation",
+    "review_finding": "Partial",
+    "answer": "A pending or confirmed COD order can be cancelled after a confirmation prompt. There is no cancellation-reason field, and variant purchases restore product stock rather than the selected variant's stock.",
+    "sources": [
+      "frontend/lib/screens/order_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-CAN-002",
+    "sheet": "B11 Cancellation",
+    "review_finding": "Gap",
+    "answer": "Cancellation only asks for confirmation. A reason is not requested or required by the API.",
+    "sources": [
+      "frontend/lib/screens/order_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-CAN-003",
+    "sheet": "B11 Cancellation",
+    "review_finding": "Missing",
+    "answer": "Prepaid checkout and automatic refunds are not available. Cancellation also does not restore voucher usage.",
+    "sources": [
+      "frontend/lib/screens/order_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-CAN-004",
+    "sheet": "B11 Cancellation",
+    "review_finding": "Partial",
+    "answer": "Cancel is limited to pending and confirmed orders in both the screen and API. The seller's Ready for Pickup status needs checking against those actual status values.",
+    "sources": [
+      "frontend/lib/screens/order_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-CAN-005",
+    "sheet": "B11 Cancellation",
+    "review_finding": "Supported",
+    "answer": "The Cancel button is hidden once an order leaves pending or confirmed, and the API rejects cancellation for later statuses.",
+    "sources": [
+      "frontend/lib/screens/order_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-CAN-006",
+    "sheet": "B11 Cancellation",
+    "review_finding": "Needs live check",
+    "answer": "A later repeat request is refused once the order is cancelled. The cancellation and stock restoration are not locked together, so simultaneous taps still need testing.",
+    "sources": [
+      "frontend/lib/screens/order_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-RET-001",
+    "sheet": "B12 Return & Refund",
+    "review_finding": "Missing",
+    "answer": "I couldn't find a Return/Refund request screen or endpoint in this buyer app. A damaged-item request with photo evidence cannot be submitted here.",
+    "sources": [
+      "backend/routes/api.php",
+      "frontend/lib/screens/order_detail_screen.dart"
+    ]
+  },
+  {
+    "id": "BUY-RET-002",
+    "sheet": "B12 Return & Refund",
+    "review_finding": "Missing",
+    "answer": "Returns are unavailable throughout the current app, including before delivery. This does not demonstrate a working delivery-based eligibility rule.",
+    "sources": [
+      "backend/routes/api.php",
+      "frontend/lib/screens/order_detail_screen.dart"
+    ]
+  },
+  {
+    "id": "BUY-RET-003",
+    "sheet": "B12 Return & Refund",
+    "review_finding": "Missing",
+    "answer": "There is no return window or return-request flow, so the seven-day boundary is not enforced here.",
+    "sources": [
+      "backend/routes/api.php",
+      "frontend/lib/screens/order_detail_screen.dart"
+    ]
+  },
+  {
+    "id": "BUY-RET-004",
+    "sheet": "B12 Return & Refund",
+    "review_finding": "Missing",
+    "answer": "Return descriptions and evidence uploads are not implemented, so their required fields and limits cannot be checked.",
+    "sources": [
+      "backend/routes/api.php",
+      "frontend/lib/screens/order_detail_screen.dart"
+    ]
+  },
+  {
+    "id": "BUY-RET-005",
+    "sheet": "B12 Return & Refund",
+    "review_finding": "Missing",
+    "answer": "The app has no return-request tracking, seller rejection details, or Escalate option.",
+    "sources": [
+      "backend/routes/api.php",
+      "frontend/lib/screens/order_detail_screen.dart"
+    ]
+  },
+  {
+    "id": "BUY-RET-006",
+    "sheet": "B12 Return & Refund",
+    "review_finding": "Missing",
+    "answer": "There is no return-evidence screen with camera or gallery attachments. This two-photo submission flow is not available.",
+    "sources": [
+      "backend/routes/api.php",
+      "frontend/lib/screens/order_detail_screen.dart"
+    ]
+  },
+  {
+    "id": "BUY-RATE-001",
+    "sheet": "B13 Ratings & Reviews",
+    "review_finding": "Partial",
+    "answer": "Delivered orders have a star-rating and optional feedback form. It does not accept review photos or provide the complete masked-name and variant display described here.",
+    "sources": [
+      "frontend/lib/screens/order_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-RATE-002",
+    "sheet": "B13 Ratings & Reviews",
+    "review_finding": "Gap",
+    "answer": "The screen offers rating for delivered orders, but the API does not require delivery or completion before saving a review. Owning the order and its product is enough for that request.",
+    "sources": [
+      "frontend/lib/screens/order_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-RATE-003",
+    "sheet": "B13 Ratings & Reviews",
+    "review_finding": "Gap",
+    "answer": "Another submission updates the same buyer, product, and order review instead of adding a duplicate. The app does not switch to an Edit-only flow or refuse the second submission.",
+    "sources": [
+      "frontend/lib/screens/order_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-RATE-004",
+    "sheet": "B13 Ratings & Reviews",
+    "review_finding": "Gap",
+    "answer": "The server accepts ratings from one to five and comments up to 2,000 characters. Review photos and the workbook's 500-character limit are not implemented.",
+    "sources": [
+      "frontend/lib/screens/order_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-RATE-005",
+    "sheet": "B13 Ratings & Reviews",
+    "review_finding": "Gap",
+    "answer": "There is no one-edit limit or 30-day review deadline. Submitting again can keep updating the existing review.",
+    "sources": [
+      "frontend/lib/screens/order_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-RATE-006",
+    "sheet": "B13 Ratings & Reviews",
+    "review_finding": "Supported",
+    "answer": "Saving a review recalculates the product's average from visible reviews and rounds it to one decimal place. Two reviews of five and one stars would give 3.0; the visible count still needs checking.",
+    "sources": [
+      "frontend/lib/screens/order_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-RATE-007",
+    "sheet": "B13 Ratings & Reviews",
+    "review_finding": "Missing",
+    "answer": "The review form has no photo picker or camera action, so the five-photo selection flow is not available.",
+    "sources": [
+      "frontend/lib/screens/order_detail_screen.dart",
+      "backend/app/Http/Controllers/Api/OrderController.php"
+    ]
+  },
+  {
+    "id": "BUY-CHAT-001",
+    "sheet": "B14 Chat & Notifs",
+    "review_finding": "Partial",
+    "answer": "Seller-linked text conversations are supported, but photos and product cards are not attached to messages. The product page's main Chat shortcut also opens the general message list.",
+    "sources": [
+      "frontend/lib/screens/chat_screen.dart",
+      "frontend/lib/screens/notifications_screen.dart",
+      "backend/app/Http/Controllers/Api/ChatController.php",
+      "backend/app/Http/Controllers/Api/NotificationController.php"
+    ]
+  },
+  {
+    "id": "BUY-CHAT-002",
+    "sheet": "B14 Chat & Notifs",
+    "review_finding": "Gap",
+    "answer": "Chat messages can contain up to 2,000 characters, so a 1,001-character message is not rejected by that rule. File attachments are not supported.",
+    "sources": [
+      "frontend/lib/screens/chat_screen.dart",
+      "frontend/lib/screens/notifications_screen.dart",
+      "backend/app/Http/Controllers/Api/ChatController.php",
+      "backend/app/Http/Controllers/Api/NotificationController.php"
+    ]
+  },
+  {
+    "id": "BUY-CHAT-003",
+    "sheet": "B14 Chat & Notifs",
+    "review_finding": "Partial",
+    "answer": "The inbox builds order notifications from the buyer's saved status history and opens the related order. Exactly one entry per external status change still needs a live integration check.",
+    "sources": [
+      "frontend/lib/screens/chat_screen.dart",
+      "frontend/lib/screens/notifications_screen.dart",
+      "backend/app/Http/Controllers/Api/ChatController.php",
+      "backend/app/Http/Controllers/Api/NotificationController.php"
+    ]
+  },
+  {
+    "id": "BUY-CHAT-004",
+    "sheet": "B14 Chat & Notifs",
+    "review_finding": "Missing",
+    "answer": "I couldn't find a flash-sale reminder or reminder subscription in this buyer app.",
+    "sources": [
+      "frontend/lib/screens/chat_screen.dart",
+      "frontend/lib/screens/notifications_screen.dart",
+      "backend/app/Http/Controllers/Api/ChatController.php",
+      "backend/app/Http/Controllers/Api/NotificationController.php"
+    ]
+  },
+  {
+    "id": "BUY-CHAT-005",
+    "sheet": "B14 Chat & Notifs",
+    "review_finding": "Supported",
+    "answer": "Opening a notification marks it read, and Mark All as Read clears the inbox's unread total. The 3-to-2-to-0 sequence still needs checking with three unread entries.",
+    "sources": [
+      "frontend/lib/screens/chat_screen.dart",
+      "frontend/lib/screens/notifications_screen.dart",
+      "backend/app/Http/Controllers/Api/ChatController.php",
+      "backend/app/Http/Controllers/Api/NotificationController.php"
+    ]
+  },
+  {
+    "id": "BUY-CHAT-006",
+    "sheet": "B14 Chat & Notifs",
+    "review_finding": "Missing",
+    "answer": "Chat has no background push-notification service or notification link that opens a conversation.",
+    "sources": [
+      "frontend/pubspec.yaml",
+      "frontend/lib/screens/chat_screen.dart"
+    ]
+  },
+  {
+    "id": "BUY-CHAT-007",
+    "sheet": "B14 Chat & Notifs",
+    "review_finding": "Partial",
+    "answer": "The in-app notification list is separate from phone push permissions. This app has no push service, so turning notifications off does not test a working push-permission flow.",
+    "sources": [
+      "frontend/lib/screens/chat_screen.dart",
+      "frontend/lib/screens/notifications_screen.dart",
+      "backend/app/Http/Controllers/Api/ChatController.php",
+      "backend/app/Http/Controllers/Api/NotificationController.php"
+    ]
+  },
+  {
+    "id": "BUY-CHAT-008",
+    "sheet": "B14 Chat & Notifs",
+    "review_finding": "Gap",
+    "answer": "Sending clears the text before the request succeeds, and a failure only shows an error. There is no saved unsent message, retry action, or automatic resend.",
+    "sources": [
+      "frontend/lib/screens/chat_screen.dart",
+      "frontend/lib/screens/notifications_screen.dart",
+      "backend/app/Http/Controllers/Api/ChatController.php",
+      "backend/app/Http/Controllers/Api/NotificationController.php"
+    ]
+  }
+]

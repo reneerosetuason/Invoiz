@@ -1,0 +1,121 @@
+{
+  "database": "invoizdb",
+  "isolation": "dedicated fictional records",
+  "run_id": "1d0dd1e4",
+  "created_ids": {
+    "users": [
+      157,
+      158,
+      159,
+      160
+    ],
+    "sellers": [
+      51,
+      52
+    ],
+    "categories": [
+      23
+    ],
+    "products": [
+      119,
+      120,
+      121,
+      122,
+      123,
+      124,
+      125
+    ],
+    "product_variants": [
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110
+    ],
+    "addresses": [
+      26,
+      27
+    ],
+    "vouchers": [
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43
+    ],
+    "carts": [
+      56,
+      57
+    ],
+    "product_images": [
+      88,
+      89,
+      90
+    ]
+  },
+  "ids": {
+    "users": {
+      "buyer1": 157,
+      "buyer2": 158,
+      "seller1": 159,
+      "seller2": 160
+    },
+    "products": {
+      "P-01": 119,
+      "P-02": 120,
+      "P-03": 121,
+      "P-04": 122,
+      "P-05": 123,
+      "P-06": 124,
+      "P-07": 125
+    },
+    "variants": {
+      "Natural-S": 103,
+      "Natural-M": 104,
+      "Natural-L": 105,
+      "Black-S": 106,
+      "Black-M": 107,
+      "Black-L": 108,
+      "Earbuds-Black": 109,
+      "Earbuds-White": 110
+    },
+    "addresses": {
+      "ADDR-1": 26,
+      "ADDR-3": 27
+    },
+    "vouchers": {
+      "MCH50": 35,
+      "MCH10": 36,
+      "RVSECRET": 37,
+      "MCHOLD": 38,
+      "MCHSOON": 39,
+      "MCHMAX": 40,
+      "PLAT100": 41,
+      "FREESHIP": 42,
+      "MCHT100": 43
+    },
+    "categories": {
+      "Women's Bags": 23,
+      "Home & Living": 3,
+      "Electronics": 2
+    }
+  },
+  "fixture_limitations": [
+    "No seller/logistics app was run.",
+    "Combined color/size options were stored in the variant fields supported by the buyer app.",
+    "Existing accounts, orders and products were not edited.",
+    "Test account emails and voucher codes have a unique suffix to avoid touching existing records."
+  ],
+  "media_folder": "C:\\Users\\LENOVO\\OneDrive\\Desktop\\Invoiz e-commerce\\Invoiz buyer acc\\backend\\storage\\app\\public\\qa_1d0dd1e4",
+  "uploaded_media": [
+    "avatars/URmHZTJXYV0h7gNrmy41yo60uaANiTfwzm06Q5Rk.jpg"
+  ],
+  "cleaned_up": true
+}

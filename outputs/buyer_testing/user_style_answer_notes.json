@@ -1,0 +1,919 @@
+[
+  {
+    "id": "BUY-VOU-001",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Vouchers can be selected or entered at checkout, but there is no voucher wallet or Claimed state.",
+    "remark": "Draft: Add claiming and a wallet if this flow is required."
+  },
+  {
+    "id": "BUY-VOU-002",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "One voucher discounts the whole cart rather than a particular store group. The checkout also does not add the shipping charge in this example.",
+    "remark": "Draft: Apply store vouchers to the correct store and include shipping separately."
+  },
+  {
+    "id": "BUY-VOU-003",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Only one voucher can be selected at a time. Store, platform, and shipping vouchers cannot be combined as in the example.",
+    "remark": "Draft: Add the agreed voucher-stacking rules."
+  },
+  {
+    "id": "BUY-VOU-004",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The voucher is rejected below its minimum spend and allowed at the minimum. The message gives the required spend rather than how much more is needed.",
+    "remark": "Draft: Add a helpful message such as Spend ₱0.01 More."
+  },
+  {
+    "id": "BUY-VOU-005",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Expired, future, exhausted, and unknown voucher codes are rejected with the same Invalid or Expired message.",
+    "remark": "Draft: Give a specific reason for each unavailable voucher."
+  },
+  {
+    "id": "BUY-VOU-006",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no per-buyer usage check, so the same buyer is not specifically blocked from reusing the voucher.",
+    "remark": "Draft: Apply the limit separately to each buyer."
+  },
+  {
+    "id": "BUY-VOU-007",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Checkout checks the minimum spend again before placing an order. The applied voucher is not automatically removed with a notice when the amount falls below the minimum.",
+    "remark": "Draft: Remove an ineligible voucher and update the total clearly."
+  },
+  {
+    "id": "BUY-VOU-008",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "A percentage voucher is capped at its maximum discount, and the discount is rounded to two decimal places.",
+    "remark": "Draft: Confirm each amount around the minimum and cap."
+  },
+  {
+    "id": "BUY-VOU-009",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Shipping is not calculated separately, and shipping vouchers are not handled as a separate discount on that fee.",
+    "remark": "Draft: Apply free shipping to the delivery fee rather than the merchandise."
+  },
+  {
+    "id": "BUY-VOU-010",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The voucher discount cannot reduce the merchandise total below zero. There is no separate shipping charge in the current total.",
+    "remark": "Draft: Keep the total non-negative and handle shipping separately."
+  },
+  {
+    "id": "BUY-VOU-011",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Voucher calculations use the current sale price, so a sale item can still qualify. The extra shipping amount in the example is not included.",
+    "remark": "Draft: Confirm the sale discount and shipping breakdown together."
+  },
+  {
+    "id": "BUY-VOU-012",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Cancelling an order does not restore the voucher's usage or return it to a voucher wallet.",
+    "remark": "Draft: Return an eligible voucher after cancellation."
+  },
+  {
+    "id": "BUY-ADDR-001",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "An address can be saved without making it the default, but the form uses typed location fields. My Addresses opens the add form instead of a saved-address list.",
+    "remark": "Draft: Show saved addresses and provide the location dropdowns described in the case."
+  },
+  {
+    "id": "BUY-ADDR-002",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Province, city, and barangay are entered manually on the address form. There is no linked Region list that clears the selections below it.",
+    "remark": "Draft: Add linked location dropdowns to avoid mismatched addresses."
+  },
+  {
+    "id": "BUY-ADDR-003",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Empty recipient, phone, street, city, province, and barangay fields are required. There is no separate Region field on this form.",
+    "remark": "Draft: Required-field checks are present, but the Region part differs from the test."
+  },
+  {
+    "id": "BUY-ADDR-004",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The address form accepts a phone number without checking the required Philippine format. Short and long numbers are not specifically blocked.",
+    "remark": "Draft: Accept only valid 09 or +63 mobile numbers."
+  },
+  {
+    "id": "BUY-ADDR-005",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no ten-address limit, so adding an eleventh address is not specifically blocked.",
+    "remark": "Draft: Add the address limit and explain it when the buyer reaches it."
+  },
+  {
+    "id": "BUY-ADDR-006",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "A new address can be marked as default, and checkout prefers it. There is no saved-address list for changing an existing address to default.",
+    "remark": "Draft: Let buyers choose the default from their saved addresses."
+  },
+  {
+    "id": "BUY-ADDR-007",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The app has no delete option in a saved-address list. The address-delete action also does not require choosing a new default first.",
+    "remark": "Draft: Keep one default address and make address management available."
+  },
+  {
+    "id": "BUY-ADDR-008",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Existing orders refer to the saved address, so changing that address can change the order's address details too.",
+    "remark": "Draft: Keep the original delivery address with each order."
+  },
+  {
+    "id": "BUY-ADDR-009",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Address changes are restricted to the signed-in buyer's own addresses. Another buyer's address is not included in that lookup.",
+    "remark": "Draft: Confirm with two test accounts before marking it passed."
+  },
+  {
+    "id": "BUY-ADDR-010",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no Use My Location option on the address form. The buyer needs to enter the address manually.",
+    "remark": "Not supported."
+  },
+  {
+    "id": "BUY-ADDR-011",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Phone is set up for a phone keyboard, while recipient and street use text input. Reaching Save with the phone keyboard open still needs checking.",
+    "remark": "Draft: Check the keyboard and Save button on a phone."
+  },
+  {
+    "id": "BUY-CART-001",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Adding the same product and variation again increases the quantity on the existing cart line.",
+    "remark": "Draft: Confirm three units produce one line and the expected subtotal."
+  },
+  {
+    "id": "BUY-CART-002",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Different variations of the same product stay on separate cart lines with their own prices.",
+    "remark": "Draft: Confirm both selected variations and amounts in the cart."
+  },
+  {
+    "id": "BUY-CART-003",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Items are shown in one list instead of being grouped under their store names.",
+    "remark": "Draft: Group items by store to make the cart easier to review."
+  },
+  {
+    "id": "BUY-CART-004",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Selecting and deselecting changes the subtotal shown in the cart. Checkout still loads the whole cart, including unselected items.",
+    "remark": "Draft: Send only the selected items to checkout."
+  },
+  {
+    "id": "BUY-CART-005",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Quantity cannot go below one, and an amount above the available stock is rejected.",
+    "remark": "Draft: Confirm the one- and twenty-unit boundaries with the prepared stock."
+  },
+  {
+    "id": "BUY-CART-006",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The cart uses the current selling price when it is loaded again. A changed price is reflected after reloading the cart.",
+    "remark": "Draft: Confirm the price and subtotal both change to the new amount."
+  },
+  {
+    "id": "BUY-CART-007",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Unavailable items are not clearly disabled for selection. A stock problem in one item can also stop checkout for the rest of the cart.",
+    "remark": "Draft: Mark unavailable items and let the buyer check out the available ones."
+  },
+  {
+    "id": "BUY-CART-008",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The cart belongs to the buyer account and is kept after signing out. Loading the same cart on a second device still needs checking.",
+    "remark": "Draft: Confirm the same quantities appear after login on both devices."
+  },
+  {
+    "id": "BUY-CART-009",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Removing an item deletes its cart line and reloads the remaining items and subtotal.",
+    "remark": "Draft: Confirm the removed line stays gone when the cart is reopened."
+  },
+  {
+    "id": "BUY-CART-010",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Cart updates and removals are limited to items in the signed-in buyer's own cart.",
+    "remark": "Draft: Confirm another buyer's item cannot be changed through a direct request."
+  },
+  {
+    "id": "BUY-CART-011",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The displayed quantity changes after a successful save rather than immediately. Failed updates show an error, but reconnecting still needs checking.",
+    "remark": "Draft: Confirm the displayed quantity matches what was actually saved."
+  },
+  {
+    "id": "BUY-CART-012",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The bottom cart badge counts item lines rather than individual units. It loads when the bottom menu is created, so immediate changes are not guaranteed.",
+    "remark": "Draft: Keep the badge updated after each add or removal."
+  },
+  {
+    "id": "BUY-ACCT-001",
+    "status": "Fail",
+    "basis": "observed in Chrome before testing was stopped",
+    "actual": "The new name and photo stayed saved after signing in again, but the account details did not refresh straight after saving. The bottom menu also partly covered Save.",
+    "remark": "Refresh the account details after saving and keep Save visible."
+  },
+  {
+    "id": "BUY-ACCT-002",
+    "status": "Fail",
+    "basis": "observed in Chrome before testing was stopped",
+    "actual": "An empty first name was rejected, but Juan123 and a one-letter name were still accepted.",
+    "remark": "Reject names containing numbers and add a minimum name length."
+  },
+  {
+    "id": "BUY-ACCT-003",
+    "status": "Pass",
+    "basis": "observed in Chrome before testing was stopped",
+    "actual": "The password changed successfully. The old password was rejected, and the new password worked when signing in again.",
+    "remark": "Worked."
+  },
+  {
+    "id": "BUY-ACCT-004",
+    "status": "Fail",
+    "basis": "observed in Chrome before testing was stopped",
+    "actual": "The password-change form did not ask for the current password before saving a new one.",
+    "remark": "Require the current password before allowing a change."
+  },
+  {
+    "id": "BUY-ACCT-005",
+    "status": "Fail",
+    "basis": "observed in Chrome before testing was stopped",
+    "actual": "A short password was rejected, but a password with no uppercase letter was accepted.",
+    "remark": "Apply all password rules, not just the minimum length."
+  },
+  {
+    "id": "BUY-ACCT-006",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no option to change the email address on the profile screen, so the new-email verification step is unavailable.",
+    "remark": "Draft: Add an email-change option with verification."
+  },
+  {
+    "id": "BUY-ACCT-007",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no email-change verification screen for entering a wrong or expired code.",
+    "remark": "Draft: This depends on having an email-change feature first."
+  },
+  {
+    "id": "BUY-ACCT-008",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The profile does not offer email editing, so a duplicate replacement email cannot be submitted through this screen.",
+    "remark": "Draft: Check for duplicate emails when email editing is added."
+  },
+  {
+    "id": "BUY-ACCT-009",
+    "status": "Fail",
+    "basis": "observed in Chrome before testing was stopped",
+    "actual": "A short phone number and another buyer's phone number were both saved without verification.",
+    "remark": "Reject invalid or duplicate numbers and verify a new number before saving it."
+  },
+  {
+    "id": "BUY-ACCT-010",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The profile photo picker supports selecting an image. Taking a photo and handling denied camera access still need checking on a phone.",
+    "remark": "Draft: A phone is needed to check the camera and permission messages."
+  },
+  {
+    "id": "BUY-ACCT-011",
+    "status": "Fail",
+    "basis": "observed in Chrome before testing was stopped",
+    "actual": "Another signed-in session stayed active after the password was changed.",
+    "remark": "Sign out the other sessions when the password changes; phone behaviour still needs checking."
+  },
+  {
+    "id": "BUY-ACCT-012",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Sign-in is remembered, and logging out returns to the login screen. Force-closing the phone app and using the phone's Back button still need checking.",
+    "remark": "Draft: Confirm this on a phone before marking it passed."
+  },
+  {
+    "id": "BUY-CHAT-001",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The app supports text conversations with a seller, but not photo attachments or a product card in the conversation. The main product Chat shortcut opens the message list.",
+    "remark": "Draft: Open the correct seller conversation and include the product and photo."
+  },
+  {
+    "id": "BUY-CHAT-002",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Messages allow up to 2,000 characters, so a 1,001-character message is not blocked by the stated limit. Attachments are unavailable.",
+    "remark": "Draft: Apply the agreed message limit and add safe attachment checks."
+  },
+  {
+    "id": "BUY-CHAT-003",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The notification inbox shows order-history updates and can open the related order. Exactly one notification per change still needs checking.",
+    "remark": "Draft: Confirm the count and destination for each order update."
+  },
+  {
+    "id": "BUY-CHAT-004",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no flash-sale reminder option or notification linked to the upcoming sale.",
+    "remark": "Draft: Add reminders if scheduled flash sales are required."
+  },
+  {
+    "id": "BUY-CHAT-005",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Opening a notification marks it read, and Mark All as Read clears the unread total.",
+    "remark": "Draft: Confirm the three-to-two-to-zero sequence with three unread updates."
+  },
+  {
+    "id": "BUY-CHAT-006",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Chat messages do not generate a phone push notification that opens the conversation.",
+    "remark": "Draft: Add background message notifications and a direct conversation link."
+  },
+  {
+    "id": "BUY-CHAT-007",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The in-app inbox is separate from phone notification settings, but phone push notifications are not available in this version.",
+    "remark": "Draft: Check permission behaviour after push notifications are added."
+  },
+  {
+    "id": "BUY-CHAT-008",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The message text is cleared before sending finishes. A failed send shows an error without keeping an unsent message or offering Retry.",
+    "remark": "Draft: Keep failed messages available for retry so buyers do not lose their text."
+  },
+  {
+    "id": "BUY-RATE-001",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Delivered orders can be rated with stars and a written comment. Review photos, masked names, and the full variation display are not provided as described.",
+    "remark": "Draft: Complete the review details and photo attachments."
+  },
+  {
+    "id": "BUY-RATE-002",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The rating button is shown for delivered orders, but a direct rating submission is not restricted to completed or delivered orders.",
+    "remark": "Draft: Enforce review eligibility even when the button is bypassed."
+  },
+  {
+    "id": "BUY-RATE-003",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Submitting another review updates the existing review instead of creating a second one. The screen does not switch to an Edit-only option.",
+    "remark": "Draft: Show the existing review and provide Edit instead of another new submission."
+  },
+  {
+    "id": "BUY-RATE-004",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Ratings are limited to one through five stars, but comments allow 2,000 characters rather than 500. Review photos are unavailable.",
+    "remark": "Draft: Apply the agreed text and photo limits."
+  },
+  {
+    "id": "BUY-RATE-005",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no one-edit limit or thirty-day deadline on changing a review.",
+    "remark": "Draft: Limit edits and stop changes after the agreed window."
+  },
+  {
+    "id": "BUY-RATE-006",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The product's average rating is recalculated from visible reviews. A five-star and a one-star review would give an average of 3.0.",
+    "remark": "Draft: Confirm both the average and review count on the product and search listing."
+  },
+  {
+    "id": "BUY-RATE-007",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no camera or multi-photo selection option in the review form.",
+    "remark": "Draft: Add review photos and enforce the five-photo limit."
+  },
+  {
+    "id": "BUY-RET-001",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no Return/Refund option for submitting a damaged-item request with photos.",
+    "remark": "Draft: Add the return-request form and its order status."
+  },
+  {
+    "id": "BUY-RET-002",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Returns are unavailable before delivery and after delivery, so the intended delivery-based restriction cannot be checked.",
+    "remark": "Draft: This depends on having a working return-request feature."
+  },
+  {
+    "id": "BUY-RET-003",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no return-request window, so the seven-day boundary cannot be checked.",
+    "remark": "Draft: Add the return window before checking its limits."
+  },
+  {
+    "id": "BUY-RET-004",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no return form for entering a description or attaching evidence.",
+    "remark": "Draft: Add the required description and photo checks with the return feature."
+  },
+  {
+    "id": "BUY-RET-005",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Return-request status, rejection reasons, and an Escalate option are not available.",
+    "remark": "Draft: Let the buyer follow the request and respond to a rejection."
+  },
+  {
+    "id": "BUY-RET-006",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no return-evidence picker for taking or selecting photos.",
+    "remark": "Draft: Add evidence uploads, then check camera and gallery behaviour on a phone."
+  },
+  {
+    "id": "BUY-CAN-001",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "A pending or confirmed order can be cancelled after a confirmation message. A reason is not collected, and stock restoration differs for variation purchases.",
+    "remark": "Draft: Collect the reason and restore stock to the exact variation bought."
+  },
+  {
+    "id": "BUY-CAN-002",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Cancellation only asks for confirmation and does not require a reason.",
+    "remark": "Draft: Ask the buyer to choose a reason before cancelling."
+  },
+  {
+    "id": "BUY-CAN-003",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Prepaid orders and automatic refunds are not available. Cancelling also does not restore the voucher's usage.",
+    "remark": "Draft: Add the refund and voucher-return flow for prepaid cancellations."
+  },
+  {
+    "id": "BUY-CAN-004",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Cancel is offered only for pending and confirmed orders. The Ready for Pickup step still needs checking against the seller's order flow.",
+    "remark": "Draft: Confirm cancellation is unavailable once pickup preparation reaches the agreed cutoff."
+  },
+  {
+    "id": "BUY-CAN-005",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Cancel is hidden after the order leaves pending or confirmed, and later cancellation requests are rejected.",
+    "remark": "Draft: Confirm both the screen and a direct request reject cancellation after shipping."
+  },
+  {
+    "id": "BUY-CAN-006",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "A repeat cancellation is rejected after the order is already cancelled. Simultaneous taps still need checking to confirm stock is restored only once.",
+    "remark": "Draft: Confirm one cancellation and one stock restoration."
+  },
+  {
+    "id": "BUY-SRCH-001",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Opening a category filters the listing to active products in that category. The basket should appear when its test record is available.",
+    "remark": "Draft: Confirm the complete result list using the prepared test products."
+  },
+  {
+    "id": "BUY-SRCH-002",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The store page has products, search, sorting, and reviews, but no Home Decor or Lamps category tree.",
+    "remark": "Draft: Add store categories so buyers can browse by subcategory."
+  },
+  {
+    "id": "BUY-SRCH-003",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Search supports full names and partial words, ignores spaces at either end, and treats uppercase and lowercase searches alike.",
+    "remark": "Draft: Confirm all four searches return the basket."
+  },
+  {
+    "id": "BUY-SRCH-004",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "An unmatched search shows a no-results message. The misspelled search does not offer a corrected spelling or suggestion.",
+    "remark": "Draft: Add a useful suggestion when the search contains a typo."
+  },
+  {
+    "id": "BUY-SRCH-005",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Search text is treated as text, but a percent sign can match many products instead of being treated literally.",
+    "remark": "Draft: Handle special search characters without broadening the results unexpectedly."
+  },
+  {
+    "id": "BUY-SRCH-006",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Searching with an empty box or spaces returns the normal product list.",
+    "remark": "Draft: The planned behaviour matches; confirm it in the running app."
+  },
+  {
+    "id": "BUY-SRCH-007",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is an Under ₱500 shortcut, but no minimum-and-maximum price range to enter the listed amounts.",
+    "remark": "Draft: Add a price-range filter and reject invalid ranges."
+  },
+  {
+    "id": "BUY-SRCH-008",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The available shortcuts do not combine rating, category, and seller location as required in this case.",
+    "remark": "Draft: Keep all selected filters active together and clear them individually."
+  },
+  {
+    "id": "BUY-SRCH-009",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Price and rating sorting are available, but there is no best-selling sort or control to keep loading more results.",
+    "remark": "Draft: Complete the sort options and make the remaining products accessible."
+  },
+  {
+    "id": "BUY-SRCH-010",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Inactive and draft products are excluded from the normal listing and product details. Deleted-product links still need checking with prepared test records.",
+    "remark": "Draft: Confirm unavailable links show a clear message without exposing the product."
+  },
+  {
+    "id": "BUY-SRCH-011",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The buyer screens do not show an On Vacation notice or a purchase block for a vacation store.",
+    "remark": "Draft: Tell buyers when a store is away and block purchases as required."
+  },
+  {
+    "id": "BUY-SRCH-012",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The keyboard Search action runs the search. Pulling to refresh on Home reloads the general listing rather than keeping the same search results.",
+    "remark": "Draft: Keep the search term and filters when refreshing."
+  },
+  {
+    "id": "BUY-SRCH-013",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "A failed search shows an error, but there is no dedicated offline message with a Retry button. Reconnecting and searching again still need checking.",
+    "remark": "Draft: Make the connection problem clear and provide an easy retry."
+  },
+  {
+    "id": "BUY-CHK-001",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Checkout combines the cart into one order with one voucher. It does not create separate store orders or include the shipping breakdown in the worked example.",
+    "remark": "Draft: Split orders by store and show the full discount and shipping breakdown."
+  },
+  {
+    "id": "BUY-CHK-002",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Changing the delivery address does not add or update a shipping fee.",
+    "remark": "Draft: Recalculate shipping for the selected address and store."
+  },
+  {
+    "id": "BUY-CHK-003",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no shipping calculation based on the parcel's weight, so the one-kilogram boundary is not applied.",
+    "remark": "Draft: Calculate delivery fees using the agreed weight brackets."
+  },
+  {
+    "id": "BUY-CHK-004",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Checkout checks that the address belongs to the buyer but does not block an area that delivery services cannot cover.",
+    "remark": "Draft: Check delivery coverage before allowing an order."
+  },
+  {
+    "id": "BUY-CHK-005",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no Note to Seller field on the checkout screen. The order-note allowance also differs from the 200-character rule.",
+    "remark": "Draft: Add the note field with the agreed character limit."
+  },
+  {
+    "id": "BUY-CHK-006",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Cash on Delivery is already selected, so there is no blank payment selection through the checkout screen. A request without a payment method is rejected.",
+    "remark": "Draft: The payment method is required, but the screen uses a default selection."
+  },
+  {
+    "id": "BUY-CHK-007",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Place Order is disabled while an order is being submitted. Repeated or simultaneous submissions still need checking to confirm only one order is saved.",
+    "remark": "Draft: Confirm one order and one stock deduction after repeated taps."
+  },
+  {
+    "id": "BUY-CHK-008",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "A changed price is used when the order is placed, but the buyer is not asked to confirm the new amount first.",
+    "remark": "Draft: Show the new price and ask the buyer to confirm before placing the order."
+  },
+  {
+    "id": "BUY-CHK-009",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Stock is checked again before an order is placed. Two buyers ordering at the same moment still need checking.",
+    "remark": "Draft: Confirm the last unit cannot be sold twice."
+  },
+  {
+    "id": "BUY-CHK-010",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "An invalidated voucher stops the order with an error, but the voucher and displayed total are not automatically refreshed.",
+    "remark": "Draft: Remove the invalid voucher and show the corrected total."
+  },
+  {
+    "id": "BUY-CHK-011",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Checkout uses the real product prices rather than accepting a replacement total supplied in the order request.",
+    "remark": "Draft: Confirm a changed request cannot alter the amount charged."
+  },
+  {
+    "id": "BUY-CHK-012",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "A connection error is shown if the request fails. The app does not check whether the order was already saved before offering another attempt.",
+    "remark": "Draft: Recover the existing order after a lost response and avoid duplicates."
+  },
+  {
+    "id": "BUY-CHK-013",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Checkout selections stay with the open screen. Interruptions, app switching, and reopening after the phone closes the app still need checking.",
+    "remark": "Draft: Check this on a phone with an address and voucher selected."
+  },
+  {
+    "id": "BUY-WISH-001",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "A signed-in buyer can save a product to Favorites and remove it again. The heart changes with the saved state returned by that action.",
+    "remark": "Draft: Confirm the Favorites list and reopened product stay in sync."
+  },
+  {
+    "id": "BUY-WISH-002",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Favorites is limited to one saved entry for each buyer and product. Rapid taps and the final heart state still need checking.",
+    "remark": "Draft: Prevent repeated taps from leaving the heart in the wrong state."
+  },
+  {
+    "id": "BUY-WISH-003",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Favorites does not provide the Sold Out and Unavailable placeholders described in this test.",
+    "remark": "Draft: Keep unavailable items understandable without breaking the list."
+  },
+  {
+    "id": "BUY-WISH-004",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Following and unfollowing changes the store's follower count. There is no separate Following list to check.",
+    "remark": "Draft: Add a list of followed stores and keep it in sync."
+  },
+  {
+    "id": "BUY-WISH-005",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Saving a favorite and following a store require the buyer to sign in first.",
+    "remark": "Draft: Confirm both guest actions return to login without saving anything."
+  },
+  {
+    "id": "BUY-TRK-001",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The order tabs are All, To Ship, In Transit, Delivered, and Cancelled. To Pay, Completed, and Return/Refund are not available.",
+    "remark": "Draft: Match the order tabs to the agreed order flow."
+  },
+  {
+    "id": "BUY-TRK-002",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Order details show saved status updates and a basic progress display. The complete hub-to-hub timeline still needs updates from the seller and delivery roles.",
+    "remark": "Draft: Confirm every event using the connected delivery workflow."
+  },
+  {
+    "id": "BUY-TRK-003",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no Order Received button to move a delivered order to Completed.",
+    "remark": "Draft: Add buyer confirmation and the corresponding completion step."
+  },
+  {
+    "id": "BUY-TRK-004",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Order Received is unavailable before delivery, but it is also unavailable after delivery.",
+    "remark": "Draft: The intended delivery-based eligibility rule is not complete."
+  },
+  {
+    "id": "BUY-TRK-005",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no seven-day automatic completion step for delivered orders.",
+    "remark": "Draft: Add completion after the agreed delivery window."
+  },
+  {
+    "id": "BUY-TRK-006",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Order details are limited to orders belonging to the signed-in buyer. Another buyer's order is not included in that lookup.",
+    "remark": "Draft: Confirm access is refused with two separate test accounts."
+  },
+  {
+    "id": "BUY-TRK-007",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Order updates can appear in the in-app inbox, but there is no phone push notification that opens the related order.",
+    "remark": "Draft: Add push notifications and the matching order link."
+  },
+  {
+    "id": "BUY-PAY-001",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "A COD order starts under To Ship with payment still pending. The example's ₱500 total differs because checkout does not add the shipping charge.",
+    "remark": "Draft: Show the correct delivery-inclusive COD amount."
+  },
+  {
+    "id": "BUY-PAY-002",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Cash on Delivery is the only payment option. There is no e-wallet or card payment screen.",
+    "remark": "Draft: Online payments are not available in this version."
+  },
+  {
+    "id": "BUY-PAY-003",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no online-payment failure screen or Pay Again option.",
+    "remark": "Draft: This depends on adding an online payment method."
+  },
+  {
+    "id": "BUY-PAY-004",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Checkout does not open a payment gateway, so there is no gateway-cancellation flow.",
+    "remark": "Draft: This flow is unavailable without online payments."
+  },
+  {
+    "id": "BUY-PAY-005",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no gateway payment or payment-reference update to check after closing the app.",
+    "remark": "Draft: This depends on adding the online payment flow first."
+  },
+  {
+    "id": "BUY-PAY-006",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no automatic cancellation for an unpaid online order.",
+    "remark": "Draft: Add the unpaid-order deadline if online payments are introduced."
+  },
+  {
+    "id": "BUY-PAY-007",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no one-hour payment window or Pay action for an unpaid online order.",
+    "remark": "Draft: The fifty-nine- and sixty-one-minute cases cannot be completed in this version."
+  },
+  {
+    "id": "BUY-PAY-008",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The app does not open an e-wallet or return from an e-wallet payment.",
+    "remark": "Draft: This requires an online payment method and a phone check."
+  },
+  {
+    "id": "BUY-PAY-009",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no online-payment processing screen to leave with Back.",
+    "remark": "Draft: Add payment recovery and Back handling when this flow is available."
+  },
+  {
+    "id": "BUY-PDP-001",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "An item can be added without choosing a variation. The page also keeps only one selected option instead of requiring both colour and size.",
+    "remark": "Draft: Require every variation choice before adding or buying the item."
+  },
+  {
+    "id": "BUY-PDP-002",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Selecting a variation changes the displayed price. The available-stock text and photo do not change with that selection.",
+    "remark": "Draft: Show the selected variation's own stock and image."
+  },
+  {
+    "id": "BUY-PDP-003",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "An out-of-stock variation can still be selected. The stock warning comes when the buyer tries to add it to the cart.",
+    "remark": "Draft: Disable sold-out choices before the buyer tries to add them."
+  },
+  {
+    "id": "BUY-PDP-004",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The quantity starts at one, and adding more than the available stock is rejected. Quantity is changed with buttons rather than a typing field.",
+    "remark": "Draft: Confirm the listed boundaries; variation limits also need checking."
+  },
+  {
+    "id": "BUY-PDP-005",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no purchase limit that remembers how many units the buyer already bought in earlier orders.",
+    "remark": "Draft: Enforce the per-buyer limit across separate orders."
+  },
+  {
+    "id": "BUY-PDP-006",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The product page does not show a flash-sale countdown, remaining flash units, or a Claim button for the voucher.",
+    "remark": "Draft: Show the sale details buyers need before purchasing."
+  },
+  {
+    "id": "BUY-PDP-007",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "Buy Now adds the product to the existing cart and opens that cart. Other items already in the cart are still included.",
+    "remark": "Draft: Open checkout for only the item chosen with Buy Now."
+  },
+  {
+    "id": "BUY-PDP-008",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "An unavailable product has a Product Not Found state, and inactive products are not returned as available items.",
+    "remark": "Draft: Confirm the deleted and inactive links both reach this state."
+  },
+  {
+    "id": "BUY-PDP-009",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "The gallery supports swiping, a position indicator, and a larger zoomable view. Gesture behaviour and keeping the variation selected still need checking.",
+    "remark": "Draft: Confirm swiping and zooming on a phone."
+  },
+  {
+    "id": "BUY-PDP-010",
+    "status": "Not Run",
+    "basis": "draft assessment, not executed",
+    "actual": "There is no Share action on the product page or a product-link opening flow for another phone.",
+    "remark": "Draft: Add sharing and open the correct product from the shared link."
+  }
+]
